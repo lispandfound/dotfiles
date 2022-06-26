@@ -1,0 +1,23 @@
+;; -*- mode: Lisp -*-
+#-quicklisp
+(let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp"
+                                       (user-homedir-pathname))))
+  (when (probe-file quicklisp-init)
+    (load quicklisp-init)))
+
+(ql:quickload "slynk")
+(in-package :stumpwm)
+(require 'slynk)
+(slynk:create-server :port 4004)
+
+(if (equal (machine-instance) "galois")
+    (run-shell-command "xrandr --output DP-0 --primary --output DVI-D-0 --right-of DP-0 --rotate left"))
+
+(run-shell-command "setxkbmap -option ctrl:nocaps")
+
+(run-shell-command "JAVA_TOOL_OPTIONS=\"-Djava.awt.headless=true\" davmail &")
+(set-prefix-key (kbd "C-'"))
+(which-key-mode)
+
+(setq *shell-program* "/bin/bash")
+(setf (getenv "GDK_CORE_DEVICE_EVENTS") "1")
