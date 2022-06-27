@@ -76,12 +76,12 @@
     (add-to-list 'cdlatex-env-alist (list environment (format "\\begin{%s}\nAUTOLABEL\n?\n\\end{%s}" environment environment) nil))
     (add-to-list 'cdlatex-command-alist (list shortcut (format "Insert %s env" environment) "" 'cdlatex-environment (list environment) t nil)))
   (defun jake/cdlatex-hook ()
-
-    (cdlatex-mode)
     ;; Fixing #35 on github, cdlatex-takeover-parenthesis doesn't work...
     (unbind-key "(" cdlatex-mode-map)
     (unbind-key "{" cdlatex-mode-map)
     (unbind-key "[" cdlatex-mode-map))
+  (add-to-list 'safe-local-variable-values
+               '(TeX-command-extra-options . "-shell-escape"))
   (map! :map cdlatex-mode-map
         "TAB" #'cdlatex-tab)
   (add-hook 'LaTeX-mode-hook 'jake/cdlatex-hook)
@@ -136,8 +136,14 @@
                       nil)
   (setq +mu4e-gmail-accounts '(("jakefaulkn@gmail.com" . "/gmail"))))
 
+(after! embark
+  (map! "s-<return>" #'embark-act))
 
+(after! citar
+  (setq! citar-bibliography '("~/Sync/bibliography/bibliography.bib")
+        citar-library-paths '("~/Sync/bibliography/pdfs")))
 
+(setq-default cursor-type 'bar)
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
