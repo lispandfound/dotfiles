@@ -95,6 +95,7 @@
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
         org-directory "~/Sync"
+        org-pretty-entities t
         org-hide-emphasis-markers t
         org-roam-directory "~/Sync/org-roam"))
 
@@ -121,7 +122,6 @@
                       t)
 
   (set-email-account! "gmail"
-
                       '((mu4e-sent-folder       . "/gmail/sent")
                         (mu4e-drafts-folder     . "/gmail/drafts")
                         (mu4e-trash-folder      . "/gmail/trash")
@@ -136,15 +136,45 @@
                       nil)
   (setq +mu4e-gmail-accounts '(("jakefaulkn@gmail.com" . "/gmail"))))
 
-(after! embark
-  (map! "s-<return>" #'embark-act))
+
+(map! "s-<return>" #'embark-act)
 
 (after! citar
   (setq! citar-bibliography '("~/Sync/bibliography/bibliography.bib")
         citar-library-paths '("~/Sync/bibliography/pdfs")))
 
+
+(use-package gap
+  :mode (("\\.g\\'" . gap-mode)
+         ("\\.gap\\'" . gap-mode))
+  :init
+  (setq gap-executable "/usr/bin/gap"
+        gap-start-options '("-f" "-b" "-m" "2m" "-E")
+        gap-electric-semicolon nil
+        gap-electric-equals nil))
+
+
 (setq-default cursor-type 'bar)
 
+(after! citar
+  (setq citar-notes-paths '("~/Sync/org-roam") ))
+(use-package! org-roam-bibtex
+  :when (featurep! :lang org +roam2)
+  :after org-roam
+  :preface
+  ;; if the user has not set a template mechanism set a reasonable one of them
+  ;; The package already tests for nil itself so we define a dummy tester
+  (defvar orb-preformat-keywords
+    '("title" "url" "file" "author-or-editor" "keywords" "citekey" "pdf"))
+  ;;:hook (org-roam-mode . org-roam-bibtex-mode)
+  :custom
+  (orb-note-actions-interface 'default)
+  :init
+  (setq bibtex-completion-bibliography "~/Sync/bibliography/bibliography.bib")
+  :config
+  (setq orb-insert-interface 'generic)
+  (setq orb-process-file-keyword t
+        orb-file-field-extensions '("pdf")))
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
