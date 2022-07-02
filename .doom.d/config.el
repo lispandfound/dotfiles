@@ -90,6 +90,9 @@
   (dolist (kv '(("theorem" "thm") ("definition" "def") ("corollary" "cor") ("lemma" "lem")))
     (add-labelled-env (car kv) (cadr kv))))
 
+
+(add-hook! org-mode #'org-appear-mode)
+
 (after! org
   (setq org-agenda-files '("~/Sync/todo.org")
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
