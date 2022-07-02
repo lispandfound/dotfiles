@@ -175,6 +175,15 @@
   (setq orb-insert-interface 'generic)
   (setq orb-process-file-keyword t
         orb-file-field-extensions '("pdf")))
+
+(defun jake/share-this-file ()
+  (interactive)
+  (let* ((fp (buffer-file-name (current-buffer)))
+         (command (format "woof %s" fp))
+         (proc (start-process-shell-command "woof" (get-buffer-create "*woof*") command)))
+    (set-process-filter proc (lambda (proc line)
+                               (when (string-match "Now serving on \\(.*\\)" line)
+                                 (message line))))))
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
