@@ -84,7 +84,8 @@
                '(TeX-command-extra-options . "-shell-escape"))
   (map! :map cdlatex-mode-map
         "TAB" #'cdlatex-tab)
-  (add-hook 'LaTeX-mode-hook 'jake/cdlatex-hook)
+  (add-hook! LaTeX-mode #'jake/cdlatex-hook #'+word-wrap-mode)
+
   (setq cdlatex-use-dollar-to-ensure-math nil)
   (add-to-list 'cdlatex-math-modify-alist '(115 "\\mathbb" nil t nil nil))
   (dolist (kv '(("theorem" "thm") ("definition" "def") ("corollary" "cor") ("lemma" "lem")))
