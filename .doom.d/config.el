@@ -157,13 +157,21 @@
   (setq gap-executable "/usr/bin/gap"
         gap-start-options '("-f" "-b" "-m" "2m" "-E")
         gap-electric-semicolon nil
-        gap-electric-equals nil))
+        gap-electric-equals nil)
+  (defun +gap-open-repl ()
+    (interactive)
+    (unless (gap-running-p)
+      (gap))
+    (pop-to-buffer gap-process-buffer))
+  (set-repl-handler! 'gap-mode #'+gap-open-repl)
+  (set-popup-rule! "^\\*GAP Help\\*" :size 0.3))
+
 
 
 (setq-default cursor-type 'bar)
 
 (after! citar
-  (setq citar-notes-paths '("~/Sync/org-roam") ))
+  (setq citar-notes-paths '("~/Sync/org-roam")))
 (use-package! org-roam-bibtex
   :when (featurep! :lang org +roam2)
   :after org-roam
