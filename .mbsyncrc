@@ -1,11 +1,14 @@
 IMAPAccount uni
 # Address to connect to
-Host localhost
+Host outlook.office365.com
 User jaf150@uclive.ac.nz
-Port 1143
-Pass "gpg --quiet --for-your-eyes-only --no-tty --decrypt secrets/uni.gpg"
-SSLType none
-AuthMechs LOGIN
+Port 993
+PassCmd oauth2ms
+AuthMechs XOAUTH2
+SSLType IMAPS
+SSLVersions TLSv1.2
+
+
 # To store the password in an encrypted file use PassCmd instead of Pass
 # PassCmd "gpg2 -q --for-your-eyes-only --no-tty -d ~/.mailpass.gpg"
 #
@@ -32,7 +35,7 @@ Near :uni-local:
 IMAPAccount gmail
 Host imap.gmail.com
 User jakefaulkn@gmail.com
-PassCmd "gpg --quiet --for-your-eyes-only --no-tty --decrypt secrets/gmail.gpg"
+PassCmd "gpg --quiet --for-your-eyes-only --no-tty --decrypt ~/.dotfiles/secrets/gmail.gpg"
 AuthMechs LOGIN
 SSLType IMAPS
 CertificateFile /etc/ssl/certs/ca-certificates.crt
