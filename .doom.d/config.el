@@ -92,7 +92,7 @@
     (add-labelled-env (car kv) (cadr kv))))
 
 
-(add-hook! org-mode #'org-appear-mode)
+(add-hook! org-mode #'org-appear-mode #'+word-wrap-mode)
 
 (after! org
   (setq org-agenda-files '("~/Sync/todo.org")
@@ -158,6 +158,8 @@
         gap-start-options '("-f" "-b" "-m" "2m" "-E")
         gap-electric-semicolon nil
         gap-electric-equals nil)
+
+  (set-docsets! 'gap-mode "gap" "fining")
   (defun +gap-open-repl ()
     (interactive)
     (unless (gap-running-p)
@@ -165,8 +167,19 @@
     (pop-to-buffer gap-process-buffer))
   (set-repl-handler! 'gap-mode #'+gap-open-repl)
   (set-popup-rule! "^\\*GAP Help\\*" :size 0.3))
-
-
+(use-package maxima
+  :defer t)
+(after! biblio
+  (setq biblio-crossref-user-email-address "jake.faulkner@pg.canterbury.ac.nz")
+  (defun biblio-url-retrieve (url callback)
+  "Wrapper around `url-queue-retrieve'.
+URL and CALLBACK; see `url-queue-retrieve'"
+  (message "Fetching %s" url)
+  (if biblio-synchronous
+      (with-current-buffer (url-retrieve-synchronously url)
+        (funcall callback nil))
+    (setq url-queue-timeout 5)
+    (url-queue-retrieve url callback))))
 
 (setq-default cursor-type 'bar)
 
@@ -192,12 +205,24 @@
 
 (defun jake/share-this-file ()
   (interactive)
-  (let* ((fp (buffer-file-name (current-buffer)))
+  (let* ((fp (read-file-name "File to share: " (buffer-file-name (current-buffer))))
          (command (format "woof %s" fp))
          (proc (start-process-shell-command "woof" (get-buffer-create "*woof*") command)))
     (set-process-filter proc (lambda (proc line)
                                (when (string-match "Now serving on \\(.*\\)" line)
                                  (message line))))))
+
+
+(add-hook 'after-init-hook #'repeat-mode)
+
+
+
+
+
+
+
+
+
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
@@ -209,7 +234,7 @@
 ;;   - Setting file/directory variables (like `org-directory')
 ;;   - Setting variables which explicitly tell you to set them before their
 ;;     package is loaded (see 'C-h v VARIABLE' to look up their documentation).
-;;   - Setting doom variables (which start with 'doom-' or '+').
+;;   - Setting variables (which start with 'doom-' or '+').
 ;;
 ;; Here are some additional functions/macros that will help you configure Doom.
 ;;
