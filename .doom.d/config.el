@@ -99,6 +99,7 @@
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
         org-directory "~/Sync"
+        org-todo-keywords '((sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)"))
         org-pretty-entities t
         org-hide-emphasis-markers t
         org-roam-directory "~/Sync/org-roam")
@@ -213,16 +214,11 @@ URL and CALLBACK; see `url-queue-retrieve'"
                                (when (string-match "Now serving on \\(.*\\)" line)
                                  (message line))))))
 
+(after! avy
+  (setq avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
+
 
 (add-hook 'after-init-hook #'repeat-mode)
-
-
-
-
-
-
-
-
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
