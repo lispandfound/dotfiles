@@ -99,11 +99,10 @@
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
         org-directory "~/Sync"
+        org-todo-keywords '((sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)"))
         org-pretty-entities t
         org-hide-emphasis-markers t
         org-roam-directory "~/Sync/org-roam"))
-
-
 (global-set-key (kbd "M-/") 'hippie-expand)
 
 (setq-default abbrev-mode t)
