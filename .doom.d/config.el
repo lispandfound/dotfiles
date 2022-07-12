@@ -42,7 +42,7 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/Sync/")
+
 
 (after! LaTeX
   (setq TeX-auto-save t
@@ -92,7 +92,7 @@
     (add-labelled-env (car kv) (cadr kv))))
 
 
-(add-hook! org-mode #'org-appear-mode #'+word-wrap-mode)
+
 
 (after! org
   (setq org-agenda-files '("~/Sync/todo.org")
@@ -101,7 +101,8 @@
         org-directory "~/Sync"
         org-pretty-entities t
         org-hide-emphasis-markers t
-        org-roam-directory "~/Sync/org-roam"))
+        org-roam-directory "~/Sync/org-roam")
+  (add-hook! org-mode #'org-appear-mode #'+word-wrap-mode))
 
 
 (global-set-key (kbd "M-/") 'hippie-expand)
