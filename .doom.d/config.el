@@ -68,10 +68,13 @@
   (add-to-list 'reftex-label-alist '("theorem" ?h "thm:" "~\\ref{%s}" t ("Theorem" "theorem") nil) )
   (add-to-list 'reftex-label-alist '("definition" ?d "def:" "~\\ref{%s}" t ("Definition" "definition") nil) )
   (add-to-list 'reftex-label-alist '("corollary" ?c "cor:" "~\\ref{%s}" t ("Corollary" "corollary") nil) )
-  (add-to-list 'reftex-label-alist '("lemma" ?m "lem:" "~\\ref{%s}" t ("Lemma" "lemma") nil) )
-  (reftex-reset-mode))
+  (add-to-list 'reftex-label-alist '("lemma" ?m "lem:" "~\\ref{%s}" t ("Lemma" "lemma") nil) ))
 
 (after! cdlatex
+  (add-hook 'cdlatex-mode-hook
+            (lambda () (when (eq major-mode 'org-mode)
+                    (make-local-variable 'org-pretty-entities-include-sub-superscripts)
+                    (setq org-pretty-entities-include-sub-superscripts nil))))
   (defun add-labelled-env (environment shortcut)
     (add-to-list 'cdlatex-env-alist (list environment (format "\\begin{%s}\nAUTOLABEL\n?\n\\end{%s}" environment environment) nil))
     (add-to-list 'cdlatex-command-alist (list shortcut (format "Insert %s env" environment) "" 'cdlatex-environment (list environment) t nil)))
