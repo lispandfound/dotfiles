@@ -233,12 +233,13 @@ URL and CALLBACK; see `url-queue-retrieve'"
 
 
 (add-hook 'after-init-hook #'repeat-mode)
-
 (defadvice he-substitute-string (after he-smartparens-fix)
   "remove extra paren when expanding line in smartparens"
   (if (and smartparens-mode (member (substring str -1) '(")" "]" "}")))
       (save-excursion
         (progn (backward-delete-char 1) (forward-char)))))
+(add-to-list '+lookup-provider-url-alist '("MathSciNet" "https://mathscinet.ams.org/mathscinet/search/publications.html?pg4=TI&s4=%s&co4=AND&pg5=DOI&s5=&co5=AND&pg6=PC&s6=&co6=AND&pg7=ALLF&s7=&co7=AND&dr=all&yrop=eq&arg3=&yearRangeFirst=&yearRangeSecond=&pg8=ET&s8=All&review_format=html&Submit=Search"))
+(add-to-list '+lookup-provider-url-alist '("GScholar" "https://scholar.google.com/scholar?&q=%s"))
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
