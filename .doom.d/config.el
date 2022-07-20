@@ -97,6 +97,15 @@
 
 
 
+(after! ox-latex
+  (add-to-list 'org-latex-classes
+              '("book"
+                "\\documentclass{book}"
+                ("\\chapter{%s}" . "\\chapter*{%s}")
+                ("\\section{%s}" . "\\section*{%s}")
+                ("\\subsection{%s}" . "\\subsection*{%s}")
+                ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+              ))
 (after! org
   (setq org-agenda-files '("~/Sync/todo.org")
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
