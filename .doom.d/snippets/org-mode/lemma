@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: lemma
+# key: lem
+# --
+#+begin_lemma
+\label{lem:$1}
+$2
+#+end_lemma

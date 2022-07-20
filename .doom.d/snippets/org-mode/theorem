@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: theorem
+# key: theorem
+# --
+#+begin_theorem
+\label{thm:$1}
+$2
+#+end_theorem
+#+begin_proof
+$0
+#+end_proof
