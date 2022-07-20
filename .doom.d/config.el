@@ -112,7 +112,7 @@
   (setq org-agenda-files '("~/Sync/todo.org")
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
-        org-directory "~/Sync"
+        org-directory "~/Sync/org-roam"
         org-todo-keywords '((sequence "[ ](t)" "[-](k)" "[?](w)" "|" "[X](d)") (sequence "TODO(T)" "KILL(K)" "|" "DONE(D)"))
         org-pretty-entities t
         org-hide-emphasis-markers t
