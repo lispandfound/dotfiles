@@ -234,6 +234,11 @@ URL and CALLBACK; see `url-queue-retrieve'"
 
 (add-hook 'after-init-hook #'repeat-mode)
 
+(defadvice he-substitute-string (after he-smartparens-fix)
+  "remove extra paren when expanding line in smartparens"
+  (if (and smartparens-mode (member (substring str -1) '(")" "]" "}")))
+      (save-excursion
+        (progn (backward-delete-char 1) (forward-char)))))
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
