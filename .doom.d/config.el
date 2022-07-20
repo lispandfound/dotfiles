@@ -106,7 +106,9 @@
                 ("\\subsection{%s}" . "\\subsection*{%s}")
                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
               ))
+(setq evil-want-fine-undo t)
 (after! org
+
   (setq org-agenda-files '("~/Sync/todo.org")
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
