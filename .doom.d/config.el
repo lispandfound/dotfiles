@@ -3,6 +3,7 @@
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
 
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
@@ -112,8 +113,8 @@
   (setq org-agenda-files '("~/Sync/todo.org")
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
-        org-directory "~/Sync/org-roam"
-        org-todo-keywords '((sequence "[ ](t)" "[-](k)" "[?](w)" "|" "[X](d)") (sequence "TODO(T)" "KILL(K)" "|" "DONE(D)"))
+        org-directory "~/Sync/"
+        org-todo-keywords '((sequence "[ ](t)" "[?](w)" "|" "[-](k)" "[X](d)") (sequence "TODO(T)" "KILL(K)" "|" "DONE(D)"))
         org-pretty-entities t
         org-hide-emphasis-markers t
         org-roam-directory "~/Sync/org-roam")
@@ -128,7 +129,6 @@
 
 (after! mu4e
   (require 'smtpmail)
-
   (set-email-account! "uni"
                       '((mu4e-sent-folder       . "/uni/Sent Mail")
                         (mu4e-drafts-folder     . "/uni/Drafts")
@@ -141,23 +141,7 @@
                         (mu4e-refile-folder     . "/uni/All Mail")
                         (smtpmail-user-mail-address . "jaf150@uclive.ac.nz")
                         (user-mail-address      . "jake.faulkner@pg.canterbury.ac.nz"))
-                      t)
-
-  (set-email-account! "gmail"
-                      '((mu4e-sent-folder       . "/gmail/sent")
-                        (mu4e-drafts-folder     . "/gmail/drafts")
-                        (mu4e-trash-folder      . "/gmail/trash")
-                        (mu4e-refile-folder     . "/gmail/archive")
-                        (send-mail-function . smtpmail-send-it)
-                        (smtpmail-smtp-user     . "jakefaulkn@gmail.com")
-                        (user-mail-address      . "jakefaulkn@gmail.com")
-                        (smtpmail-default-smtp-server . "smtp.gmail.com")
-                        (smtpmail-smtp-server . "smtp.gmail.com")
-                        (smtpmail-smtp-service . 587)
-                        (smtpmail-auth-credentials . (expand-file-name "~/.authinfo")))
-                      nil)
-  (setq +mu4e-gmail-accounts '(("jakefaulkn@gmail.com" . "/gmail"))))
-
+                      t))
 
 (map! "s-<return>" #'embark-act)
 
@@ -217,7 +201,7 @@ URL and CALLBACK; see `url-queue-retrieve'"
   :config
   (setq orb-insert-interface 'generic)
   (setq orb-process-file-keyword t
-        orb-file-field-extensions '("pdf")))
+        orb-attached-file-extensions '("pdf")))
 
 (defun jake/share-this-file ()
   (interactive)
@@ -231,13 +215,12 @@ URL and CALLBACK; see `url-queue-retrieve'"
 (after! avy
   (setq avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
 
-
-(add-hook 'after-init-hook #'repeat-mode)
 (defadvice he-substitute-string (after he-smartparens-fix)
   "remove extra paren when expanding line in smartparens"
   (if (and smartparens-mode (member (substring str -1) '(")" "]" "}")))
       (save-excursion
         (progn (backward-delete-char 1) (forward-char)))))
+
 (add-to-list '+lookup-provider-url-alist '("MathSciNet" "https://mathscinet.ams.org/mathscinet/search/publications.html?pg4=TI&s4=%s&co4=AND&pg5=DOI&s5=&co5=AND&pg6=PC&s6=&co6=AND&pg7=ALLF&s7=&co7=AND&dr=all&yrop=eq&arg3=&yearRangeFirst=&yearRangeSecond=&pg8=ET&s8=All&review_format=html&Submit=Search"))
 (add-to-list '+lookup-provider-url-alist '("GScholar" "https://scholar.google.com/scholar?&q=%s"))
 (add-to-list '+lookup-provider-url-alist '("Encyclopedia of Mathematics" "https://encyclopediaofmath.org/index.php?search=%s"))

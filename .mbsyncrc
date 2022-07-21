@@ -30,30 +30,3 @@ Inbox ~/.mail/uni/Inbox
 Channel uni
 Far :uni-remote:
 Near :uni-local:
-
-# imap account information
-IMAPAccount gmail
-Host imap.gmail.com
-User jakefaulkn@gmail.com
-PassCmd "gpg --quiet --for-your-eyes-only --no-tty --decrypt ~/.dotfiles/secrets/gmail.gpg"
-AuthMechs LOGIN
-SSLType IMAPS
-CertificateFile /etc/ssl/certs/ca-certificates.crt
-
-# remote-storage (use the imap account specified above)
-IMAPStore gmail-remote
-Account gmail
-
-# local storage
-MaildirStore gmail-local
-Path ~/.mail/gmail/
-Inbox ~/.mail/gmail/Inbox
-Subfolders Verbatim
-
-# channel to remote storage
-Channel gmail
-Far :gmail-remote:
-Near :gmail-local:
-Patterns * ![Gmail]* "[Gmail]/Sent Mail" "[Gmail]/Bin"
-Create Both
-SyncState *
