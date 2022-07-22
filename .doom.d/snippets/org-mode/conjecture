@@ -1,0 +1,6 @@
+# key: conjecture
+# name: conjecture
+# --
+#+begin_conjecture
+$0
+#+end_conjecture
