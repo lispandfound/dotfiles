@@ -153,8 +153,6 @@
                         (user-mail-address      . "jake.faulkner@pg.canterbury.ac.nz"))
                       t))
 
-(map! "s-<return>" #'embark-act)
-
 (after! citar
   (setq! citar-bibliography '("~/Sync/bibliography/bibliography.bib")
         citar-library-paths '("~/Sync/bibliography/pdfs")))
