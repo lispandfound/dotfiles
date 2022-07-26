@@ -109,8 +109,18 @@
               ))
 (setq evil-want-fine-undo t)
 (after! org
+  (after! smartparens
+    (sp-local-pair 'org-mode "\\[" "\\]")
+    (sp-local-pair 'org-mode "$" "$")
+    (sp-local-pair 'org-mode "'" "'" :actions '(rem))
+    (sp-local-pair 'org-mode "=" "=" :actions '(rem))
+    (sp-local-pair 'org-mode "\\left(" "\\right)" :trigger "\\l(" :post-handlers '(sp-latex-insert-spaces-inside-pair))
+    (sp-local-pair 'org-mode "\\left[" "\\right]" :trigger "\\l[" :post-handlers '(sp-latex-insert-spaces-inside-pair))
+    (sp-local-pair 'org-mode "\\left\\{" "\\right\\}" :trigger "\\l{" :post-handlers '(sp-latex-insert-spaces-inside-pair))
+    (sp-local-pair 'org-mode "\\left|" "\\right|" :trigger "\\l|" :post-handlers '(sp-latex-insert-spaces-inside-pair)))
 
   (setq org-agenda-files '("~/Sync/todo.org")
+        org-export-in-background t
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
         org-directory "~/Sync/"
@@ -223,7 +233,11 @@ URL and CALLBACK; see `url-queue-retrieve'"
 
 (add-to-list '+lookup-provider-url-alist '("MathSciNet" "https://mathscinet.ams.org/mathscinet/search/publications.html?pg4=TI&s4=%s&co4=AND&pg5=DOI&s5=&co5=AND&pg6=PC&s6=&co6=AND&pg7=ALLF&s7=&co7=AND&dr=all&yrop=eq&arg3=&yearRangeFirst=&yearRangeSecond=&pg8=ET&s8=All&review_format=html&Submit=Search"))
 (add-to-list '+lookup-provider-url-alist '("GScholar" "https://scholar.google.com/scholar?&q=%s"))
+
 (add-to-list '+lookup-provider-url-alist '("Encyclopedia of Mathematics" "https://encyclopediaofmath.org/index.php?search=%s"))
+
+(setq hippie-expand-try-functions-list '(try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-list try-expand-line try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol))
+
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
