@@ -136,6 +136,8 @@
 (setq-default abbrev-mode t)
 (add-hook 'prog-mode-hook (lambda () (abbrev-mode -1)))
 (setq abbrev-file-name "~/.emacs.d/abbrev.el")
+(use-package! company-ctags
+  :config (company-ctags-auto-setup))
 
 (after! mu4e
   (require 'smtpmail)
@@ -166,14 +168,16 @@
         gap-start-options '("-f" "-b" "-m" "2m" "-E")
         gap-electric-semicolon nil
         gap-electric-equals nil)
-
+  (add-hook 'gap-mode-hook (lambda () (add-to-list 'company-backends '(company-ctags))))
   (set-docsets! 'gap-mode "gap" "fining")
   (defun +gap-open-repl ()
     (interactive)
     (unless (gap-running-p)
       (gap))
     (pop-to-buffer gap-process-buffer))
-  (set-repl-handler! 'gap-mode #'+gap-open-repl)
+  (set-repl-handler! 'gap-mode #'+gap-open-repl
+    :send-region 'gap-eval-region
+    :send-buffer 'gap-eval-buffer)
   (set-popup-rule! "^\\*GAP Help\\*" :size 0.3))
 (use-package maxima
   :defer t)
