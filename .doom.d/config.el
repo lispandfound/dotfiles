@@ -205,7 +205,6 @@ URL and CALLBACK; see `url-queue-retrieve'"
   ;; The package already tests for nil itself so we define a dummy tester
   (defvar orb-preformat-keywords
     '("title" "url" "file" "author-or-editor" "keywords" "citekey" "pdf"))
-  ;;:hook (org-roam-mode . org-roam-bibtex-mode)
   :custom
   (orb-note-actions-interface 'default)
   :init
@@ -235,10 +234,21 @@ URL and CALLBACK; see `url-queue-retrieve'"
 
 (add-to-list '+lookup-provider-url-alist '("MathSciNet" "https://mathscinet.ams.org/mathscinet/search/publications.html?pg4=TI&s4=%s&co4=AND&pg5=DOI&s5=&co5=AND&pg6=PC&s6=&co6=AND&pg7=ALLF&s7=&co7=AND&dr=all&yrop=eq&arg3=&yearRangeFirst=&yearRangeSecond=&pg8=ET&s8=All&review_format=html&Submit=Search"))
 (add-to-list '+lookup-provider-url-alist '("GScholar" "https://scholar.google.com/scholar?&q=%s"))
-
 (add-to-list '+lookup-provider-url-alist '("Encyclopedia of Mathematics" "https://encyclopediaofmath.org/index.php?search=%s"))
 
 (setq hippie-expand-try-functions-list '(try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-list try-expand-line try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol))
+(setq-default display-line-numbers 'relative)
+(add-hook! dashboard-mode-hook (setq-local display-line-numbers nil))
+
+(defun delete-other-workspaces ()
+  "Delete all workspaces except for the current workspace."
+  (interactive)
+  (let ((current (+workspace-current)))
+    (-map (lambda (wk) (+workspace-delete (persp-name wk))) (delete current (+workspace-list)))))
+
+(map!
+ :leader
+ "TAB C-o" #'delete-other-workspaces)
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
