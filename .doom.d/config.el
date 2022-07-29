@@ -239,6 +239,7 @@ URL and CALLBACK; see `url-queue-retrieve'"
 (setq hippie-expand-try-functions-list '(try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-list try-expand-line try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol))
 (setq-default display-line-numbers 'relative)
 (add-hook! dashboard-mode-hook (setq-local display-line-numbers nil))
+(advice-remove #'delete-backward-char #'+default--delete-backward-char-a)
 
 (defun delete-other-workspaces ()
   "Delete all workspaces except for the current workspace."
