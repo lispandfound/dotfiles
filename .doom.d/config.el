@@ -71,6 +71,7 @@
   (add-to-list 'reftex-label-alist '("corollary" ?c "cor:" "~\\ref{%s}" t ("Corollary" "corollary") nil) )
   (add-to-list 'reftex-label-alist '("lemma" ?m "lem:" "~\\ref{%s}" t ("Lemma" "lemma") nil) ))
 
+
 (after! cdlatex
   (add-hook 'cdlatex-mode-hook
             (lambda () (when (eq major-mode 'org-mode)
@@ -169,7 +170,9 @@
         gap-electric-semicolon nil
         gap-electric-equals nil)
   (add-hook 'gap-mode-hook (lambda () (add-to-list 'company-backends '(company-ctags))))
+  (add-hook! gap-mode (visit-tags-table "/usr/share/gap/TAGS" t))
   (set-docsets! 'gap-mode "gap" "fining")
+  (set-docsets! 'gap-process-mode "gap" "fining")
   (defun +gap-open-repl ()
     (interactive)
     (unless (gap-running-p)
@@ -250,7 +253,7 @@ URL and CALLBACK; see `url-queue-retrieve'"
 (map!
  :leader
  "TAB C-o" #'delete-other-workspaces)
-
+(setq evil-ex-substitute-global t)
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
