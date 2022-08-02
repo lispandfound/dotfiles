@@ -243,7 +243,7 @@ URL and CALLBACK; see `url-queue-retrieve'"
 (setq-default display-line-numbers 'relative)
 (add-hook! dashboard-mode-hook (setq-local display-line-numbers nil))
 (advice-remove #'delete-backward-char #'+default--delete-backward-char-a)
-
+(add-hook 'auto-save-hook 'org-save-all-org-buffers)
 (defun delete-other-workspaces ()
   "Delete all workspaces except for the current workspace."
   (interactive)
