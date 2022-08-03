@@ -121,7 +121,6 @@
     (sp-local-pair 'org-mode "\\left|" "\\right|" :trigger "\\l|" :post-handlers '(sp-latex-insert-spaces-inside-pair)))
 
   (setq org-agenda-files '("~/Sync/todo.org")
-        org-export-in-background t
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
         org-directory "~/Sync/"
@@ -240,7 +239,6 @@ URL and CALLBACK; see `url-queue-retrieve'"
 (add-to-list '+lookup-provider-url-alist '("Encyclopedia of Mathematics" "https://encyclopediaofmath.org/index.php?search=%s"))
 
 (setq hippie-expand-try-functions-list '(try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-list try-expand-line try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol))
-(setq-default display-line-numbers 'relative)
 (add-hook! dashboard-mode-hook (setq-local display-line-numbers nil))
 (advice-remove #'delete-backward-char #'+default--delete-backward-char-a)
 (add-hook 'auto-save-hook 'org-save-all-org-buffers)
