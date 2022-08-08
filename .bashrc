@@ -17,5 +17,5 @@ fi
 
 # Put your fun stuff here.
 
-export PATH=~/.local/nyxt/usr/local/bin:~/.local/bin:$PATH
+export PATH=~/.emacs.d/bin/:~/.local/nyxt/usr/local/bin:~/.local/bin:$PATH
 export XDG_CONFIG_HOME=$HOME/.config
