@@ -121,18 +121,24 @@
     (sp-local-pair 'org-mode "\\left|" "\\right|" :trigger "\\l|" :post-handlers '(sp-latex-insert-spaces-inside-pair)))
 
 
+  (setq org-capture-templates '(("t" "Personal todo" entry
+                                  (file+headline +org-capture-todo-file "Inbox")
+                                  "* TODO %?\n%i\n%a" :prepend t)
+                                 ("n" "Personal notes" entry
+                                  (file+headline +org-capture-notes-file "Inbox")
+                                  "* %u %?\n%i\n%a" :prepend t)))
   (setq org-agenda-files '("~/Sync/todo.org")
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
         org-directory "~/Sync/"
-        org-todo-keywords '((sequence "[ ](t)" "[?](w)" "[P](p)" "|" "[X](d)" "[-](k)" ) (sequence "TODO(T)" "KILL(K)" "|" "DONE(D)"))
+        org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "|" "KILL(k)" "DONE(d)") (sequence "[ ](T)" "[?](W)" "[P](P)" "|" "[X](D)" "[-](K)" ))
         org-pretty-entities t
         org-hide-emphasis-markers t
         org-roam-directory "~/Sync/org-roam"
         org-superstar-headline-bullets-list '(" ")
         org-ellipsis "  "
         org-agenda-block-separator "")
-  (add-hook! org-mode #'org-appear-mode #'+word-wrap-mode))
+  (add-hook! org-mode #'org-appear-mode #'+word-wrap-mode (bibtex-set-dialect 'biblatex)))
 
 
 (global-set-key (kbd "M-/") 'hippie-expand)
@@ -256,7 +262,7 @@ URL and CALLBACK; see `url-queue-retrieve'"
  :leader
  "TAB C-o" #'delete-other-workspaces)
 (setq bookmark-default-file "~/.doom.d/bookmarks")
-(setq org-stuck-projects '("TODO=\"[P]\"+LEVEL=2/-[X]" ("[ ]") nil ""))
+(setq org-stuck-projects '("+LEVEL=2+PROJECT" ("TODO") nil ""))
 
 (setq evil-ex-substitute-global t)
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
