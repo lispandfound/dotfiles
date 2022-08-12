@@ -136,8 +136,10 @@
         org-hide-emphasis-markers t
         org-roam-directory "~/Sync/org-roam"
         org-superstar-headline-bullets-list '(" ")
+        org-attach-id-dir ".attach"
         org-ellipsis "  "
         org-agenda-block-separator "")
+
   (add-hook! org-mode #'org-appear-mode #'+word-wrap-mode (bibtex-set-dialect 'biblatex)))
 
 
@@ -265,6 +267,14 @@ URL and CALLBACK; see `url-queue-retrieve'"
 (setq org-stuck-projects '("+LEVEL=2+PROJECT" ("TODO") nil ""))
 
 (setq evil-ex-substitute-global t)
+
+(defun open-current-directory-sysfm ()
+  (interactive)
+  (call-process-shell-command (format "xdg-open \"%s\"&" (f-dirname (buffer-file-name)))))
+
+(map!
+ :leader
+ "o." 'open-current-directory-sysfm)
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
