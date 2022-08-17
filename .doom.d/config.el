@@ -161,8 +161,12 @@
 
 (after! citar
   (setq! citar-bibliography '("~/Sync/bibliography/bibliography.bib")
-        citar-library-paths '("~/Sync/bibliography/pdfs")))
-
+         citar-library-paths '("~/Sync/bibliography/pdfs")))
+(use-package! oxr
+  :config (setq oxr-types '((figure . "fig")
+                            (table . "tab")
+                            (equation . "eq")
+                            (section . "sec"))))
 
 (use-package gap
   :mode (("\\.g\\'" . gap-mode)
