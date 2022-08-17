@@ -132,7 +132,7 @@
         org-superstar-headline-bullets-list '(" ")
         org-ellipsis "  "
         org-agenda-block-separator "")
-  (add-hook! org-mode #'org-appear-mode #'+word-wrap-mode))
+  (add-hook! org-mode #'evil-tex-mode #'org-appear-mode #'+word-wrap-mode))
 
 
 (global-set-key (kbd "M-/") 'hippie-expand)
