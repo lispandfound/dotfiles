@@ -109,6 +109,23 @@
                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
               ))
 (setq evil-want-fine-undo t)
+(after! (org transient)
+  (transient-define-prefix org-element-transient ()
+    "Org Mode Element Transient State"
+    ["Motion"
+     ("h" "Up Element" org-up-element :transient t)
+     ("l" "Down Element" org-down-element :transient t)
+     ("j" "Forward Element" org-forward-element :transient t)
+     ("k" "Backward Element" org-backward-element :transient t)]
+    ["Move"
+     ("K" "Move Subtree Up" org-move-subtree-up :transient t)
+     ("J" "Move Subtree Down" org-move-subtree-down :transient t)
+     ("H" "Promote Subtree" org-promote-subtree :transient t)
+     ("L" "Demote Subtree" org-demote-subtree :transient t)
+     ("r" "Refile Subtree" org-refile :transient t)])
+ (map! :map org-mode-map
+   :n "g." 'org-element-transient))
+
 (after! org
   (after! smartparens
     (sp-local-pair 'org-mode "\\[" "\\]")
