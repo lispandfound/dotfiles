@@ -292,9 +292,20 @@ URL and CALLBACK; see `url-queue-retrieve'"
   (interactive)
   (call-process-shell-command (format "xdg-open \"%s\"&" (f-dirname (buffer-file-name)))))
 
-(map!
- :leader
- "o." 'open-current-directory-sysfm)
+(map! :leader "o." 'open-current-directory-sysfm)
+
+(after! (embark consult org)
+  (defun consult-org-store-link (candidate)
+    (save-excursion
+      (goto-char (get-text-property 0 'consult--candidate candidate))
+      (org-store-link nil t)))
+  (embark-define-keymap embark-consult-org-heading
+    "Consult Org Embark Bindings"
+    ("n" consult-org-store-link))
+  (add-to-list 'embark-keymap-alist '(consult-org-heading . embark-consult-org-heading)))
+
+
+
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
