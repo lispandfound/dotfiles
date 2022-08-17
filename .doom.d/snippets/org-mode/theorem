@@ -1,8 +1,8 @@
 # -*- mode: snippet -*-
 # name: theorem
-# key: theorem
+# key: thm
 # --
+#+name: thm:$1
 #+begin_theorem
-\label{thm:$1}
 $0
 #+end_theorem

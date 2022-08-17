@@ -2,7 +2,7 @@
 # name: lemma
 # key: lem
 # --
+#+name: lem:$1
 #+begin_lemma
-\label{lem:$1}
 $2
 #+end_lemma
