@@ -52,7 +52,8 @@
 (package! company-ctags)
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
-
+(package! oxr
+  :recipe (:host github :repo "bdarcus/oxr"))
 ;; When using org-roam via the `+roam` flag
 (unpin! org-roam)
 

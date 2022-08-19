@@ -109,6 +109,23 @@
                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
               ))
 (setq evil-want-fine-undo t)
+(after! (org transient)
+  (transient-define-prefix org-element-transient ()
+    "Org Mode Element Transient State"
+    ["Motion"
+     ("h" "Up Element" org-up-element :transient t)
+     ("l" "Down Element" org-down-element :transient t)
+     ("j" "Forward Element" org-forward-element :transient t)
+     ("k" "Backward Element" org-backward-element :transient t)]
+    ["Move"
+     ("K" "Move Subtree Up" org-move-subtree-up :transient t)
+     ("J" "Move Subtree Down" org-move-subtree-down :transient t)
+     ("H" "Promote Subtree" org-promote-subtree :transient t)
+     ("L" "Demote Subtree" org-demote-subtree :transient t)
+     ("r" "Refile Subtree" org-refile :transient t)])
+ (map! :map org-mode-map
+   :n "g." 'org-element-transient))
+
 (after! org
   (after! smartparens
     (sp-local-pair 'org-mode "\\[" "\\]")
@@ -139,8 +156,7 @@
         org-attach-id-dir ".attach"
         org-ellipsis "  "
         org-agenda-block-separator "")
-
-  (add-hook! org-mode #'org-appear-mode #'+word-wrap-mode (bibtex-set-dialect 'biblatex)))
+  (add-hook! org-mode #'evil-tex-mode #'org-appear-mode #'+word-wrap-mode (bibtex-set-dialect 'biblatex)))
 
 
 (global-set-key (kbd "M-/") 'hippie-expand)
@@ -169,8 +185,12 @@
 
 (after! citar
   (setq! citar-bibliography '("~/Sync/bibliography/bibliography.bib")
-        citar-library-paths '("~/Sync/bibliography/pdfs")))
-
+         citar-library-paths '("~/Sync/bibliography/pdfs")))
+(use-package! oxr
+  :config (setq oxr-types '((figure . "fig")
+                            (table . "tab")
+                            (equation . "eq")
+                            (section . "sec"))))
 
 (use-package gap
   :mode (("\\.g\\'" . gap-mode)
@@ -272,9 +292,46 @@ URL and CALLBACK; see `url-queue-retrieve'"
   (interactive)
   (call-process-shell-command (format "xdg-open \"%s\"&" (f-dirname (buffer-file-name)))))
 
-(map!
- :leader
- "o." 'open-current-directory-sysfm)
+(map! :leader "o." 'open-current-directory-sysfm)
+
+(after! (embark consult org)
+  (defun consult-org-store-link (candidate)
+    (save-excursion
+      (goto-char (get-text-property 0 'consult--candidate candidate))
+      (org-store-link nil t)))
+  (embark-define-keymap embark-consult-org-heading
+    "Consult Org Embark Bindings"
+    ("n" consult-org-store-link))
+  (add-to-list 'embark-keymap-alist '(consult-org-heading . embark-consult-org-heading)))
+
+(defconst small-words '("a" "an" "and" "as" "at" "but" "by" "en" "for" "if" "of" "on" "or" "the" "to" "v" "v." "via" "vs" "vs."))
+
+(defun titlecase-string (str)
+  "Convert string STR to title case and return the resulting string."
+  (let ((words (s-split " " str)))
+    (s-join " " (cons (s-titleize (car words))
+                      (-map (lambda (w) (if (member w small-words)
+                                       (s-downcase w)
+                                     (s-titleize w))) (cdr words))))))
+
+(defun titlecase-region (begin end)
+  "Convert text in region from BEGIN to END to title case."
+  (interactive "*r")
+  (let ((pt (point)))
+    (insert (titlecase-string (delete-and-extract-region begin end)))
+    (goto-char pt)))
+
+(defun titlecase-dwim ()
+  "Convert the region or current line to title case.
+If Transient Mark Mode is on and there is an active region, convert
+the region to title case.  Otherwise, work on the current line."
+  (interactive)
+  (if (and transient-mark-mode mark-active)
+      (titlecase-region (region-beginning) (region-end))
+    (titlecase-region (point-at-bol) (point-at-eol))))
+
+
+
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
