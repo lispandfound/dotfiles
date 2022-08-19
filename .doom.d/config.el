@@ -304,6 +304,32 @@ URL and CALLBACK; see `url-queue-retrieve'"
     ("n" consult-org-store-link))
   (add-to-list 'embark-keymap-alist '(consult-org-heading . embark-consult-org-heading)))
 
+(defconst small-words '("a" "an" "and" "as" "at" "but" "by" "en" "for" "if" "of" "on" "or" "the" "to" "v" "v." "via" "vs" "vs."))
+
+(defun titlecase-string (str)
+  "Convert string STR to title case and return the resulting string."
+  (let ((words (s-split " " str)))
+    (s-join " " (cons (s-titleize (car words))
+                      (-map (lambda (w) (if (member w small-words)
+                                       (s-downcase w)
+                                     (s-titleize w))) (cdr words))))))
+
+(defun titlecase-region (begin end)
+  "Convert text in region from BEGIN to END to title case."
+  (interactive "*r")
+  (let ((pt (point)))
+    (insert (titlecase-string (delete-and-extract-region begin end)))
+    (goto-char pt)))
+
+(defun titlecase-dwim ()
+  "Convert the region or current line to title case.
+If Transient Mark Mode is on and there is an active region, convert
+the region to title case.  Otherwise, work on the current line."
+  (interactive)
+  (if (and transient-mark-mode mark-active)
+      (titlecase-region (region-beginning) (region-end))
+    (titlecase-region (point-at-bol) (point-at-eol))))
+
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
