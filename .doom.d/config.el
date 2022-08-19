@@ -212,7 +212,7 @@ URL and CALLBACK; see `url-queue-retrieve'"
 (after! citar
   (setq citar-notes-paths '("~/Sync/org-roam")))
 (use-package! org-roam-bibtex
-  :when (featurep! :lang org +roam2)
+  :when (modulep! :lang org +roam2)
   :after org-roam
   :preface
   ;; if the user has not set a template mechanism set a reasonable one of them
