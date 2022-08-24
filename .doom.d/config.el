@@ -197,11 +197,9 @@
          ("\\.gap\\'" . gap-mode))
   :init
   (setq gap-executable "/usr/bin/gap"
-        gap-start-options '("-f" "-b" "-m" "2m" "-E")
         gap-electric-semicolon nil
         gap-electric-equals nil)
   (add-hook 'gap-mode-hook (lambda () (add-to-list 'company-backends '(company-ctags))))
-  (add-hook! gap-mode (visit-tags-table "/usr/share/gap/TAGS" t))
   (set-docsets! 'gap-mode "gap" "fining")
   (set-docsets! 'gap-process-mode "gap" "fining")
   (defun +gap-open-repl ()
@@ -213,6 +211,12 @@
     :send-region 'gap-eval-region
     :send-buffer 'gap-eval-buffer)
   (set-popup-rule! "^\\*GAP Help\\*" :size 0.3))
+
+(use-package gap-company
+  :after gap
+  :config
+  (set-company-backend! 'gap-mode '(company-gap-backend)))
+
 (use-package maxima
   :defer t)
 (after! biblio
@@ -232,7 +236,7 @@ URL and CALLBACK; see `url-queue-retrieve'"
 (after! citar
   (setq citar-notes-paths '("~/Sync/org-roam")))
 (use-package! org-roam-bibtex
-  :when (featurep! :lang org +roam2)
+  :when (modulep! :lang org +roam2)
   :after org-roam
   :preface
   ;; if the user has not set a template mechanism set a reasonable one of them
