@@ -215,12 +215,11 @@
   (set-repl-handler! 'gap-mode #'+gap-open-repl
     :send-region 'gap-eval-region
     :send-buffer 'gap-eval-buffer)
+  (set-company-backend! 'gap-mode 'company-gap-backend)
   (set-popup-rule! "^\\*GAP Help\\*" :size 0.3))
 
 (use-package gap-company
-  :after gap
-  :config
-  (set-company-backend! 'gap-mode '(company-gap-backend)))
+  :commands (company-gap-backend))
 
 (use-package maxima
   :defer t)
