@@ -1,32 +1,20 @@
-IMAPAccount uni
-# Address to connect to
-Host outlook.office365.com
+IMAPAccount uclive
+Host localhost
+Port 1143
 User jaf150@uclive.ac.nz
-Port 993
-PassCmd oauth2ms
-AuthMechs XOAUTH2
-SSLType IMAPS
-SSLVersions TLSv1.2
+AuthMechs LOGIN
+SSLType None
+Pass nope
 
 
-# To store the password in an encrypted file use PassCmd instead of Pass
-# PassCmd "gpg2 -q --for-your-eyes-only --no-tty -d ~/.mailpass.gpg"
-#
-# Use SSL
-# The following line should work. If you get certificate errors, uncomment the two following lines and read the "Troubleshooting" section.
+IMAPStore uclive-remote
+Account uclive
 
-#CertificateFile /etc/ssl/certs/ca-certificates.crt
-#CertificateFile ~/.cert/imap.gmail.com.pem
-#CertificateFile ~/.cert/Equifax_Secure_CA.pem
+MaildirStore uclive-local
+Path ~/.mail/
+Inbox ~/.mail/inbox
 
-IMAPStore uni-remote
-Account uni
 
-MaildirStore uni-local
-# The trailing "/" is important
-Path ~/.mail/uni
-Inbox ~/.mail/uni/Inbox
-
-Channel uni
-Far :uni-remote:
-Near :uni-local:
+Channel uclive
+Far :uclive-remote:
+Near :uclive-local:
