@@ -148,7 +148,7 @@
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
         org-directory "~/Sync/"
-        org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "|" "KILL(k)" "DONE(d)") (sequence "[ ](T)" "[?](W)" "[P](P)" "|" "[X](D)" "[-](K)" ))
+        org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)" "KILL(k)") (sequence "[ ](T)" "[?](W)" "[P](P)" "|" "[X](D)" "[-](K)" ))
         org-pretty-entities t
         org-hide-emphasis-markers t
         org-roam-directory "~/Sync/org-roam"
@@ -169,16 +169,21 @@
 
 (after! mu4e
   (require 'smtpmail)
+  (setq
+   sendmail-program (executable-find "msmtp")
+   send-mail-function #'smtpmail-send-it
+   message-sendmail-f-is-evil t
+   message-sendmail-extra-arguments '("--read-envelope-from")
+   message-send-mail-function #'message-send-mail-with-sendmail)
   (set-email-account! "uni"
-                      '((mu4e-sent-folder       . "/uni/Sent Mail")
-                        (mu4e-drafts-folder     . "/uni/Drafts")
-                        (mu4e-trash-folder      . "/uni/Trash")
+                      '((mu4e-sent-folder       . "/Sent Mail")
+                        (mu4e-drafts-folder     . "/Drafts")
+                        (mu4e-trash-folder      . "/Trash")
                         (message-send-mail-function . message-send-mail-with-sendmail)
                         (mail-specify-envelope-from . t)
                         (message-sendmail-envelope-from . header)
-                        (sendmail-program . "/usr/bin/msmtp")
                         (mail-envelope-from . header)
-                        (mu4e-refile-folder     . "/uni/All Mail")
+                        (mu4e-refile-folder     . "/All Mail")
                         (smtpmail-user-mail-address . "jaf150@uclive.ac.nz")
                         (user-mail-address      . "jake.faulkner@pg.canterbury.ac.nz"))
                       t))
@@ -210,12 +215,11 @@
   (set-repl-handler! 'gap-mode #'+gap-open-repl
     :send-region 'gap-eval-region
     :send-buffer 'gap-eval-buffer)
+  (set-company-backend! 'gap-mode 'company-gap-backend)
   (set-popup-rule! "^\\*GAP Help\\*" :size 0.3))
 
 (use-package gap-company
-  :after gap
-  :config
-  (set-company-backend! 'gap-mode '(company-gap-backend)))
+  :commands (company-gap-backend))
 
 (use-package maxima
   :defer t)
