@@ -148,7 +148,7 @@
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
         org-directory "~/Sync/"
-        org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "|" "KILL(k)" "DONE(d)") (sequence "[ ](T)" "[?](W)" "[P](P)" "|" "[X](D)" "[-](K)" ))
+        org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)" "KILL(k)") (sequence "[ ](T)" "[?](W)" "[P](P)" "|" "[X](D)" "[-](K)" ))
         org-pretty-entities t
         org-hide-emphasis-markers t
         org-roam-directory "~/Sync/org-roam"
