@@ -169,16 +169,21 @@
 
 (after! mu4e
   (require 'smtpmail)
+  (setq
+   sendmail-program (executable-find "msmtp")
+   send-mail-function #'smtpmail-send-it
+   message-sendmail-f-is-evil t
+   message-sendmail-extra-arguments '("--read-envelope-from")
+   message-send-mail-function #'message-send-mail-with-sendmail)
   (set-email-account! "uni"
-                      '((mu4e-sent-folder       . "/uni/Sent Mail")
-                        (mu4e-drafts-folder     . "/uni/Drafts")
-                        (mu4e-trash-folder      . "/uni/Trash")
+                      '((mu4e-sent-folder       . "/Sent Mail")
+                        (mu4e-drafts-folder     . "/Drafts")
+                        (mu4e-trash-folder      . "/Trash")
                         (message-send-mail-function . message-send-mail-with-sendmail)
                         (mail-specify-envelope-from . t)
                         (message-sendmail-envelope-from . header)
-                        (sendmail-program . "/usr/bin/msmtp")
                         (mail-envelope-from . header)
-                        (mu4e-refile-folder     . "/uni/All Mail")
+                        (mu4e-refile-folder     . "/All Mail")
                         (smtpmail-user-mail-address . "jaf150@uclive.ac.nz")
                         (user-mail-address      . "jake.faulkner@pg.canterbury.ac.nz"))
                       t))
