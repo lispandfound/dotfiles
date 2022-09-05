@@ -3,7 +3,7 @@ IMAPAccount uni
 Host localhost
 User jaf150@uclive.ac.nz
 Port 1143
-PassCmd "pass show uni/email | head -n 1"
+PassCmd "secret-tool lookup xdg:schema org.gnome.keyring.Note"
 SSLType None
 AuthMechs LOGIN
 
