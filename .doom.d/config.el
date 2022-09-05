@@ -318,9 +318,10 @@ URL and CALLBACK; see `url-queue-retrieve'"
   "Convert string STR to title case and return the resulting string."
   (let ((words (s-split " " str)))
     (s-join " " (cons (s-titleize (car words))
-                      (-map (lambda (w) (if (member w small-words)
-                                       (s-downcase w)
-                                     (s-titleize w))) (cdr words))))))
+                      (-map (lambda (w) (let ((dw (s-downcase w)))
+                                     (if (member dw small-words)
+                                         dw
+                                       (s-titleize w)))) (cdr words))))))
 
 (defun titlecase-region (begin end)
   "Convert text in region from BEGIN to END to title case."
