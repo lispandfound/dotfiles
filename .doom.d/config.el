@@ -339,6 +339,10 @@ the region to title case.  Otherwise, work on the current line."
       (titlecase-region (region-beginning) (region-end))
     (titlecase-region (point-at-bol) (point-at-eol))))
 
+(use-package! lsp-ltex
+  :hook (org-mode-local-vars-hook . (lambda () (require 'lsp-ltex)
+                                      (lsp!)))
+  :config (customize-set-variable 'lsp-ltex-version "15.2.0"))
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
