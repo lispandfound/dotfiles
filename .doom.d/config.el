@@ -3,7 +3,7 @@
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
 
-(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
+(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
@@ -318,9 +318,10 @@ URL and CALLBACK; see `url-queue-retrieve'"
   "Convert string STR to title case and return the resulting string."
   (let ((words (s-split " " str)))
     (s-join " " (cons (s-titleize (car words))
-                      (-map (lambda (w) (if (member w small-words)
-                                       (s-downcase w)
-                                     (s-titleize w))) (cdr words))))))
+                      (-map (lambda (w) (let ((dw (s-downcase w)))
+                                     (if (member dw small-words)
+                                         dw
+                                       (s-titleize w)))) (cdr words))))))
 
 (defun titlecase-region (begin end)
   "Convert text in region from BEGIN to END to title case."
@@ -338,6 +339,10 @@ the region to title case.  Otherwise, work on the current line."
       (titlecase-region (region-beginning) (region-end))
     (titlecase-region (point-at-bol) (point-at-eol))))
 
+(use-package! lsp-ltex
+  :hook (org-mode-local-vars-hook . (lambda () (require 'lsp-ltex)
+                                      (lsp!)))
+  :config (customize-set-variable 'lsp-ltex-version "15.2.0"))
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an

@@ -1,20 +1,21 @@
-IMAPAccount uclive
+IMAPAccount uni
+# Address to connect to
 Host localhost
-Port 1143
 User jaf150@uclive.ac.nz
-AuthMechs LOGIN
+Port 1143
+PassCmd "secret-tool lookup xdg:schema org.gnome.keyring.Note"
 SSLType None
-Pass nope
+AuthMechs LOGIN
 
 
-IMAPStore uclive-remote
-Account uclive
+IMAPStore uni-remote
+Account uni
 
-MaildirStore uclive-local
+MaildirStore uni-local
+# The trailing "/" is important
 Path ~/.mail/
-Inbox ~/.mail/inbox
+Inbox ~/.mail/inbox/
 
-
-Channel uclive
-Far :uclive-remote:
-Near :uclive-local:
+Channel uni
+Far :uni-remote:
+Near :uni-local:
