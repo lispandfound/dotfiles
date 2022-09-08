@@ -312,7 +312,16 @@ URL and CALLBACK; see `url-queue-retrieve'"
     ("n" consult-org-store-link))
   (add-to-list 'embark-keymap-alist '(consult-org-heading . embark-consult-org-heading)))
 
-(defconst small-words '("a" "an" "and" "as" "at" "but" "by" "en" "for" "if" "of" "on" "or" "the" "to" "v" "v." "via" "vs" "vs."))
+(after (citar)
+       (setq citar-symbols
+             `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
+               (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
+               (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " ")))
+       (setq citar-symbol-separator "  ") )
+
+(defconst small-words '("a" "an" "and" "as"
+                        "at" "but" "by" "en" "for" "if" "of" "on" "or" "the" "to" "v" "v." "via" "vs"
+                        "vs."))
 
 (defun titlecase-string (str)
   "Convert string STR to title case and return the resulting string."
@@ -343,6 +352,8 @@ the region to title case.  Otherwise, work on the current line."
   :hook (org-mode-local-vars-hook . (lambda () (require 'lsp-ltex)
                                       (lsp!)))
   :config (customize-set-variable 'lsp-ltex-version "15.2.0"))
+
+
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
