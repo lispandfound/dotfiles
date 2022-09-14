@@ -122,7 +122,9 @@
      ("J" "Move Subtree Down" org-move-subtree-down :transient t)
      ("H" "Promote Subtree" org-promote-subtree :transient t)
      ("L" "Demote Subtree" org-demote-subtree :transient t)
-     ("r" "Refile Subtree" org-refile :transient t)])
+     ("r" "Refile Subtree" org-refile :transient t)]
+    ["Store"
+     ("n" "Store Link" org-store-link :transient t)])
  (map! :map org-mode-map
    :n "g." 'org-element-transient))
 
