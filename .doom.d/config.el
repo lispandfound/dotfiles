@@ -129,6 +129,8 @@
    :n "g." 'org-element-transient))
 
 (after! org
+  (set-company-backend! 'org-mode nil)
+  (setq org-highlight-latex-and-related '(script entities))
   (after! smartparens
     (sp-local-pair 'org-mode "\\[" "\\]")
     (sp-local-pair 'org-mode "$" "$")
@@ -141,11 +143,11 @@
 
 
   (setq org-capture-templates '(("t" "Personal todo" entry
-                                  (file+headline +org-capture-todo-file "Inbox")
-                                  "* TODO %?\n%i\n%a" :prepend t)
-                                 ("n" "Personal notes" entry
-                                  (file+headline +org-capture-notes-file "Inbox")
-                                  "* %u %?\n%i\n%a" :prepend t)))
+                                 (file+headline +org-capture-todo-file "Inbox")
+                                 "* TODO %?\n%i\n%a" :prepend t)
+                                ("n" "Personal notes" entry
+                                 (file+headline +org-capture-notes-file "Inbox")
+                                 "* %u %?\n%i\n%a" :prepend t)))
   (setq org-agenda-files '("~/Sync/todo.org")
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
@@ -158,7 +160,7 @@
         org-attach-id-dir ".attach"
         org-ellipsis "  "
         org-agenda-block-separator "")
-  (add-hook! org-mode #'evil-tex-mode #'org-appear-mode #'+word-wrap-mode (bibtex-set-dialect 'biblatex)))
+  (add-hook! org-mode #'evil-tex-mode (bibtex-set-dialect 'biblatex)))
 
 
 (global-set-key (kbd "M-/") 'hippie-expand)
@@ -314,7 +316,7 @@ URL and CALLBACK; see `url-queue-retrieve'"
     ("n" consult-org-store-link))
   (add-to-list 'embark-keymap-alist '(consult-org-heading . embark-consult-org-heading)))
 
-(after (citar)
+(after! (citar)
        (setq citar-symbols
              `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
                (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
@@ -349,12 +351,10 @@ the region to title case.  Otherwise, work on the current line."
   (if (and transient-mark-mode mark-active)
       (titlecase-region (region-beginning) (region-end))
     (titlecase-region (point-at-bol) (point-at-eol))))
-
 (use-package! lsp-ltex
   :hook (org-mode-local-vars-hook . (lambda () (require 'lsp-ltex)
                                       (lsp!)))
   :config (customize-set-variable 'lsp-ltex-version "15.2.0"))
-
 
 
 
