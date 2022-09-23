@@ -344,7 +344,10 @@ the region to title case.  Otherwise, work on the current line."
                                       (lsp!)))
   :config (customize-set-variable 'lsp-ltex-version "15.2.0"))
 
-
+(use-package! consult-recoll
+  :commands (consult-recoll)
+  :init
+  (map! :leader "sR" 'consult-recoll))
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;

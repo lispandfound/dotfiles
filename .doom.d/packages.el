@@ -50,6 +50,7 @@
 ;(unpin! t)
 (package! gap-mode)
 (package! company-ctags)
+(package! consult-recoll)
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
 (package! oxr
