@@ -352,7 +352,10 @@ the region to title case.  Otherwise, work on the current line."
       (titlecase-region (region-beginning) (region-end))
     (titlecase-region (point-at-bol) (point-at-eol))))
 
-
+(use-package! consult-recoll
+  :commands (consult-recoll)
+  :init
+  (map! :leader "sR" 'consult-recoll))
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
