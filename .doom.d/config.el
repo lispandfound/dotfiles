@@ -125,11 +125,11 @@
      ("r" "Refile Subtree" org-refile :transient t)]
     ["Store"
      ("n" "Store Link" org-store-link :transient t)])
- (map! :map org-mode-map
-   :n "g." 'org-element-transient))
+  (map! :map org-mode-map
+        :n "g." 'org-element-transient))
 
 (after! org
-  (set-company-backend! 'org-mode nil)
+  (setq org-stuck-projects '("+LEVEL=2+PROJECT" ("TODO") nil ""))
   (setq org-highlight-latex-and-related '(script entities))
   (after! smartparens
     (sp-local-pair 'org-mode "\\[" "\\]")
@@ -196,6 +196,7 @@
   (setq! citar-bibliography '("~/Sync/bibliography/bibliography.bib")
          citar-library-paths '("~/Sync/bibliography/pdfs")))
 (use-package! oxr
+  :after org
   :config (setq oxr-types '((figure . "fig")
                             (table . "tab")
                             (equation . "eq")
@@ -243,22 +244,6 @@ URL and CALLBACK; see `url-queue-retrieve'"
 
 (after! citar
   (setq citar-notes-paths '("~/Sync/org-roam")))
-(use-package! org-roam-bibtex
-  :when (modulep! :lang org +roam2)
-  :after org-roam
-  :preface
-  ;; if the user has not set a template mechanism set a reasonable one of them
-  ;; The package already tests for nil itself so we define a dummy tester
-  (defvar orb-preformat-keywords
-    '("title" "url" "file" "author-or-editor" "keywords" "citekey" "pdf"))
-  :custom
-  (orb-note-actions-interface 'default)
-  :init
-  (setq bibtex-completion-bibliography "~/Sync/bibliography/bibliography.bib")
-  :config
-  (setq orb-insert-interface 'generic)
-  (setq orb-process-file-keyword t
-        orb-attached-file-extensions '("pdf")))
 
 (defun jake/share-this-file ()
   (interactive)
@@ -296,7 +281,6 @@ URL and CALLBACK; see `url-queue-retrieve'"
  :leader
  "TAB C-o" #'delete-other-workspaces)
 (setq bookmark-default-file "~/.doom.d/bookmarks")
-(setq org-stuck-projects '("+LEVEL=2+PROJECT" ("TODO") nil ""))
 
 (setq evil-ex-substitute-global t)
 
