@@ -49,15 +49,10 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 (package! gap-mode)
-(package! company-ctags)
-(package! consult-recoll)
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
-(package! oxr
-  :recipe (:host github :repo "bdarcus/oxr"))
+(package! languagetool)
 ;; When using org-roam via the `+roam` flag
-(unpin! org-roam)
 
 ;; When using bibtex-completion via the `biblio` module
 (unpin! bibtex-completion helm-bibtex ivy-bibtex)
-(package! maxima)

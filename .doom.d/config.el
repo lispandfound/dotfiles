@@ -29,13 +29,13 @@
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
 ;; refresh your font settings. If Emacs still can't find your font, it likely
 ;; wasn't installed correctly. Font issues are rarely Doom issues!
-(setq doom-font (font-spec :family "RobotoMono Nerd Font" :size 14))
+(setq doom-font (font-spec :family "Roboto Mono" :size 14))
 (setq doom-variable-pitch-font (font-spec :family "Roboto" :size 14 :weight 'semi-light))
 (setq doom-unicode-font (font-spec :family "Noto Sans Math"))
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'modus-operandi)
+(setq doom-theme 'doom-one-light)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -168,8 +168,6 @@
 (setq-default abbrev-mode t)
 (add-hook 'prog-mode-hook (lambda () (abbrev-mode -1)))
 (setq abbrev-file-name "~/.emacs.d/abbrev.el")
-(use-package! company-ctags
-  :config (company-ctags-auto-setup))
 
 (after! mu4e
   (require 'smtpmail)
@@ -195,12 +193,6 @@
 (after! citar
   (setq! citar-bibliography '("~/Sync/bibliography/bibliography.bib")
          citar-library-paths '("~/Sync/bibliography/pdfs")))
-(use-package! oxr
-  :after org
-  :config (setq oxr-types '((figure . "fig")
-                            (table . "tab")
-                            (equation . "eq")
-                            (section . "sec"))))
 
 (use-package gap
   :mode (("\\.g\\'" . gap-mode)
@@ -340,6 +332,26 @@ the region to title case.  Otherwise, work on the current line."
   :commands (consult-recoll)
   :init
   (map! :leader "sR" 'consult-recoll))
+
+
+(after! langtool
+  (setq langtool-default-language "en-NZ"
+        langtool-java-classpath nil
+        langtool-language-tool-jar "~/.local/langtool/languagetool-commandline.jar"))
+
+(use-package languagetool
+  :commands (languagetool-check
+             languagetool-clear-suggestions
+             languagetool-correct-at-point
+             languagetool-correct-buffer
+             languagetool-set-language
+             languagetool-server-mode
+             languagetool-server-start
+             languagetool-server-stop)
+  :config
+  (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8")
+        languagetool-console-command "~/.local/langtool/languagetool-commandline.jar"
+        languagetool-server-command "~/.local/langtool/languagetool-server.jar"))
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
