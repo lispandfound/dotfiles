@@ -40,7 +40,7 @@
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
-
+(set-input-method "TeX")
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 
@@ -128,9 +128,19 @@
   (map! :map org-mode-map
         :n "g." 'org-element-transient))
 
+
+
+(after! ox-beamer
+  (add-to-list 'org-beamer-environments-extra '("conjecture" "C" "\\begin{conjecture}%a[%h]" "\\end{conjecture}")))
+(use-package! ob-ditaa
+  :after org
+  :config
+  (setq-default org-ditaa-jar-path "~/.local/bin/ditaa.jar" ))
 (after! org
-  (setq org-stuck-projects '("+LEVEL=2+PROJECT" ("TODO") nil ""))
-  (setq org-highlight-latex-and-related '(script entities))
+  (setq org-stuck-projects '("+LEVEL=2+PROJECT" ("TODO") nil "")
+        org-highlight-latex-and-related '(script entities))
+
+
   (after! smartparens
     (sp-local-pair 'org-mode "\\[" "\\]")
     (sp-local-pair 'org-mode "$" "$")
@@ -145,6 +155,9 @@
   (setq org-capture-templates '(("t" "Personal todo" entry
                                  (file+headline +org-capture-todo-file "Inbox")
                                  "* TODO %?\n%i\n%a" :prepend t)
+                                ("p" "Paper" entry
+                                 (file+headline +org-capture-todo-file "Inbox")
+                                 "* TODO Read %?\n" :prepend t)
                                 ("n" "Personal notes" entry
                                  (file+headline +org-capture-notes-file "Inbox")
                                  "* %u %?\n%i\n%a" :prepend t)))
@@ -198,7 +211,7 @@
   :mode (("\\.g\\'" . gap-mode)
          ("\\.gap\\'" . gap-mode))
   :init
-  (setq gap-executable "/usr/bin/gap"
+  (setq gap-executable "/usr/local/bin/gap"
         gap-electric-semicolon nil
         gap-electric-equals nil)
   (add-hook 'gap-mode-hook (lambda () (add-to-list 'company-backends '(company-ctags))))
@@ -352,6 +365,9 @@ the region to title case.  Otherwise, work on the current line."
   (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8")
         languagetool-console-command "~/.local/langtool/languagetool-commandline.jar"
         languagetool-server-command "~/.local/langtool/languagetool-server.jar"))
+
+
+
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
