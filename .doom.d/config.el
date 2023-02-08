@@ -154,13 +154,13 @@
 
   (setq org-capture-templates '(("t" "Personal todo" entry
                                  (file+headline +org-capture-todo-file "Inbox")
-                                 "* TODO %?\n%i\n%a" :prepend t)
+                                 "* TODO %?\n%i\n" :prepend t)
                                 ("p" "Paper" entry
                                  (file+headline +org-capture-todo-file "Inbox")
                                  "* TODO Read %?\n" :prepend t)
                                 ("n" "Personal notes" entry
                                  (file+headline +org-capture-notes-file "Inbox")
-                                 "* %u %?\n%i\n%a" :prepend t)))
+                                 "* %u %?\n%i\n" :prepend t)))
   (setq org-agenda-files '("~/Sync/todo.org")
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
@@ -346,7 +346,7 @@ the region to title case.  Otherwise, work on the current line."
   :init
   (map! :leader "sR" 'consult-recoll))
 
-
+(setq ispell-dictionary "en_NZ")
 (after! langtool
   (setq langtool-default-language "en-NZ"
         langtool-java-classpath nil
