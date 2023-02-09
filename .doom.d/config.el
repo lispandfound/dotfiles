@@ -137,6 +137,8 @@
   :config
   (setq-default org-ditaa-jar-path "~/.local/bin/ditaa.jar" ))
 (after! org
+  (setq org-latex-pdf-process '("latexmk -f -pdf -shell-escape -%latex -interaction=nonstopmode -output-directory=%o %f"))
+  (setq org-latex-compiler "lualatex")
   (setq org-stuck-projects '("+LEVEL=2+PROJECT" ("TODO") nil "")
         org-highlight-latex-and-related '(script entities))
 
