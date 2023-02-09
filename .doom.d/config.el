@@ -349,6 +349,11 @@ the region to title case.  Otherwise, work on the current line."
   (map! :leader "sR" 'consult-recoll))
 
 (setq ispell-dictionary "en_NZ")
+(setq +org-capture-frame-parameters '((name . "doom-capture")
+                                      (width . 70)
+                                      (height . 25)
+                                      (transient . t)
+                                      (window-system . x)))
 (after! langtool
   (setq langtool-default-language "en-NZ"
         langtool-java-classpath nil
