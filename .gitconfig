@@ -3,3 +3,9 @@
 	name = Jake Faulkner
 [pull]
 	rebase = false
+[difftool.latex]
+        cmd = git-latexdiff \"$LOCAL\" \"$REMOTE\"
+[difftool]
+        prompt = false
+[alias]
+        ldiff = difftool -t latex
