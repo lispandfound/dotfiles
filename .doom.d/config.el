@@ -137,6 +137,8 @@
   :config
   (setq-default org-ditaa-jar-path "~/.local/bin/ditaa.jar" ))
 (after! org
+  (setq org-latex-pdf-process '("latexmk -f -pdf -shell-escape -%latex -interaction=nonstopmode -output-directory=%o %f"))
+  (setq org-latex-compiler "lualatex")
   (setq org-stuck-projects '("+LEVEL=2+PROJECT" ("TODO") nil "")
         org-highlight-latex-and-related '(script entities))
 
@@ -154,13 +156,13 @@
 
   (setq org-capture-templates '(("t" "Personal todo" entry
                                  (file+headline +org-capture-todo-file "Inbox")
-                                 "* TODO %?\n%i\n%a" :prepend t)
+                                 "* TODO %?\n%i\n" :prepend t)
                                 ("p" "Paper" entry
                                  (file+headline +org-capture-todo-file "Inbox")
                                  "* TODO Read %?\n" :prepend t)
                                 ("n" "Personal notes" entry
                                  (file+headline +org-capture-notes-file "Inbox")
-                                 "* %u %?\n%i\n%a" :prepend t)))
+                                 "* %u %?\n%i\n" :prepend t)))
   (setq org-agenda-files '("~/Sync/todo.org")
         org-refile-targets '((nil . (:maxlevel . 2)) ("~/Sync/archive.org" . (:level . 1)))
         org-default-notes-file "~/Sync/todo.org"
@@ -346,7 +348,12 @@ the region to title case.  Otherwise, work on the current line."
   :init
   (map! :leader "sR" 'consult-recoll))
 
-
+(setq ispell-dictionary "en_NZ")
+(setq +org-capture-frame-parameters '((name . "doom-capture")
+                                      (width . 70)
+                                      (height . 25)
+                                      (transient . t)
+                                      (window-system . x)))
 (after! langtool
   (setq langtool-default-language "en-NZ"
         langtool-java-classpath nil
