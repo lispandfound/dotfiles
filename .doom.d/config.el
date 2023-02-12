@@ -175,7 +175,7 @@
         org-attach-id-dir ".attach"
         org-ellipsis "  "
         org-agenda-block-separator "")
-  (add-hook! org-mode #'evil-tex-mode (bibtex-set-dialect 'biblatex)))
+  )
 
 
 (global-set-key (kbd "M-/") 'hippie-expand)
@@ -235,17 +235,40 @@
 
 (use-package maxima
   :defer t)
-(after! biblio
-  (setq biblio-crossref-user-email-address "jake.faulkner@pg.canterbury.ac.nz")
+
+(use-package biblio
+  :config
+  (setq my/reference-bibfile "~/Sync/bibliography/bibliography.bib")
+  (defun my/biblio--selection-insert-at-end-of-bibfile-callback (bibtex entry)
+    "Add BIBTEX (from ENTRY) to end of a user-specified bibtex file."
+    (with-current-buffer (find-file-noselect my/reference-bibfile)
+      (goto-char (point-max))
+      (insert bibtex)
+      (save-buffer))
+    (message "Inserted bibtex entry for %S."
+             (biblio--prepare-title (biblio-alist-get 'title entry))))
+
+
+  (defun ans/biblio-selection-insert-end-of-bibfile ()
+    "Insert BibTeX of current entry at the end of user-specified bibtex file."
+    (interactive)
+    (biblio--selection-forward-bibtex #'my/biblio--selection-insert-at-end-of-bibfile-callback))
+
+  (map! :map biblio-selection-mode-map
+        "S" #'ans/biblio-selection-insert-end-of-bibfile
+        "j" #'biblio--selection-next
+        "k" #'biblio--selection-previous)
+  (map! :leader "s x" #'zbmath-lookup)
+  (load "~/.doom.d/biblio-zbmath.el")
   (defun biblio-url-retrieve (url callback)
-  "Wrapper around `url-queue-retrieve'.
+    "Wrapper around `url-queue-retrieve'.
 URL and CALLBACK; see `url-queue-retrieve'"
-  (message "Fetching %s" url)
-  (if biblio-synchronous
-      (with-current-buffer (url-retrieve-synchronously url)
-        (funcall callback nil))
-    (setq url-queue-timeout 5)
-    (url-queue-retrieve url callback))))
+    (message "Fetching %s" url)
+    (if biblio-synchronous
+        (with-current-buffer (url-retrieve-synchronously url)
+          (funcall callback nil))
+      (setq url-queue-timeout 5)
+      (url-queue-retrieve url callback))))
 
 (setq-default cursor-type 'bar)
 
@@ -354,6 +377,7 @@ the region to title case.  Otherwise, work on the current line."
                                       (height . 25)
                                       (transient . t)
                                       (window-system . x)))
+(setq browse-url-browser-function 'browse-url-firefox)
 (after! langtool
   (setq langtool-default-language "en-NZ"
         langtool-java-classpath nil
