@@ -380,6 +380,9 @@ the region to title case.  Otherwise, work on the current line."
 (setq browse-url-browser-function 'browse-url-firefox)
 (after! langtool
   (setq langtool-default-language "en-NZ"
+        langtool-user-arguments '("--enablecategories" "STYLE"
+                                  "-e" "PASSIVE_VOICE"
+                                  "--level" "PICKY")
         langtool-java-classpath nil
         langtool-language-tool-jar "~/.local/langtool/languagetool-commandline.jar"))
 
