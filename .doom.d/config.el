@@ -136,6 +136,7 @@
   :after org
   :config
   (setq-default org-ditaa-jar-path "~/.local/bin/ditaa.jar" ))
+(add-hook 'org-mode-hook #'org-appear-mode)
 (after! org
   (setq org-latex-pdf-process '("latexmk -f -pdf -shell-escape -%latex -interaction=nonstopmode -output-directory=%o %f"))
   (setq org-latex-compiler "lualatex")
