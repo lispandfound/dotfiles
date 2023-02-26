@@ -402,6 +402,12 @@ the region to title case.  Otherwise, work on the current line."
         languagetool-server-command "~/.local/langtool/languagetool-server.jar"))
 
 
+(setq org-publish-project-alist
+      '(("website"
+        :base-directory "~/src/personal-website/"
+        :publishing-directory "/ssh:server@172.105.170.218:/home/server/org/"
+        :publishing-function org-html-publish-to-html)))
+(setq org-export-with-timestamps nil)
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
