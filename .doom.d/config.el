@@ -405,7 +405,7 @@ the region to title case.  Otherwise, work on the current line."
 (setq org-publish-project-alist
       '(("website"
         :base-directory "~/src/personal-website/"
-        :publishing-directory "/ssh:server@172.105.170.218:/home/server/org/"
+        :publishing-directory "/ssh:server@jakefaulkner.me:/home/server/org/"
         :publishing-function org-html-publish-to-html)))
 (setq org-export-with-timestamps nil)
 
