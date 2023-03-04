@@ -28,8 +28,7 @@
 (require 'elpaca-autoloads)
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
-(keyboard-translate ?\C-t ?\C-x)
-(keyboard-translate ?\C-x ?\C-t)
+
 
 
 
@@ -48,6 +47,7 @@
 (use-package emacs
   :elpaca nil
   :custom
+  (vc-follow-symlinks t)
   (initial-major-mode 'text-mode)
   (completion-cycle-threshold 3)
   (tab-always-indent 'complete)
@@ -100,8 +100,10 @@
   (unless backup-directory-alist
     (setq backup-directory-alist `(("." . ,(concat user-emacs-directory
                                                    "backups")))))
-
-  (electric-pair-mode 1))
+  (repeat-mode)
+  (electric-pair-mode 1)
+  (keyboard-translate ?\C-t ?\C-x)
+  (keyboard-translate ?\C-x ?\C-t))
 
 (use-package uniquify
   :elpaca nil
@@ -344,7 +346,7 @@
   ;;(add-to-list 'completion-at-point-functions #'cape-dict)
   ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
-)
+  )
 (use-package cdlatex
   :hook (org-mode . org-cdlatex-mode)
   :init (defun add-labelled-env (environment shortcut)
@@ -370,27 +372,25 @@
   :hook ((LaTeX-mode . reftex-mode)))
 
 
-(use-package popwin
-  :init (add-hook 'after-init-hook #'popwin-mode)
-  :config
-  (defun popup-eshell ()
-    (interactive)
-    (let* ((parent (if (buffer-file-name)
-		       (file-name-directory (buffer-file-name))
-		     default-directory))
-	   (name (format "*eshell-popup:%s*" parent))
-	   (buf-exists (get-buffer name))
-	   (new-buf (get-buffer-create name)))
-      (with-current-buffer new-buf
-	(when (null buf-exists)
-	  (eshell-mode))
-	(popwin:popup-buffer new-buf))))
 
-  (global-set-key (kbd "C-c .") #'popup-eshell)
-  (defun popup-scratch ()
-    (interactive)
-      (popwin:popup-buffer (get-buffer "*scratch*")))
-  (global-set-key (kbd "C-c x") #'popup-scratch))
+(use-package popper
+  :bind (("C-`"   . popper-toggle-latest)
+         ("M-`"   . popper-cycle)
+         ("C-M-`" . popper-toggle-type))
+  :init
+  (setq popper-reference-buffers
+        '("\\*Messages\\*"
+          "Output\\*$"
+          "\\*Async Shell Command\\*"
+          "^\\*eshell.*\\*$" eshell-mode ;eshell as a popup
+          "^\\*shell.*\\*$"  shell-mode  ;shell as a popup
+          "^\\*term.*\\*$"   term-mode   ;term as a popup
+          "^\\*vterm.*\\*$"  vterm-mode
+          help-mode
+          compilation-mode))
+  (popper-mode +1)
+  (popper-echo-mode +1))
+
 
 
 (use-package apheleia
@@ -514,7 +514,7 @@
   ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
   ;;;; 5. No project support
   ;; (setq consult-project-function nil)
-)
+  )
 
 (use-package citar-embark
   :after citar embark
