@@ -151,6 +151,9 @@
 (use-package which-key
   :demand t
   :config
+  (defun which-key-showing? ()
+    (and which-key--buffer (window-live-p (get-buffer-window which-key--buffer))))
+  (setq golden-ratio-inhibit-functions '(which-key-showing?))
   (which-key-mode))
 
 (use-package modus-themes
@@ -380,6 +383,7 @@
   :init
   (setq popper-reference-buffers
         '("\\*Messages\\*"
+          "\\*helpful .*\\*$"
           "Output\\*$"
           "\\*Async Shell Command\\*"
           "^\\*eshell.*\\*$" eshell-mode ;eshell as a popup
@@ -387,7 +391,11 @@
           "^\\*term.*\\*$"   term-mode   ;term as a popup
           "^\\*vterm.*\\*$"  vterm-mode
           help-mode
+          helpful-mode
           compilation-mode))
+  (defun popper-p ()
+    (not (null popper-popup-status)))
+  (with-eval-after-load 'golden-ratio (add-to-list 'golden-ratio-inhibit-functions #'popper-p))
   (popper-mode +1)
   (popper-echo-mode +1))
 
