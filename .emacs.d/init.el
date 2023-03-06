@@ -374,7 +374,12 @@
   :after latex
   :hook ((LaTeX-mode . reftex-mode)))
 
-
+(use-package elfeed
+  :custom ((elfeed-feeds '(("ttrss+https://jake@jakefaulkner.me/tt-rss" :password-file "~/.password")))))
+(use-package elfeed-protocol
+  :after elfeed
+  :custom ((elfeed-protocol-enabled-protocols '(ttrss)))
+  :config (elfeed-protocol-enable))
 
 (use-package popper
   :bind (("C-`"   . popper-toggle-latest)
