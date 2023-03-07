@@ -98,9 +98,12 @@
 
   ;; https://www.emacswiki.org/emacs/SavePlace
   (save-place-mode 1)
-
+  (winner-mode)
   (global-set-key (kbd "M-/") 'hippie-expand)
   (global-set-key (kbd "M-z") 'zap-up-to-char)
+  (global-set-key (kbd "s-t") 'eshell)
+  (global-set-key (kbd "s-/") 'winner-undo)
+  
 
   (global-set-key (kbd "C-s") 'isearch-forward-regexp)
   (global-set-key (kbd "C-r") 'isearch-backward-regexp)
