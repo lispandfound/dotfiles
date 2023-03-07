@@ -177,14 +177,14 @@
   :config
   (require 'ox-beamer)
   (org-babel-do-load-languages 'org-babel-load-languages '((haskell . t)))
+  (advice-add 'org-agenda-quit :before 'org-save-all-org-buffers)
+  (add-hook 'org-capture-after-finalize-hook #'org-save-all-org-buffers)
+  (add-hook 'org-agenda-finalize-hook #'org-save-all-org-buffers)
   (add-to-list 'org-latex-packages-alist '("" "minted")))
 
 (use-package which-key
   :demand t
   :config
-  (defun which-key-showing? ()
-    (and which-key--buffer (window-live-p (get-buffer-window which-key--buffer))))
-  (setq golden-ratio-inhibit-functions '(which-key-showing?))
   (which-key-mode))
 
 (use-package modus-themes
