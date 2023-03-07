@@ -43,6 +43,15 @@
 ;; Block until current queue processed.
 (elpaca-wait)
 
+(use-package esh-module
+  :elpaca nil
+  :custom
+  (eshell-prefer-lisp-functions t)
+  (eshell-prefer-lisp-variables t)
+  (password-cache t)
+  (password-cache-expiry 3600)
+  :config
+  (add-to-list 'eshell-modules-list 'eshell-tramp))
 
 (use-package emacs
   :elpaca nil
@@ -60,11 +69,17 @@
   (visible-bell t)
   (load-prefer-newer t)
   (backup-by-copying t)
+  (backup-directory-alist '(("." . "~/.emacs.d/saves")))
+  (delete-old-versions t)
+  (kept-new-versions 6)
+  (kept-old-versions 2)
+  (version-control t)
   (frame-inhibit-implied-resize t)
   (dictionary-server "localhost")
   (ediff-window-setup-function 'ediff-setup-windows-plain)
   (custom-file (expand-file-name "custom.el" user-emacs-directory))
   (inhibit-splash-screen t)
+  
   :config
   (load custom-file)
   (add-hook 'after-init-hook #'global-display-line-numbers-mode)
@@ -229,6 +244,7 @@
   (setq minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+  (setq-default abbrev-mode t)
 
   ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
   ;; Vertico commands are hidden in normal buffers.
@@ -376,10 +392,13 @@
 
 (use-package elfeed
   :custom ((elfeed-feeds '(("ttrss+https://jake@jakefaulkner.me/tt-rss" :password-file "~/.password")))))
+
 (use-package elfeed-protocol
-  :after elfeed
   :custom ((elfeed-protocol-enabled-protocols '(ttrss)))
-  :config (elfeed-protocol-enable))
+  :demand t
+  :after elfeed
+  :config
+  (elfeed-protocol-enable))
 
 (use-package popper
   :bind (("C-`"   . popper-toggle-latest)
@@ -561,7 +580,9 @@
 
 (use-package tree-sitter
   :config (global-tree-sitter-mode))
-(use-package tree-sitter-langs)
+(use-package tree-sitter-langs
+  :after tree-sitter
+  :demand t)
 (use-package flymake
   :config
   (setq flymake-no-changes-timeout 3))
