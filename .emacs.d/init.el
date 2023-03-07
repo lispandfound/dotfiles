@@ -600,5 +600,4 @@
          ("C-h o" . helpful-symbol)
          ("C-h v" . helpful-variable)
          ("C-h k" . helpful-key)))
-(use-package shell-pop
-  :custom (shell-pop-universal-key "C-t"))
+
