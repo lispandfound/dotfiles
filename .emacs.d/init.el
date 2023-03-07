@@ -232,6 +232,7 @@
 (use-package emacs
   :elpaca nil
   :init
+  (setq epg-gpg-program "gpg")
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
   (defun crm-indicator (args)
@@ -393,8 +394,13 @@
   :after latex
   :hook ((LaTeX-mode . reftex-mode)))
 
+(use-package auth-source
+  :elpaca nil
+  :custom (auth-sources '("~/.authinfo.gpg")))
+
+
 (use-package elfeed
-  :custom ((elfeed-feeds '(("ttrss+https://jake@jakefaulkner.me/tt-rss" :password-file "~/.password")))))
+  :custom ((elfeed-feeds '(("ttrss+https://jake@jakefaulkner.me/tt-rss" :use-authinfo t)))))
 
 (use-package elfeed-protocol
   :custom ((elfeed-protocol-enabled-protocols '(ttrss)))
