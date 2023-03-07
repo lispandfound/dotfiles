@@ -437,9 +437,7 @@
           help-mode
           helpful-mode
           compilation-mode))
-  (defun popper-p ()
-    (not (null popper-popup-status)))
-  (with-eval-after-load 'golden-ratio (add-to-list 'golden-ratio-inhibit-functions #'popper-p))
+
   (popper-mode +1)
   (popper-echo-mode +1))
 
