@@ -105,7 +105,7 @@
   (global-set-key (kbd "H-s-t") 'eshell)
   (global-set-key (kbd "s-/") 'winner-undo)
   (global-set-key (kbd "H-s-/") 'winner-undo)
-  
+  (global-set-key (kbd "M-o") 'other-window)
 
   (global-set-key (kbd "C-s") 'isearch-forward-regexp)
   (global-set-key (kbd "C-r") 'isearch-backward-regexp)
