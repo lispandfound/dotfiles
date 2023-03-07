@@ -123,7 +123,16 @@
   (repeat-mode)
   (electric-pair-mode 1)
   
-  (define-key key-translation-map "\C-t" "\C-x")
+
+  (defun dvorak-translation ()
+    (keyboard-translate ?\C-t ?\C-x)
+    (keyboard-translate ?\C-x ?\C-t))
+  (defun setup-frame-keyboard (&optional frame)
+    "Re-map keys in the current terminal."
+    (with-selected-frame (or frame (selected-frame))
+      (dvorak-translation)))
+  (dvorak-translation)
+  (add-hook 'after-make-frame-functions #'setup-frame-keyboard)
 
   )
 
