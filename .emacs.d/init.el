@@ -120,8 +120,10 @@
                                                    "backups")))))
   (repeat-mode)
   (electric-pair-mode 1)
-  (keyboard-translate ?\C-t ?\C-x)
-  (keyboard-translate ?\C-x ?\C-t))
+  
+  (define-key key-translation-map "\C-t" "\C-x")
+
+  )
 
 (use-package uniquify
   :elpaca nil
