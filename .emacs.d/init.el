@@ -427,6 +427,7 @@
   (setq popper-reference-buffers
         '("\\*Messages\\*"
           "\\*helpful .*\\*$"
+          "\\*Warnings\\*"
           "Output\\*$"
           "\\*Async Shell Command\\*"
           "^\\*eshell.*\\*$" eshell-mode ;eshell as a popup
