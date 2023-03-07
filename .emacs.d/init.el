@@ -122,7 +122,7 @@
                                                    "backups")))))
   (repeat-mode)
   (electric-pair-mode 1)
-  
+  (electric-indent-mode 1)
 
   (defun dvorak-translation ()
     (keyboard-translate ?\C-t ?\C-x)
