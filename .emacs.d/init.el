@@ -316,9 +316,6 @@
   :no-require
   :init (citar-embark-mode))
 
-(use-package golden-ratio
-  :init
-  (golden-ratio-mode 1))
 
 (use-package org-appear
   :custom ((org-appear-inside-latex t)
