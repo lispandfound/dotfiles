@@ -57,6 +57,7 @@
   :elpaca nil
   :custom
   (vc-follow-symlinks t)
+  (epg-pinentry-mode 'loopback)
   (initial-major-mode 'text-mode)
   (completion-cycle-threshold 3)
   (tab-always-indent 'complete)
