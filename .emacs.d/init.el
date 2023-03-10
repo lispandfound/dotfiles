@@ -617,3 +617,7 @@
          ("C-h v" . helpful-variable)
          ("C-h k" . helpful-key)))
 
+(use-package ox-moderncv
+  :after org
+  :demand t
+  :elpaca (:repo "https://gitlab.com/lafrenierejm/org-cv.git"))
