@@ -628,6 +628,7 @@
          ("C-h v" . helpful-variable)
          ("C-h k" . helpful-key)))
 
+
 (use-package mu4e
   :elpaca nil
   :load-path "/usr/share/emacs/site-lisp/mu4e"
@@ -695,3 +696,9 @@
   ;; use davmail to retrieve Exchange email
   (setq message-send-mail-function 'message-send-mail-with-sendmail)
   (setq sendmail-program "msmtp"))
+
+(use-package ox-moderncv
+  :after org
+  :demand t
+  :elpaca (:repo "https://gitlab.com/lafrenierejm/org-cv.git"))
+
