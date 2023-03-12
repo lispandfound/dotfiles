@@ -56,6 +56,7 @@
 (use-package emacs
   :elpaca nil
   :custom
+  (native-comp-async-report-warnings-errors nil)
   (vc-follow-symlinks t)
   (epg-pinentry-mode 'loopback)
   (initial-major-mode 'text-mode)
