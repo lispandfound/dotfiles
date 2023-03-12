@@ -3,7 +3,7 @@ IMAPAccount uni
 Host localhost
 User jaf150@uclive.ac.nz
 Port 1143
-PassCmd "secret-tool lookup xdg:schema org.gnome.keyring.Note"
+PassCmd "gpg -q --for-your-eyes-only --no-tty -d ~/.authinfo.gpg | awk '/machine smtp.outlook.com/ {print $NF}'"
 SSLType None
 AuthMechs LOGIN
 
