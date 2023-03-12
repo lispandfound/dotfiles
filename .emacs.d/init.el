@@ -603,11 +603,16 @@
   :init (exec-path-from-shell-initialize))
 
 
-(use-package tree-sitter
-  :config (global-tree-sitter-mode))
-(use-package tree-sitter-langs
-  :after tree-sitter
-  :demand t)
+(use-package treesit
+  :elpaca nil
+  :custom (treesit-font-lock-level 4))
+
+(use-package treesit-auto
+  :custom (treesit-auto-install 'prompt)
+  :config
+  (global-treesit-auto-mode))
+
+
 (use-package flymake
   :config
   (setq flymake-no-changes-timeout 3))
@@ -623,3 +628,70 @@
          ("C-h v" . helpful-variable)
          ("C-h k" . helpful-key)))
 
+(use-package mu4e
+  :elpaca nil
+  :load-path "/usr/share/emacs/site-lisp/mu4e"
+  :commands mu4e mu4e-compose-new
+  :config
+  ;; set mail user agent to mu4e
+  (setq mail-user-agent 'mu4e-user-agent)
+
+  ;; set mu4e mail directory
+  (setq mu4e-maildir "~/.mail")
+
+  ;; use mu4e for sending mail
+  (setq send-mail-function 'smtpmail-send-it
+        message-send-mail-function 'smtpmail-send-it)
+
+  ;; SMTP settings for sending mail
+  (setq smtpmail-smtp-server "localhost"
+        smtpmail-smtp-service 1025) ;; or the port number that DavMail is using
+
+  ;; enable mu4e
+  (setq mu4e-get-mail-command "mbsync -a"
+        mu4e-update-interval 300 ;; update every 5 minutes
+        mu4e-view-show-addresses t
+        mu4e-compose-signature-auto-include nil
+        mu4e-view-show-images t
+        mu4e-headers-include-related nil
+        mu4e-use-fancy-chars t
+        mu4e-headers-date-format "%Y-%m-%d %H:%M"
+        mu4e-headers-fields '((:human-date . 12)
+                              (:flags . 4)
+                              (:from . 22)
+                              (:subject . nil))
+        mu4e-headers-visible-columns 100
+        mu4e-headers-skip-duplicates t
+        mu4e-headers-sort-direction 'descending
+        mu4e-headers-auto-update t
+        mu4e-compose-dont-reply-to-self t
+        mu4e-confirm-quit nil
+        mu4e-compose-format-flowed t
+        mu4e-compose-dont-reply-to-self t
+        mu4e-view-prefer-html t)
+
+  ;; specify the mail sources
+  (setq mu4e-maildir-shortcuts
+        '(("/inbox" . ?i)
+          ("/sent" . ?s)
+          ("/drafts" . ?d)
+          ("/trash" . ?t)))
+
+  ;; define the Exchange email account
+  (setq mu4e-sent-folder "/sent"
+        mu4e-drafts-folder "/drafts"
+        mu4e-trash-folder "/trash"
+        mu4e-refile-folder "/archive"
+        mu4e-sent-messages-behavior 'delete
+        mu4e-compose-signature-auto-include nil
+        mu4e-user-mail-address-list '("jake.faulkner@pg.canterbury.ac.nz")
+        user-mail-address "jake.faulkner@pg.canterbury.ac.nz"
+        mu4e-sent-messages-behavior 'delete
+        mu4e-maildir-shortcuts '(("/inbox" . ?i)
+                                 ("/sent" . ?s)
+                                 ("/drafts" . ?d)
+                                 ("/trash" . ?t)))
+
+  ;; use davmail to retrieve Exchange email
+  (setq message-send-mail-function 'message-send-mail-with-sendmail)
+  (setq sendmail-program "msmtp"))
