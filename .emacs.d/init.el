@@ -595,7 +595,8 @@
     (load (concat user-emacs-directory "tempo.el")))
   (add-hook 'after-init-hook #'setup-tempo))
 
-(use-package haskell-mode)
+(use-package haskell-mode
+  :hook (haskell-mode . interactive-haskell-mode))
 
 (use-package exec-path-from-shell
   :demand t
