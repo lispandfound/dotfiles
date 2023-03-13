@@ -703,6 +703,10 @@
   :demand t
   :elpaca (:repo "https://gitlab.com/lafrenierejm/org-cv.git"))
 
+(defun my/rectangle-number-lines ()
+  (interactive)
+  (rectangle-number-lines (region-beginning) (region-end) 1 "%d. "))
+
 (transient-define-prefix rectangle-commands ()
   "Transient state for rectangle mark mode."
   [:class transient-columns
@@ -716,7 +720,7 @@
    ["Insert"
     ("<tab>" "Shift text to the right" open-rectangle)
     ("i" "Insert string at the start of rectangle" string-insert-rectangle)
-    ("n" "Insert numbers at the start of the rectangle" rectangle-number-lines)
+    ("n" "Insert numbers at the start of the rectangle" my/rectangle-number-lines)
     ]
    ["Copy/Yank"
     ("w" "Copy rectangle" copy-rectangle-as-kill)
