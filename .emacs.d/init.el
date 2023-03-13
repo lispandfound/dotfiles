@@ -703,3 +703,33 @@
   :demand t
   :elpaca (:repo "https://gitlab.com/lafrenierejm/org-cv.git"))
 
+(transient-define-prefix rectangle-commands ()
+  "Transient state for rectangle mark mode."
+  [:class transient-columns
+   ["Cut/Kill/Delete"
+    ("<backspace>" "Delete rectangle" delete-rectangle)
+    ("k" "Kill rectangle" kill-rectangle)
+    ]
+   ["Replace"
+    ("c" "Replace with whitespace" clear-rectangle)
+    ("s" "Replace rectangle with string" string-rectangle)]
+   ["Insert"
+    ("<tab>" "Shift text to the right" open-rectangle)
+    ("i" "Insert string at the start of rectangle" string-insert-rectangle)
+    ("n" "Insert numbers at the start of the rectangle" rectangle-number-lines)
+    ]
+   ["Copy/Yank"
+    ("w" "Copy rectangle" copy-rectangle-as-kill)
+    ("r" "Copy rectangle to register" copy-rectangle-to-register)
+    ("y" "Yank rectangle" yank-rectangle)]
+   ["Calc"
+    ("M" "Send rectangle as matrix to calc" calc-grab-rectangle)
+    ("D" "Sum a rectangle down" calc-grab-sum-down)
+    ("A" "Sum a rectangle across" calc-grab-sum-across)]
+
+   ["Cycle"
+    ("x" "Cycle point around the rectangle's corners" rectangle-exchange-point-and-mark :transient t)]
+   ])
+(bind-key "SPC" 'rectangle-commands rectangle-mark-mode-map)
+
+
