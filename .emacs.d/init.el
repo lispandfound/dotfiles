@@ -58,6 +58,7 @@
   :custom
   (native-comp-async-report-warnings-errors nil)
   (vc-follow-symlinks t)
+  (sentence-end-double-space nil)
   (epg-pinentry-mode 'loopback)
   (initial-major-mode 'text-mode)
   (completion-cycle-threshold 3)
