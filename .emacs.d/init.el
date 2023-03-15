@@ -86,6 +86,9 @@
   :config
   (load custom-file)
   (add-hook 'after-init-hook #'global-display-line-numbers-mode)
+  (defun disable-line-numbers ()
+    (display-line-numbers-mode -1))
+  (add-hook 'doc-view-mode-hook #'disable-line-numbers)
   
   (unless (memq window-system '(mac ns))
     (menu-bar-mode -1))
@@ -750,3 +753,36 @@
                                    (add-to-list 'compilation-error-regexp-alist-alist '(languagetool-file "^Working on \\(.*?\\)\\.\\.\\.$" 1))
                                    (add-to-list 'compilation-error-regexp-alist 'languagetool)
                                    (add-to-list 'compilation-error-regexp-alist 'languagetool-file)))
+
+
+(transient-define-prefix doc-view-transient ()
+  "Transient for doc-view mode."
+
+  [:class transient-columns
+ ["Zoom"
+   ("+" "Enlarge" doc-view-enlarge :transient t)
+   ("-" "Shrink" doc-view-shrink :transient t)
+   ("w" "Fit window to page" doc-view-fit-window-to-page :transient t)
+   ("W" "Fit width to window" doc-view-fit-width-to-window :transient t)]
+  ["Navigation"
+   ("g" "Go to page" doc-view-goto-page)
+   (">" "Last page" doc-view-last-page)
+   ("<" "First page" doc-view-first-page)]
+  ["Scale"
+   ("R" "Scale reset" doc-view-scale-reset)
+   ("a" "Scale adjust" doc-view-scale-adjust)]
+  ["Miscellaneous"
+   ("o" "Open text" doc-view-open-text)
+   ("s" "Set slice" doc-view-set-slice)
+   ("x" "Kill proc" doc-view-kill-proc)
+   ("c" "Clear cache" doc-view-clear-cache)
+   ("d" "Dired cache" doc-view-dired-cache)
+   ("r" "Reset slice" doc-view-reset-slice)
+   ("p" "Presentation" doc-view-presentation)]])
+
+(defun doc-view-transient-add-bindings ()
+  (bind-key "<tab>" 'doc-view-transient doc-view-mode-map))
+
+(add-hook 'doc-view-mode-hook #'doc-view-transient-add-bindings)
+
+
