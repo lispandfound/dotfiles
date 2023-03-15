@@ -179,6 +179,11 @@
                                 ("n" "Personal notes" entry
                                  (file +org-capture-notes-file)
                                  "* %u %?\n%i\n" :prepend t)))
+  (setq org-publish-project-alist
+      '(("website"
+        :base-directory "~/src/personal-website/"
+        :publishing-directory "/ssh:server@jakefaulkner.me:/home/server/org/"
+        :publishing-function org-html-publish-to-html)))
   (global-set-key (kbd "C-c a") #'org-agenda)
   (global-set-key (kbd "C-c n") #'org-capture)
   :config
