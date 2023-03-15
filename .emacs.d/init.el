@@ -739,8 +739,9 @@
    ["Cycle"
     ("x" "Cycle point around the rectangle's corners" rectangle-exchange-point-and-mark :transient t)]
    ])
-(bind-key "SPC" 'rectangle-commands rectangle-mark-mode-map)
-
+(add-hook 'rectangle-mark-mode-hook (lambda ()
+                                       (bind-key "SPC" 'rectangle-commands rectangle-mark-mode-map)))
+;;; language tool configuration
 
 (add-hook 'compilation-mode-hook (lambda ()
                                    (add-to-list 'compilation-error-regexp-alist-alist '(languagetool "Line \\([0-9]+\\), column \\([0-9]+\\)" nil 1 2))
