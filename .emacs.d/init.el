@@ -57,6 +57,7 @@
   :elpaca nil
   :custom
   (native-comp-async-report-warnings-errors nil)
+  (isearch-lazy-count t)
   (vc-follow-symlinks t)
   (sentence-end-double-space nil)
   (epg-pinentry-mode 'loopback)
