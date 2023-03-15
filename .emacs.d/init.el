@@ -152,6 +152,7 @@
 (use-package org
   :custom ((org-latex-pdf-process '("latexmk -f -pdf -shell-escape -%latex -interaction=nonstopmode -output-directory=%o %f"))
  	   (org-latex-compiler "lualatex")
+           (org-export-with-smart-quotes t)
            (org-latex-listings 'minted)
 	   (org-stuck-projects '("+LEVEL=2+PROJECT" ("TODO") nil ""))
            (org-use-speed-commands t)
@@ -320,8 +321,9 @@
 (use-package citar
   :bind ("C-c b" . citar-open)
   :custom
-  (citar-bibliography '("~/Sync/bibliography/bibliography.bib")
-                      citar-library-paths '("~/Sync/bibliography/pdfs")))
+  (citar-bibliography '("~/Sync/bibliography/bibliography.bib"))
+  :config
+  (setq citar-library-paths '("~/Sync/bibliography/pdfs")))
 (use-package citar-embark
   :after citar embark
   :elpaca nil
