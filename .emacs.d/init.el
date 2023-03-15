@@ -737,3 +737,8 @@
 (bind-key "SPC" 'rectangle-commands rectangle-mark-mode-map)
 
 
+(add-hook 'compilation-mode-hook (lambda ()
+                                   (add-to-list 'compilation-error-regexp-alist-alist '(languagetool "Line \\([0-9]+\\), column \\([0-9]+\\)" nil 1 2))
+                                   (add-to-list 'compilation-error-regexp-alist-alist '(languagetool-file "^Working on \\(.*?\\)\\.\\.\\.$" 1))
+                                   (add-to-list 'compilation-error-regexp-alist 'languagetool)
+                                   (add-to-list 'compilation-error-regexp-alist 'languagetool-file)))
