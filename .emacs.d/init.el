@@ -104,6 +104,7 @@
     "Kill up to, but not including ARGth occurrence of CHAR." t)
 
   ;; https://www.emacswiki.org/emacs/SavePlace
+  (global-auto-revert-mode t)
   (save-place-mode 1)
   (winner-mode)
   (global-set-key (kbd "M-/") 'hippie-expand)
