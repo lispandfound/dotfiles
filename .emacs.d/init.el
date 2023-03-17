@@ -793,3 +793,12 @@
 (use-package qpdf.el
   :elpaca (:host github :repo "orgtre/qpdf.el")
   :commands qpdf)
+
+
+(defun edit-as-root ()
+  "Edit the current file as root."
+  (interactive)
+  (let ((file-name (buffer-file-name)))
+    (when (not (file-writable-p file-name))
+      (setq file-name (concat "/sudo:root@localhost:" file-name)))
+    (find-file file-name)))
