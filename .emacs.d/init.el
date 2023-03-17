@@ -786,4 +786,6 @@
 
 (add-hook 'doc-view-mode-hook #'doc-view-transient-add-bindings)
 
-
+(use-package qpdf.el
+  :elpaca (:host github :repo "orgtre/qpdf.el")
+  :commands qpdf)
