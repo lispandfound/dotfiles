@@ -155,6 +155,7 @@
 
 
 (use-package org
+  :hook ((org-mode . visual-line-mode))
   :custom ((org-latex-pdf-process '("latexmk -f -pdf -shell-escape -%latex -interaction=nonstopmode -output-directory=%o %f"))
  	   (org-latex-compiler "lualatex")
            (org-export-with-smart-quotes t)
@@ -193,6 +194,7 @@
   (global-set-key (kbd "C-c a") #'org-agenda)
   (global-set-key (kbd "C-c n") #'org-capture)
   :config
+  (add-to-list 'org-modules 'org-tempo)
   (require 'ox-beamer)
   (org-babel-do-load-languages 'org-babel-load-languages '((haskell . t)))
   (advice-add 'org-agenda-quit :before 'org-save-all-org-buffers)
