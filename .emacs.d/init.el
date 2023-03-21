@@ -160,7 +160,7 @@
  	   (org-latex-compiler "lualatex")
            (org-export-with-smart-quotes t)
            (org-latex-listings 'minted)
-	   (org-stuck-projects '("+LEVEL=2+PROJECT" ("TODO") nil ""))
+           (org-stuck-projects '("+@project/-DONE" ("NEXT") nil "SCHEDULED:"))
            (org-use-speed-commands t)
 	   (org-highlight-latex-and-related '(script entities))
 	   (org-agenda-files '("~/Sync/todo.org" "~/Sync/notes.org"))
