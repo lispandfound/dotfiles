@@ -177,6 +177,7 @@
 
   (setq +org-capture-todo-file "~/Sync/todo.org")
   (setq +org-capture-notes-file "~/Sync/notes.org")
+  (setq org-bibtex-file "~/Sync/bibliography/bibliography.org")
   (setq org-capture-templates '(("t" "Personal todo" entry
                                  (file+headline +org-capture-todo-file "Inbox")
                                  "* TODO %?\n%i\n" :prepend t)
@@ -342,11 +343,14 @@
 (use-package ol-bibtex
   :elpaca nil
   :after org
+  :commands org-bibtex/capture-bibtex
   :config
   (defun org-bibtex/capture-bibtex ()
+    (bibtex-set-dialect 'biblatex)
     (with-temp-buffer
       (org-bibtex-yank)
       (buffer-substring-no-properties (point-min) (point-max)))))
+
 (use-package cdlatex
   :hook (org-mode . org-cdlatex-mode)
   :init (defun add-labelled-env (environment shortcut)
