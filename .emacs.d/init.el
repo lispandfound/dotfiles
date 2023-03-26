@@ -158,6 +158,7 @@
 
 
 (use-package org
+  :elpaca org-contrib
   :hook ((org-mode . visual-line-mode))
   :custom ((org-latex-pdf-process '("latexmk -f -pdf -shell-escape -%latex -interaction=nonstopmode -output-directory=%o %f"))
  	   (org-latex-compiler "lualatex")
