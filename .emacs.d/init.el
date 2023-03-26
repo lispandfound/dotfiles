@@ -347,7 +347,8 @@
 (use-package ol-bibtex
   :elpaca nil
   :after org
-  :commands org-bibtex/capture-bibtex
+  :demand t
+  :commands (org-bibtex/capture-bibtex org-agenda org-bibtex-search org-bibtex-write)
   :config
   (defun org-bibtex/capture-bibtex ()
     (bibtex-set-dialect 'biblatex)
