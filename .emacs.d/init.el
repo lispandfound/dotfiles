@@ -76,6 +76,7 @@
   (load-prefer-newer t)
   (backup-by-copying t)
   (backup-directory-alist '(("." . "~/.emacs.d/saves")))
+  (doc-view-resolution 300)
   (delete-old-versions t)
   (kept-new-versions 6)
   (kept-old-versions 2)
