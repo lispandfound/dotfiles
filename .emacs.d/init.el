@@ -476,10 +476,9 @@
           "\\*Warnings\\*"
           "Output\\*$"
           "\\*Async Shell Command\\*"
-          "^\\*eshell.*\\*$" eshell-mode ;eshell as a popup
-          "^\\*shell.*\\*$"  shell-mode  ;shell as a popup
-          "^\\*term.*\\*$"   term-mode   ;term as a popup
-          "^\\*vterm.*\\*$"  vterm-mode
+          "^\\*eshell.*\\*\\(<[0-9]+>\\)?$" eshell-mode ;eshell as a popup
+          "^\\*shell.*\\*\\(<[0-9]+>\\)?$"  shell-mode  ;shell as a popup
+          "^\\*term.*\\*\\(<[0-9]+>\\)?$"   term-mode   ;term as a popup
           help-mode
           helpful-mode
           compilation-mode))
