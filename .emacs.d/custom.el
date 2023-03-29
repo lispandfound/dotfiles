@@ -5,6 +5,8 @@
  ;; If there is more than one, they won't work right.
  '(eglot-ignored-server-capabilities '(:documentHighlightProvider) nil nil "Customized with use-package eglot")
  '(org-latex-src-block-backend 'minted nil nil "Customized with use-package org")
+ '(org-modules
+   '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus ol-info ol-irc ol-mhe ol-rmail org-tempo ol-w3m))
  '(shell-pop-shell-type '("eshell" "*eshell*" (lambda nil (eshell)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
