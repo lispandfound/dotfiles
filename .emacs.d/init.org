@@ -186,7 +186,7 @@ The =H-s-*= keybindings are for my laptop..
   (setup
    (autoload 'zap-up-to-char "misc"
      "Kill up to, but not including ARGth occurrence of CHAR." t)
-   (:global
+   (:gkeys
     "M-/" 'hippie-expand
     "M-z" 'zap-up-to-char
     "s-t" 'eshell
@@ -222,7 +222,7 @@ Dvorak makes x a hard key to press, so we rebind to t. The translation is done o
 * Window and Buffer Management
 #+begin_src emacs-lisp
   (setup winner
-   (:global
+   (:gkeys
     "s-/" 'winner-undo
     "H-s-/" 'winner-undo
     "s-?" 'winner-redo
@@ -236,7 +236,7 @@ Dvorak makes x a hard key to press, so we rebind to t. The translation is done o
 ** Popper
 #+begin_src emacs-lisp
   (elpaca-setup popper
-                (:bind
+                (:keys
                  "C-`"   popper-toggle-latest
                  "M-`"   popper-cycle
                  "C-M-`" popper-toggle-type)
@@ -343,7 +343,7 @@ Dvorak makes x a hard key to press, so we rebind to t. The translation is done o
      ["Cycle"
       ("x" "Cycle point around the rectangle's corners" rectangle-exchange-point-and-mark :transient t)]
      ])
-    (:bind "SPC" 'rectangle-commands))
+    (:keys "SPC" 'rectangle-commands))
 #+end_src
 ** LanguageTool
 This parses the compile output of languagetool for compile 
@@ -455,7 +455,7 @@ This parses the compile output of languagetool for compile
 * Git
 #+begin_src emacs-lisp
   (elpaca-setup magit
-                (:bind "C-x g" magit-status))
+                (:keys "C-x g" magit-status))
 #+end_src
 * Org Mode
 #+begin_src emacs-lisp
@@ -500,7 +500,7 @@ This parses the compile output of languagetool for compile
                     :base-directory "~/src/personal-website/"
                     :publishing-directory "/ssh:server@jakefaulkner.me:/home/server/org/"
                     :publishing-function org-html-publish-to-html)))
-                (:global
+                (:gkeys
                  "C-c a" org-agenda
                  "C-c n" org-capture)
                 (:with-hook org-capture-after-finalize-hook
@@ -509,7 +509,7 @@ This parses the compile output of languagetool for compile
                   (:hook org-save-all-org-buffers))
                 (:when-loaded
                   (add-to-list 'org-latex-packages-alist '("" minted))
-                  (add-to-list 'org-modules 'org-tempo)))
+                  ))
 
   (setup ox-beamer
     (:load-after org-mode)
@@ -522,14 +522,16 @@ This parses the compile output of languagetool for compile
                 (:hook-into org-mode))
 #+end_src
 
+
+
 * Completions
 ** Vertico and Orderless
 #+begin_src emacs-lisp
   (elpaca-setup vertico
                 (vertico-mode)
-                (:global "M-R" 'vertico-repeat)
+                (:gkeys "M-R" 'vertico-repeat)
                 (:with-map vertico-map
-                  (:bind "RET" vertico-directory-enter
+                  (:keys "RET" vertico-directory-enter
                          "DEL" vertico-directory-delete-char
                          "M-DEL" vertico-directory-delete-char))
                 (:with-hook minibuffer-setup-hook
@@ -550,7 +552,7 @@ This parses the compile output of languagetool for compile
 ** Embark
 #+begin_src emacs-lisp
   (elpaca-setup embark
-                (:global "C-." embark-act
+                (:gkeys "C-." embark-act
                          "C-," embark-dwim
                          "C-h B" embark-bindings)
                 (:option prefix-help-command #'embark-prefix-help-command
@@ -566,7 +568,7 @@ This parses the compile output of languagetool for compile
 #+begin_src emacs-lisp
   (elpaca-setup consult
                 ;; Replace bindings. Lazily loaded due by `use-package'.
-                (:global ;; C-c bindings (mode-specific-map)
+                (:gkeys ;; C-c bindings (mode-specific-map)
                  "C-c M-x"  consult-mode-command
                  "C-c h"  consult-history
                  "C-c k"  consult-kmacro
@@ -609,13 +611,13 @@ This parses the compile output of languagetool for compile
                  ;; Isearch integration
                  "M-s e" consult-isearch-history)
                 (:with-map isearch-mode-map
-                  (:bind
+                  (:keys
                    "M-e" consult-isearch-history         ;; orig. isearch-edit-string
                    "M-s e" consult-isearch-history       ;; orig. isearch-edit-string
                    "M-s l" consult-line                  ;; needed by consult-line to detect isearch
                    "M-s L" consult-line-multi))
                 (:with-map minibuffer-local-map
-                  (:bind
+                  (:keys
                    "M-s" consult-history
                    "M-r" consult-history))
                 (:with-hook completion-list-mode-hook
@@ -666,7 +668,7 @@ This parses the compile output of languagetool for compile
 #+begin_src emacs-lisp
   (elpaca-setup cape
               
-                (:global "M-p p" completion-at-point
+                (:gkeys "M-p p" completion-at-point
                          "M-p t" complete-tag        ;; etags
                          "M-p d" cape-dabbrev        ;; or dabbrev-completion
                          "M-p h" cape-history
@@ -763,7 +765,7 @@ This parses the compile output of languagetool for compile
 * Bibliography 
 #+begin_src emacs-lisp
   (elpaca-setup citar
-                (:global "C-c b" citar-open)
+                (:gkeys "C-c b" citar-open)
                 (:option
                  citar-bibliography '("~/Sync/bibliography/bibliography.bib"))
 
@@ -790,7 +792,7 @@ This parses the compile output of languagetool for compile
 * Helpful
 #+begin_src emacs-lisp
   (elpaca-setup helpful
-                (:global
+                (:gkeys
                  "C-h f" helpful-callable
                  "C-h o" helpful-symbol
                  "C-h v" helpful-variable
@@ -833,7 +835,7 @@ This parses the compile output of languagetool for compile
                ("r" "Reset slice" doc-view-reset-slice)
                ("p" "Presentation" doc-view-presentation)]])
 
-    (:bind "<tab>" 'doc-view-transient)
+    (:keys "<tab>" 'doc-view-transient)
     (:hook disable-line-numbers))
 #+end_src
 * Eshell
