@@ -1,5 +1,5 @@
 #+TITLE: Emacs Init
-#+PROPERTY: header-args :tangle init.el
+#+PROPERTY: header-args :tangle ~/.emacs.d/init.el
 
 * Package Manager
 - If you get a complaint that the install version [[elisp:(elpaca-browse 'elpaca)][see the github]] for the updated version.
