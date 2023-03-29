@@ -65,6 +65,20 @@ A lightweight alternative to use-package that is supposedly "less magic".
            (cl-function (lambda ,signature ,@body))
            ,@opts)))
 
+    (defsetup :keys (key command)
+              :repeatable t
+              :after-loaded t
+              :ensure (nil func)
+              `(bind-key ,key ,command ,(setup-get 'map)))
+    (defsetup :gkeys (key command)
+              :repeatable t
+              :ensure (nil func)
+              `(bind-key ,key ,command))
+    (defsetup :gkeys* (key command)
+              :repeatable t
+              :ensure (nil func)
+              `(bind-key* ,key ,command))
+
     (setup-define :load-after
       (lambda (&rest features)
         (let ((body `(require ',(setup-get 'feature))))
@@ -107,6 +121,10 @@ A lightweight alternative to use-package that is supposedly "less magic".
 #+begin_src emacs-lisp
   (elpaca-setup exec-path-from-shell
     (exec-path-from-shell-initialize))
+#+end_src
+* Bind Key
+#+begin_src emacs-lisp
+  (elpaca-setup bind-key)
 #+end_src
 * Theme
 #+begin_src emacs-lisp
