@@ -219,24 +219,23 @@ Dvorak makes x a hard key to press, so we rebind to t. The translation is done o
 #+begin_src emacs-lisp
   (elpaca-setup popper
                 (:bind
-                   "C-`"   popper-toggle-latest
-                   "M-`"   popper-cycle
-                   "C-M-`" popper-toggle-type)
+                 "C-`"   popper-toggle-latest
+                 "M-`"   popper-cycle
+                 "C-M-`" popper-toggle-type)
 
                 (:option
                  popper-reference-buffers
-                      '("\\*Messages\\*"
-                        "\\*helpful .*\\*$"
-                        "\\*Warnings\\*"
-                        "Output\\*$"
-                        "\\*Async Shell Command\\*"
-                        "^\\*eshell.*\\*$" eshell-mode ;eshell as a popup
-                        "^\\*shell.*\\*$"  shell-mode  ;shell as a popup
-                        "^\\*term.*\\*$"   term-mode   ;term as a popup
-                        "^\\*vterm.*\\*$"  vterm-mode
-                        help-mode
-                        helpful-mode
-                        compilation-mode))
+                 '("\\*Messages\\*"
+                   "\\*helpful .*\\*$"
+                   "\\*Warnings\\*"
+                   "Output\\*$"
+                   "\\*Async Shell Command\\*"
+                   "^\\*eshell.*\\*\\(<[0-9]+>\\)?$" eshell-mode ;eshell as a popup
+                   "^\\*shell.*\\*\\(<[0-9]+>\\)?$"  shell-mode  ;shell as a popup
+                   "^\\*term.*\\*\\(<[0-9]+>\\)?$"   term-mode   ;term as a popup
+                   help-mode
+                   helpful-mode
+                   compilation-mode))
 
                 (popper-mode +1)
                 (popper-echo-mode +1))
