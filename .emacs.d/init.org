@@ -436,14 +436,13 @@ This parses the compile output of languagetool for compile
 #+begin_src emacs-lisp
   (setup tempo
    (:option tempo-interactive t)
-   (:global
+   (:gkeys
     "M-g M-e" tempo-forward-mark
     "M-g M-a" tempo-backward-mark)
-   (defun load-tempo-file ()
-     )
-   (defun skip-self-insert ()
+   (defadvice tempo-define-template (after no-self-insert-in-abbrevs activate)
+     "Skip self-insert if template function is called by an abbrev."
      (put (intern (concat "tempo-template-" (ad-get-arg 0))) 'no-self-insert t))
-   (:advise tempo-define-template :after skip-self-insert)
+ 
    (:when-loaded
      (load (concat user-emacs-directory "tempo.el"))))
 #+end_src
