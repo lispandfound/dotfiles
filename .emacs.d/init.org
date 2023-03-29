@@ -342,11 +342,12 @@ This parses the compile output of languagetool for compile
     (:option
      treesit-font-lock-level 4))
 
-  (elpaca-setup treesit-auto
+  (elpaca-setup (treesit-auto :type git :host github :repo "renzmann/treesit-auto")
                 (:option
                  treesit-auto-install 'prompt)
-              
-                (global-treesit-auto-mode))
+                (:autoload global-treesit-auto-mode treesit-auto-mode)
+
+                (:hook-into prog-mode))
 #+end_src
 ** Syntax Checking
 #+begin_src emacs-lisp
