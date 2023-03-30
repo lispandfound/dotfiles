@@ -526,16 +526,19 @@ This parses the compile output of languagetool for compile
 * Completions
 ** Vertico and Orderless
 #+begin_src emacs-lisp
-  (elpaca-setup vertico
+  (elpaca-setup (vertico :files (:defaults "extensions/*.el")) 
                 (vertico-mode)
-                (:gkeys "M-R" 'vertico-repeat)
                 (:with-map vertico-map
                   (:keys "RET" vertico-directory-enter
                          "DEL" vertico-directory-delete-char
                          "M-DEL" vertico-directory-delete-char))
+              
+                (:with-hook rfn-eshadow-update-overlay-hook (:hook vertico-directory-tidy)))
+  (setup vertico-repeat
+                (:autoload vertico-repeat-save)
                 (:with-hook minibuffer-setup-hook
                   (:hook vertico-repeat-save))
-                (:with-hook rfn-eshadow-update-overlay-hook (:hook vertico-directory-tidy)))
+                (:gkeys "M-R" 'vertico-repeat))
   (elpaca-setup orderless
                 (:option
                  completion-cycle-threshold 3
