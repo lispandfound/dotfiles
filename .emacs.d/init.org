@@ -69,15 +69,15 @@ A lightweight alternative to use-package that is supposedly "less magic".
               :repeatable t
               :after-loaded t
               :ensure (nil func)
-              `(bind-key ,key ,command ,(setup-get 'map)))
+              `(keymap-set ,(setup-get 'map) ,key ,command))
     (defsetup :gkeys (key command)
               :repeatable t
               :ensure (nil func)
-              `(bind-key ,key ,command))
+              `(keymap-global-set ,key ,command))
     (defsetup :gkeys* (key command)
               :repeatable t
               :ensure (nil func)
-              `(bind-key* ,key ,command))
+              `(keymap-set override-global-map ,key ,command))
 
     (setup-define :load-after
       (lambda (&rest features)
@@ -567,13 +567,13 @@ This parses the compile output of languagetool for compile
 #+begin_src emacs-lisp
   (elpaca-setup consult
                 ;; Replace bindings. Lazily loaded due by `use-package'.
+                (global-set-key [remap Info-search] #'consult-info)
                 (:gkeys ;; C-c bindings (mode-specific-map)
                  "C-c M-x"  consult-mode-command
                  "C-c h"  consult-history
                  "C-c k"  consult-kmacro
                  "C-c m"  consult-man
                  "C-c i"  consult-info
-                 [remap Info-search]  consult-info
                  ;; C-x bindings (ctl-x-map)
                  "C-x M-:" consult-complex-command     ;; orig. repeat-complex-command
                  "C-x b" consult-buffer                ;; orig. switch-to-buffer
