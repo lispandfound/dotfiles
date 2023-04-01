@@ -178,6 +178,7 @@ Cache passwords, and setup gpg for emacs. The pinentry mode ensures emacs prompt
 #+begin_src emacs-lisp
   (setq
    initial-major-mode 'text-mode
+   initial-scratch-message ""
    inhibit-splash-screen t)
 #+end_src
 * General Bindings
@@ -187,6 +188,7 @@ The =H-s-*= keybindings are for my laptop..
    (autoload 'zap-up-to-char "misc"
      "Kill up to, but not including ARGth occurrence of CHAR." t)
    (:gkeys
+    "C-x C-b" 'ibuffer
     "M-/" 'hippie-expand
     "M-z" 'zap-up-to-char
     "s-t" 'eshell
@@ -233,38 +235,49 @@ Dvorak makes x a hard key to press, so we rebind to t. The translation is done o
   (setup uniquify
          (setq uniquify-buffer-name-style 'forward))
 #+end_src
-** Popper
+** Buffer Rules
+The variable =display-buffer-alist= controls how buffers display. Each element of the alist has three components:
+1. A regular expression or function determining when the action applies to the buffer. (see =M-x re-builder= or =rx= for building regexps).
+2. An action to describe where the window containing the buffer is displayed.
+3. A set of window parameters that describe how the action and window behaves.
+
+For points 2. and 3. see the [[help:display-buffer][Display Buffer Docs]].
 #+begin_src emacs-lisp
-  (elpaca-setup popper
-                (:keys
-                 "C-`"   popper-toggle-latest
-                 "M-`"   popper-cycle
-                 "C-M-`" popper-toggle-type)
+  (setq switch-to-buffer-obey-display-actions t
+        switch-to-buffer-in-dedicated-window 'pop)
 
-                (:option
-                 popper-reference-buffers
-                 '("\\*Messages\\*"
-                   "\\*helpful .*\\*$"
-                   "\\*Warnings\\*"
-                   "Output\\*$"
-                   "\\*Async Shell Command\\*"
-                   "^\\*eshell.*\\*\\(<[0-9]+>\\)?$" eshell-mode ;eshell as a popup
-                   "^\\*shell.*\\*\\(<[0-9]+>\\)?$"  shell-mode  ;shell as a popup
-                   "^\\*term.*\\*\\(<[0-9]+>\\)?$"   term-mode   ;term as a popup
-                   help-mode
-                   helpful-mode
-                   compilation-mode))
-
-                (popper-mode +1)
-                (popper-echo-mode +1))
+  (setq display-buffer-alist
+        `(("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*" nil
+           (window-parameters
+            (mode-line-format . none)))
+          ("\\*eshell\\*.*" display-buffer-in-side-window
+           (side . bottom)
+           (window-parameters
+            (no-delete-other-parameters . t)))))
+  #+end_src
+** IBuffer
+This package integrates IBuffer with project.el, which lets me view open buffers by their associated project and manage them from there.
+#+begin_src emacs-lisp
+  (elpaca-setup ibuffer-project
+                (add-hook 'ibuffer-hook
+                          (lambda ()
+                            (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+                            (unless (eq ibuffer-sorting-mode 'project-file-relative)
+                              (ibuffer-do-sort-by-project-file-relative)))))
 #+end_src
-
 * Jumping
 #+begin_src emacs-lisp
   (elpaca-setup beacon
                 (beacon-mode 1))
+#+end_src
 
+More intelligent movement commands. Moving to the end/beginning of the line will now cycle between the indent and true beginning of the line.
 
+#+begin_src emacs-lisp
+  (elpaca-setup mwim
+                (:gkeys
+                 "C-a" mwim-beginning
+                 "C-e" mwim-end))
 #+end_src
 * Editing
 ** General
@@ -522,7 +535,6 @@ This parses the compile output of languagetool for compile
 #+end_src
 
 
-
 * Completions
 ** Vertico and Orderless
 #+begin_src emacs-lisp
@@ -638,7 +650,7 @@ This parses the compile output of languagetool for compile
 ** Corfu
 #+begin_src emacs-lisp
   (elpaca-setup corfu
-
+                (:option tab-always-indent 'complete)
                 (global-corfu-mode)
 
                 ;; Add prompt indicator to `completing-read-multiple'.
