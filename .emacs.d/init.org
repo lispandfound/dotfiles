@@ -265,6 +265,12 @@ This package integrates IBuffer with project.el, which lets me view open buffers
                             (unless (eq ibuffer-sorting-mode 'project-file-relative)
                               (ibuffer-do-sort-by-project-file-relative)))))
 #+end_src
+** Transpose Windows
+#+begin_src emacs-lisp
+  (elpaca-setup transpose-frame
+                (:gkeys
+                 "C-x w r" transpose-frame))
+#+end_src
 * Jumping
 #+begin_src emacs-lisp
   (elpaca-setup beacon
