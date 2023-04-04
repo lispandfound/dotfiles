@@ -468,7 +468,9 @@ This parses the compile output of languagetool for compile
 ** Haskell
 #+begin_src emacs-lisp
   (elpaca-setup haskell-mode
-     (:hook interactive-haskell-mode))
+                (:hook interactive-haskell-mode)
+                (:with-mode interactive-haskell-mode
+                  (:bind "C-c C-c" 'haskell-compile)))
 #+end_src
 * Git
 #+begin_src emacs-lisp
