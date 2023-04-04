@@ -477,6 +477,7 @@ This parses the compile output of languagetool for compile
 #+end_src
 * Org Mode
 #+begin_src emacs-lisp
+  (elpaca-setup (org :type git :repo "git.savannah.gnu.org/emacs/org-mode"))
   (elpaca-setup org-contrib
                 (:option
                  org-latex-pdf-process '("latexmk -f -pdf -shell-escape -%latex -interaction=nonstopmode -output-directory=%o %f")
@@ -539,7 +540,18 @@ This parses the compile output of languagetool for compile
                  org-appear-autosubmarkers t)
                 (:hook-into org-mode))
 #+end_src
-
+** Hacks
+The following code allows =M-right= and =M-left= to be called with a numeric prefix argument, so that they demote/promote the heading =n= times. Answer from [[https://emacs.stackexchange.com/questions/76629/promoting-org-mode-headings-in-a-region-with-a-numeric-prefix/76653#76653][this stackexchange post]].
+#+begin_src emacs-lisp
+  (setup org
+    (defun make-repeatable (orig-fun &optional n)
+      "Take an interactive function `orig-fun' that does not accept a numeric prefix, and advise it to accept a numeric prefix by simply calling the function `n' times."
+      (interactive "p")
+      (dotimes (i (max n 1))
+        (call-interactively orig-fun)))
+    (:advise org-do-demote :around make-repeatable)
+    (:advise org-do-promote :around make-repeatable))
+#+end_src
 
 * Completions
 ** Vertico and Orderless
