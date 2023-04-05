@@ -476,6 +476,12 @@ This parses the compile output of languagetool for compile
                 (:with-mode interactive-haskell-mode
                   (:bind "C-c C-c" 'haskell-compile)))
 #+end_src
+** GAP
+#+begin_src emacs-lisp
+  (elpaca-setup gap-mode
+                (:option gap-executable (executable-find "gap"))
+                (:file-match "\\.g\\'" "\\.gap\\'"))
+#+end_src
 * Git
 #+begin_src emacs-lisp
   (elpaca-setup magit
@@ -705,27 +711,31 @@ The following code allows =M-right= and =M-left= to be called with a numeric pre
 ** Cape
 #+begin_src emacs-lisp
   (elpaca-setup cape
-              
+
                 (:gkeys "M-p p" completion-at-point
-                         "M-p t" complete-tag        ;; etags
-                         "M-p d" cape-dabbrev        ;; or dabbrev-completion
-                         "M-p h" cape-history
-                         "M-p f" cape-file
-                         "M-p k" cape-keyword
-                         "M-p s" cape-symbol
-                         "M-p a" cape-abbrev
-                         "M-p i" cape-ispell
-                         "M-p l" cape-line
-                         "M-p w" cape-dict
-                         "M-p \\" cape-tex
-                         "M-p _" cape-tex 
-                         "M-p ^" cape-tex
-                         "M-p &" cape-sgml
-                         "M-p r" cape-rfc1345)
+                        "M-p t" complete-tag        ;; etags
+                        "M-p d" cape-dabbrev        ;; or dabbrev-completion
+                        "M-p h" cape-history
+                        "M-p f" cape-file
+                        "M-p k" cape-keyword
+                        "M-p s" cape-symbol
+                        "M-p a" cape-abbrev
+                        "M-p i" cape-ispell
+                        "M-p l" cape-line
+                        "M-p w" cape-dict
+                        "M-p \\" cape-tex
+                        "M-p _" cape-tex 
+                        "M-p ^" cape-tex
+                        "M-p &" cape-sgml
+                        "M-p r" cape-rfc1345)
                 (defun text-completions ()
                   (add-to-list 'completion-at-point-functions #'cape-ispell))
+                (defun jake/disable-ispell-completions ()
+                  (setq-local completion-at-point-functions (delq #'cape-ispell completion-at-point-functions)))
                 (:with-hook text-mode-hook
                   (:hook text-completions))
+                (:with-hook prog-mode-hook
+                  (:hook jake/disable-ispell-completions))
                 ;; Add `completion-at-point-functions', used by `completion-at-point'.
                 (add-to-list 'completion-at-point-functions #'cape-dabbrev)
                 (add-to-list 'completion-at-point-functions #'cape-file))
