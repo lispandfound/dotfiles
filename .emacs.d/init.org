@@ -451,19 +451,23 @@ This parses the compile output of languagetool for compile
   (setup reftex
     (:hook-into latex-mode))
 #+end_src
-** Tempo
+** Tempel
 #+begin_src emacs-lisp
-  (setup tempo
-   (:option tempo-interactive t)
-   (:gkeys
-    "M-g M-e" tempo-forward-mark
-    "M-g M-a" tempo-backward-mark)
-   (defadvice tempo-define-template (after no-self-insert-in-abbrevs activate)
-     "Skip self-insert if template function is called by an abbrev."
-     (put (intern (concat "tempo-template-" (ad-get-arg 0))) 'no-self-insert t))
- 
-   (:when-loaded
-     (load (concat user-emacs-directory "tempo.el"))))
+  (elpaca-setup tempel
+                (defun tempel-setup-capf ()
+                  ;; Add the Tempel Capf to `completion-at-point-functions'.
+                  ;; `tempel-expand' only triggers on exact matches. Alternatively use
+                  ;; `tempel-complete' if you want to see all matches, but then you
+                  ;; should also configure `tempel-trigger-prefix', such that Tempel
+                  ;; does not trigger too often when you don't expect it. NOTE: We add
+                  ;; `tempel-expand' *before* the main programming mode Capf, such
+                  ;; that it will be tried first.
+                  (setq-local completion-at-point-functions
+                              (cons #'tempel-expand
+                                    completion-at-point-functions)))
+                (:with-mode (prog-mode text-mode)
+                  (:hook tempel-setup-capf)))
+  (elpaca-setup tempel-collection)
 #+end_src
 ** Haskell
 #+begin_src emacs-lisp
