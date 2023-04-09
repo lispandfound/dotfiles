@@ -253,6 +253,10 @@ For points 2. and 3. see the [[help:display-buffer][Display Buffer Docs]].
           ("\\*eshell\\*.*" display-buffer-in-side-window
            (side . bottom)
            (window-parameters
+            (no-delete-other-parameters . t)))
+          ("\\*GAP\\*.*" display-buffer-in-side-window
+           (side . bottom)
+           (window-parameters
             (no-delete-other-parameters . t)))))
   #+end_src
 ** IBuffer
@@ -473,7 +477,7 @@ This parses the compile output of languagetool for compile
 #+begin_src emacs-lisp
   (elpaca-setup haskell-mode
                 (:hook interactive-haskell-mode)
-                (:with-mode interactive-haskell-mode
+                (:with-feature interactive-haskell-mode
                   (:bind "C-c C-c" 'haskell-compile)))
 #+end_src
 ** GAP
