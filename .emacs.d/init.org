@@ -253,6 +253,10 @@ For points 2. and 3. see the [[help:display-buffer][Display Buffer Docs]].
           ("\\*eshell\\*.*" display-buffer-in-side-window
            (side . bottom)
            (window-parameters
+            (no-delete-other-parameters . t)))
+          ("\\*GAP\\*.*" display-buffer-in-side-window
+           (side . bottom)
+           (window-parameters
             (no-delete-other-parameters . t)))))
   #+end_src
 ** IBuffer
