@@ -43,7 +43,15 @@
 (set-input-method "TeX")
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-
+(defun dvorak-translation ()
+  (keyboard-translate ?\C-t ?\C-x)
+  (keyboard-translate ?\C-x ?\C-t))
+(defun setup-frame-keyboard (&optional frame)
+  "Re-map keys in the current terminal."
+  (with-selected-frame (or frame (selected-frame))
+    (dvorak-translation)))
+(dvorak-translation)
+(add-hook 'after-make-frame-functions #'setup-frame-keyboard)
 
 (after! LaTeX
   (setq TeX-auto-save t
@@ -136,7 +144,7 @@
   :after org
   :config
   (setq-default org-ditaa-jar-path "~/.local/bin/ditaa.jar" ))
-(add-hook 'org-mode-hook #'org-appear-mode)
+
 (after! org
   (setq org-latex-pdf-process '("latexmk -f -pdf -shell-escape -%latex -interaction=nonstopmode -output-directory=%o %f"))
   (setq org-latex-compiler "lualatex")
@@ -321,52 +329,6 @@ URL and CALLBACK; see `url-queue-retrieve'"
 
 (map! :leader "o." 'open-current-directory-sysfm)
 
-(after! (embark consult org)
-  (defun consult-org-store-link (candidate)
-    (save-excursion
-      (goto-char (get-text-property 0 'consult--candidate candidate))
-      (org-store-link nil t)))
-  (embark-define-keymap embark-consult-org-heading
-    "Consult Org Embark Bindings"
-    ("n" consult-org-store-link))
-  (add-to-list 'embark-keymap-alist '(consult-org-heading . embark-consult-org-heading)))
-
-(after! (citar)
-       (setq citar-symbols
-             `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
-               (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
-               (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " ")))
-       (setq citar-symbol-separator "  ") )
-
-(defconst small-words '("a" "an" "and" "as"
-                        "at" "but" "by" "en" "for" "if" "of" "on" "or" "the" "to" "v" "v." "via" "vs"
-                        "vs."))
-
-(defun titlecase-string (str)
-  "Convert string STR to title case and return the resulting string."
-  (let ((words (s-split " " str)))
-    (s-join " " (cons (s-titleize (car words))
-                      (-map (lambda (w) (let ((dw (s-downcase w)))
-                                     (if (member dw small-words)
-                                         dw
-                                       (s-titleize w)))) (cdr words))))))
-
-(defun titlecase-region (begin end)
-  "Convert text in region from BEGIN to END to title case."
-  (interactive "*r")
-  (let ((pt (point)))
-    (insert (titlecase-string (delete-and-extract-region begin end)))
-    (goto-char pt)))
-
-(defun titlecase-dwim ()
-  "Convert the region or current line to title case.
-If Transient Mark Mode is on and there is an active region, convert
-the region to title case.  Otherwise, work on the current line."
-  (interactive)
-  (if (and transient-mark-mode mark-active)
-      (titlecase-region (region-beginning) (region-end))
-    (titlecase-region (point-at-bol) (point-at-eol))))
-
 (use-package! consult-recoll
   :commands (consult-recoll)
   :init
@@ -408,6 +370,11 @@ the region to title case.  Otherwise, work on the current line."
         :publishing-directory "/ssh:server@jakefaulkner.me:/home/server/org/"
         :publishing-function org-html-publish-to-html)))
 (setq org-export-with-timestamps nil)
+
+(use-package! org-modern
+  :hook
+  (org-mode . org-modern-mode)
+  (org-agenda-finalize-hook . org-modern-agenda))
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an

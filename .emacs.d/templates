@@ -40,8 +40,10 @@ emacs-lisp-mode
 
 gap-mode
 
-(def p " := function (" p ")" n> q n "end;")
-(for "for " p " in " p " do" n> q n "od;")
+(def p " := function (" p ")" n> q n> "end;")
+(for "for " p " in " p " do" n> q n> "od;")
+(if "if" p "then" n> q n> "fi;")
+(fun "function (" p ")" n> q n> "end;")
 ;; Local Variables:
 ;; mode: lisp-data
 ;; outline-regexp: "[a-z]"

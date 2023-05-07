@@ -58,3 +58,5 @@
 (unpin! bibtex-completion helm-bibtex ivy-bibtex)
 (package! denote)
 (package! biblio)
+(package! titlecase)
+(package! org-modern)
