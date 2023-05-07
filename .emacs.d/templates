@@ -1,3 +1,6 @@
+python-mode
+(ifmain "if __name__ == '__main__':" n> q)
+
 emacs-lisp-mode
 
 (autoload ";;;###autoload")
