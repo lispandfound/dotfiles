@@ -1,6 +1,0 @@
-root=/home/jake/Sync
-root=ssh://server@172.105.170.218//home/server/sync
-path=.
-repeat=watch
-prefer=newer
-log=true

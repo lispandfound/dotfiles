@@ -1,0 +1,25 @@
+theme = "onedark"
+
+[editor]
+jump-label-alphabet = "aoeuidhtns"
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[keys.normal]
+V = ["goto_first_nonwhitespace", "extend_to_line_end"]
+D = ["ensure_selections_forward", "extend_to_line_end"]
+x = "extend_line"
+esc = ["collapse_selection", "keep_primary_selection"]
+
+[keys.select]
+";" = ["collapse_selection", "normal_mode"]
+
+# Same behaviour as normal mode x
+x = "extend_line"
+
+# Counterpart for normal mode V
+V = "extend_to_line_end"
+
