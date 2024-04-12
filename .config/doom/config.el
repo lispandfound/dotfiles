@@ -53,7 +53,12 @@
       :map haskell-mode-map
       "l" #'haskell-hoogle)
 
+;; [[https://github.com/radian-software/apheleia/discussions/78][latexindent discussion]]
 (set-formatter! 'latexindent-conf '("latexindent" "-m" "-l" ".indentconfig.yaml" "--logfile=/dev/null" "-") :modes '(TeX-mode latex-mode LaTeX-mode TeX-latex-mode))
+
+(use-package! orglink
+  :init
+  (add-hook! after-init #'global-orglink-mode))
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
