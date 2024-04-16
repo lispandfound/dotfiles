@@ -53,6 +53,10 @@
       :map haskell-mode-map
       "l" #'haskell-hoogle)
 
+(use-package! numpydoc
+  :init
+  (map! :localleader :desc "Insert docstring" :n "d" #'numpydoc-generate))
+
 ;; [[https://github.com/radian-software/apheleia/discussions/78][latexindent discussion]]
 (set-formatter! 'latexindent-conf '("latexindent" "-m" "-l" ".indentconfig.yaml" "--logfile=/dev/null" "-") :modes '(TeX-mode latex-mode LaTeX-mode TeX-latex-mode))
 
