@@ -47,6 +47,9 @@
 (setq org-agenda-files '("~/todo.org"))
 (after! org
   (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window))
+
+(map! :i "M-/" #'hippie-expand)
+
 (setq-hook! 'haskell-mode-hook +format-with-lsp t)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (set-docsets! 'haskell-mode "Haskell")
