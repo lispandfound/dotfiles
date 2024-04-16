@@ -113,6 +113,7 @@
        ;;tty               ; improve the terminal Emacs experience
 
        :lang
+       csv
        ;;agda              ; types of types of types of types...
        ;;beancount         ; mind the GAAP
        (cc +lsp +tree-sitter)         ; C > C++ == 1
