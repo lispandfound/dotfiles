@@ -44,6 +44,9 @@
 (setq org-directory "~/org/")
 (setq avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s))
 
+(setq org-agenda-files '("~/todo.org"))
+(after! org
+  (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window))
 (setq-hook! 'haskell-mode-hook +format-with-lsp t)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (set-docsets! 'haskell-mode "Haskell")
