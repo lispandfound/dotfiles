@@ -41,7 +41,7 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq org-directory "~/")
 (setq avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s))
 
 (setq org-agenda-files '("~/todo.org"))
