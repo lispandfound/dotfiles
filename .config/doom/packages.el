@@ -50,3 +50,4 @@
 ;; (unpin! t)
 (package! orglink)
 (package! numpydoc)
+(package! slack)
