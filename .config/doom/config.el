@@ -50,15 +50,15 @@
 
 (map! :i "M-/" #'hippie-expand)
 
+
 (setq-hook! 'haskell-mode-hook +format-with-lsp t)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (set-docsets! 'haskell-mode "Haskell")
 
-
 (map! :localleader
       :map haskell-mode-map
       "l" #'haskell-hoogle)
-
+(setq company-idle-delay nil)
 (use-package! numpydoc
   :init
   (map! :localleader :desc "Insert docstring" :n "d" #'numpydoc-generate))
