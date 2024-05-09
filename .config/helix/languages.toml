@@ -16,3 +16,7 @@ plugins.isort.enabled = true
 [[language]]
 name = "markdown"
 language-servers = [ { name = "ltex" } ]
+
+[[language]]
+name = "python"
+auto-format = true
