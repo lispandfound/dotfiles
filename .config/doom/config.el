@@ -55,13 +55,21 @@
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (set-docsets! 'haskell-mode "Haskell")
 
+(add-hook! python-mode
+  (add-hook! 'before-save-hook :local #'py-isort-before-save))
+
 (map! :localleader
       :map haskell-mode-map
       "l" #'haskell-hoogle)
-(setq company-idle-delay nil)
+
 (use-package! numpydoc
   :init
   (map! :localleader :desc "Insert docstring" :n "d" #'numpydoc-generate))
+
+
+(map! :localleader
+      :mode python-mode
+      "p" #'poetry)
 
 ;; [[https://github.com/radian-software/apheleia/discussions/78][latexindent discussion]]
 (set-formatter! 'latexindent-conf '("latexindent" "-m" "-l" ".indentconfig.yaml" "--logfile=/dev/null" "-") :modes '(TeX-mode latex-mode LaTeX-mode TeX-latex-mode))
