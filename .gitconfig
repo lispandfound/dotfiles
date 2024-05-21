@@ -2,3 +2,5 @@
 	email = jakefaulkn@gmail.com
 [init]
 	defaultBranch = main
+[pull]
+	rebase = false
