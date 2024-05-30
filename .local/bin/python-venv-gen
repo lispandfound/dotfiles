@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+
+PIP=pip
+
+if command -v uv &> /dev/null
+then
+    PIP="uv pip"
+    uv venv $UV_OPTIONS
+else
+    python -m venv .venv
+fi
+
+
+$PIP install \
+    "python-lsp-server[all]" \
+    python-lsp-black \
+    python-lsp-isort \
+    black \
+    isort \
+    mypy \
+    pylsp-mypy \
+    bpython
+
+if test -f requirements.txt; then
+    $PIP install -r requirements.txt
+fi

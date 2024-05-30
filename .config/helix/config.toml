@@ -14,6 +14,10 @@ D = ["ensure_selections_forward", "extend_to_line_end"]
 x = "extend_line"
 esc = ["collapse_selection", "keep_primary_selection"]
 
+[keys.normal."+"]
+d = ":pipe doq --formatter numpy"
+q = ":pipe fmt -w 80"
+
 [keys.select]
 ";" = ["collapse_selection", "normal_mode"]
 

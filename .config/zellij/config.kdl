@@ -11,6 +11,15 @@ keybinds clear-defaults=true {
             TogglePaneEmbedOrFloating;
             SwitchToMode "normal";
         }
+
+        
+        bind "Ctrl f" {
+            Run "bpython"  {
+                close_on_exit true
+            };
+            TogglePaneEmbedOrFloating;
+            SwitchToMode "normal";
+        }
     }
     locked {
         bind "Ctrl g" { SwitchToMode "Normal"; }
@@ -225,7 +234,7 @@ plugins {
 // Choose the path to the default shell that zellij will use for opening new panes
 // Default: $SHELL
 //
-default_shell "nu"
+default_shell "zsh"
 
 // Choose the path to override cwd that zellij will use for opening new panes
 //
