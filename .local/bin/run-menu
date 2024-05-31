@@ -1,2 +1,2 @@
 #!/usr/bin/env zsh
-exec $(tofi-run)
+exec $(tofi-drun)
