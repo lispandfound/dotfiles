@@ -19,6 +19,7 @@ esc = ["collapse_selection", "keep_primary_selection"]
 d = ":pipe doq --formatter numpy"
 q = ":pipe fmt -w 80 -p '#'"
 g = ":sh gitu-popup"
+s = ":sh dashit-fzf-popup"
 
 [keys.select]
 ";" = ["collapse_selection", "normal_mode"]
