@@ -18,5 +18,10 @@ name = "markdown"
 language-servers = [ { name = "ltex" } ]
 
 [[language]]
+name = "haskell"
+auto-format = true
+
+
+[[language]]
 name = "python"
 auto-format = true
