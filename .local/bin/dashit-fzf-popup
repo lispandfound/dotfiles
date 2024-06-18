@@ -1,0 +1,5 @@
+#!/usr/bin/env nu
+
+kitten @ launch dashit-fzf ~/.docs/
+
+
