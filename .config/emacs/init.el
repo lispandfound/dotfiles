@@ -227,6 +227,10 @@
   :ensure t
   :bind ("C-c g" . magit-status))
 
+(use-package forge
+  :ensure t
+  :bind ("C-c '" . forge-dispatch))
+
 (use-package pyvenv
   :ensure t
   :commands pyvenv-activate)
