@@ -4,3 +4,5 @@
 	defaultBranch = main
 [pull]
 	rebase = false
+[github]
+	user = lispandfound

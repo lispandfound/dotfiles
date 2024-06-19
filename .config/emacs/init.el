@@ -1,5 +1,9 @@
-(load-theme 'modus-vivendi)
+(require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
+
+(load-theme 'modus-vivendi)
+
 
 (keyboard-translate ?\C-t ?\C-x)
 (keyboard-translate ?\C-x ?\C-t)
@@ -49,6 +53,7 @@
   ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
   ;; available in the *Completions* buffer, add it to the
   ;; `completion-list-mode-map'.
+  :ensure t
   :bind (:map minibuffer-local-map
          ("M-A" . marginalia-cycle))
 
@@ -79,6 +84,15 @@
   ;; (setq vertico-cycle t)
   )
 
+(use-package vertico-directory
+  :after vertico
+  :config
+  (keymap-set vertico-map "RET" #'vertico-directory-enter)
+  (keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
+  (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
+
+
 ;; A few more useful configurations...
 (use-package emacs
   :init
@@ -105,6 +119,7 @@
   ;; mode.  Vertico commands are hidden in normal buffers. This setting is
   ;; useful beyond Vertico.
   (setq read-extended-command-predicate #'command-completion-default-include-p))
+
 
 ;; A few more useful configurations...
 (use-package emacs
@@ -203,10 +218,6 @@
   (embark-collect-mode . consult-preview-at-point-mode))
 
 
-(use-package eglot
-  :hook ((python-mode eglot-ensure)))
-
-
 (use-package treesit-auto
   :ensure t
   :config
@@ -222,8 +233,46 @@
 
 (use-package numpydoc
   :ensure t
-  :bind ("C-c C-n" . numpydoc-generated))
+  :bind ("C-c M-n" . numpydoc-generate))
 
 
-(package-vc-install "https://github.com/xFA25E/skempo")
-(use-package skempo)
+(unless (package-installed-p 'skempo)
+  (package-vc-install "https://github.com/xFA25E/skempo"))
+
+(require 'abbrev)
+(use-package skempo
+  :config
+  (load (concat user-emacs-directory "skempo/python.el")))
+
+(global-set-key (kbd "C-c C-n") #'tempo-forward-mark)
+(global-set-key (kbd "C-c C-p") #'tempo-backward-mark)
+(setq-default abbrev-mode t)
+
+
+(defun hook/eglot-save-hook ()
+  (require 'eglot)
+  (when (eglot-managed-p)
+      (eglot-format-buffer)))
+
+(add-hook 'after-save-hook #'hook/eglot-save-hook)
+
+(use-package jinx
+  :ensure t
+  :hook (emacs-startup . global-jinx-mode)
+  :bind (([remap ispell-word] . jinx-correct)
+         ("C-M-$" . jinx-languages)))
+
+(use-package ibuffer-project
+  :ensure t
+  :after ibuffer
+  :config
+  (add-hook 'ibuffer-hook
+             (lambda ()
+               (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups)))))
+
+(repeat-mode)
+
+
+(setq dired-dwim-target t
+      dired-listing-switches "-alFh")
+(setq tramp-use-ssh-controlmaster-options nil)
