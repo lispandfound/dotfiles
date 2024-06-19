@@ -3,7 +3,12 @@
 
 
 (load-theme 'modus-vivendi)
-
+(use-package moody
+  :ensure t
+  :config
+  (moody-replace-mode-line-front-space)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
 
 (keyboard-translate ?\C-t ?\C-x)
 (keyboard-translate ?\C-x ?\C-t)
