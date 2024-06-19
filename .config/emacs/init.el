@@ -274,7 +274,13 @@
              (lambda ()
                (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups)))))
 
-(repeat-mode)
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
+
+
+
 
 
 (setq dired-dwim-target t
