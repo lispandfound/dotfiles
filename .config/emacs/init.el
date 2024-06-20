@@ -24,7 +24,7 @@
 (use-package corfu
   :ensure t
   ;; Optional customizations
-  :custom
+  ;; :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   ;; (corfu-auto t)                 ;; Enable auto completion
   ;; (corfu-separator ?\s)          ;; Orderless field separator
@@ -242,7 +242,9 @@
 
 (use-package numpydoc
   :ensure t
-  :bind ("C-c M-n" . numpydoc-generate))
+  :bind ("C-c M-n" . numpydoc-generate)
+  :config
+  (setq numpydoc-insert-examples-block nil))
 
 
 (unless (package-installed-p 'skempo)
@@ -317,3 +319,10 @@ point reaches the beginning or end of the buffer, stop there."
 (setq dired-dwim-target t
       dired-listing-switches "-alFh")
 (setq tramp-use-ssh-controlmaster-options nil)
+
+(use-package yaml-mode
+  :ensure t)
+
+(use-package csv-mode
+  :ensure t
+  :hook (csv-mode . csv-align-mode))
