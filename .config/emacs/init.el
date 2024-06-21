@@ -334,3 +334,4 @@ point reaches the beginning or end of the buffer, stop there."
   :ensure t)
 
 
+(setq display-buffer-alist '(("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom)))))
