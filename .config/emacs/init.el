@@ -329,3 +329,8 @@ point reaches the beginning or end of the buffer, stop there."
 
 (setq vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
 (setq use-short-answers t)
+
+(use-package haskell-mode
+  :ensure t)
+
+
