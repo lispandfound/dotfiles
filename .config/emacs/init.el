@@ -326,3 +326,6 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package csv-mode
   :ensure t
   :hook (csv-mode . csv-align-mode))
+
+(setq vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
+(setq use-short-answers t)
