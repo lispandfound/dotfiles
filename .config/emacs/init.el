@@ -358,5 +358,12 @@ point reaches the beginning or end of the buffer, stop there."
   :ensure t
   :bind (("C-c M-c" . titlecase-dwim)))
 
+
 (use-package elm-mode
   :ensure t)
+
+
+(use-package eglot-booster
+  :vc (:fetcher github :repo jdtsmith/eglot-booster)
+  :after eglot
+  :config (eglot-booster-mode))
