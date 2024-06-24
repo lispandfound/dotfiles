@@ -271,6 +271,8 @@
 
 (add-hook 'after-save-hook #'hook/eglot-save-hook)
 
+(setq eglot-report-progress nil)
+
 (use-package jinx
   :ensure t
   :hook (emacs-startup . global-jinx-mode)
