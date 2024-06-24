@@ -353,3 +353,21 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package titlecase
   :ensure t
   :bind (("C-c M-c" . titlecase-dwim)))
+
+
+(use-package casual-isearch
+  :ensure t
+  :bind (:map isearch-mode-map
+              ("C-o" . casual-isearch-tmenu)))
+
+(use-package casual-calc
+  :ensure t
+  :bind (:map calc-mode-map ("C-o" . #'casual-calc-tmenu)))
+
+(use-package casual-dired
+  :ensure t
+  :bind (:map dired-mode-map ("C-o" . #'casual-dired-tmenu)))
+
+(use-package casual-info
+  :ensure t
+  :bind (:map Info-mode-map ("C-o" . #'casual-info-tmenu)))
