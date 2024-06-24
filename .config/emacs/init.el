@@ -1,6 +1,10 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-
+;; TODO: Remove after Emacs 30
+(unless (package-installed-p 'vc-use-package)
+  (package-vc-install "https://github.com/slotThe/vc-use-package"))
+(require 'vc-use-package)
+(setq package-install-upgrade-built-in t) 
 
 (load-theme 'modus-vivendi)
 (use-package moody
@@ -24,9 +28,9 @@
 (use-package corfu
   :ensure t
   ;; Optional customizations
-  ;; :custom
+  :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  ;; (corfu-auto t)                 ;; Enable auto completion
+  (corfu-auto t)                 ;; Enable auto completion
   ;; (corfu-separator ?\s)          ;; Orderless field separator
   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
@@ -247,10 +251,8 @@
   (setq numpydoc-insert-examples-block nil))
 
 
-(unless (package-installed-p 'skempo)
-  (package-vc-install "https://github.com/xFA25E/skempo"))
-
 (use-package skempo
+  :vc (:fetcher github :repo xFA25E/skempo)
   :config
   (load (concat user-emacs-directory "skempo/python.el")))
 
