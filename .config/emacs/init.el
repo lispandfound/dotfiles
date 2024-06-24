@@ -1,6 +1,10 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-
+;; TODO: Remove after Emacs 30
+(unless (package-installed-p 'vc-use-package)
+  (package-vc-install "https://github.com/slotThe/vc-use-package"))
+(require 'vc-use-package)
+(setq package-install-upgrade-built-in t) 
 
 (load-theme 'modus-vivendi)
 (use-package moody
@@ -24,9 +28,9 @@
 (use-package corfu
   :ensure t
   ;; Optional customizations
-  ;; :custom
+  :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  ;; (corfu-auto t)                 ;; Enable auto completion
+  (corfu-auto t)                 ;; Enable auto completion
   ;; (corfu-separator ?\s)          ;; Orderless field separator
   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
@@ -247,10 +251,8 @@
   (setq numpydoc-insert-examples-block nil))
 
 
-(unless (package-installed-p 'skempo)
-  (package-vc-install "https://github.com/xFA25E/skempo"))
-
 (use-package skempo
+  :vc (:fetcher github :repo xFA25E/skempo)
   :config
   (load (concat user-emacs-directory "skempo/python.el")))
 
@@ -268,6 +270,8 @@
       (eglot-format-buffer)))
 
 (add-hook 'after-save-hook #'hook/eglot-save-hook)
+
+(setq eglot-report-progress nil)
 
 (use-package jinx
   :ensure t
@@ -360,6 +364,10 @@ point reaches the beginning or end of the buffer, stop there."
   :bind (:map isearch-mode-map
               ("C-o" . casual-isearch-tmenu)))
 
+(use-package elm-mode
+  :ensure t)
+
+
 (use-package casual-calc
   :ensure t
   :bind (:map calc-mode-map ("C-o" . #'casual-calc-tmenu)))
@@ -371,3 +379,8 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package casual-info
   :ensure t
   :bind (:map Info-mode-map ("C-o" . #'casual-info-tmenu)))
+
+(use-package eglot-booster
+  :vc (:fetcher github :repo jdtsmith/eglot-booster)
+  :after eglot
+  :config (eglot-booster-mode))
