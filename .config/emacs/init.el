@@ -357,3 +357,6 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package titlecase
   :ensure t
   :bind (("C-c M-c" . titlecase-dwim)))
+
+(use-package elm-mode
+  :ensure t)
