@@ -1,6 +1,10 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-
+;; TODO: Remove after Emacs 30
+(unless (package-installed-p 'vc-use-package)
+  (package-vc-install "https://github.com/slotThe/vc-use-package"))
+(require 'vc-use-package)
+(setq package-install-upgrade-built-in t) 
 
 (load-theme 'modus-vivendi)
 (use-package moody
@@ -24,9 +28,9 @@
 (use-package corfu
   :ensure t
   ;; Optional customizations
-  ;; :custom
+  :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  ;; (corfu-auto t)                 ;; Enable auto completion
+  (corfu-auto t)                 ;; Enable auto completion
   ;; (corfu-separator ?\s)          ;; Orderless field separator
   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
@@ -247,18 +251,18 @@
   (setq numpydoc-insert-examples-block nil))
 
 
-(unless (package-installed-p 'skempo)
-  (package-vc-install "https://github.com/xFA25E/skempo"))
-
-(require 'abbrev)
 (use-package skempo
+  :vc (:fetcher github :repo xFA25E/skempo)
   :config
   (load (concat user-emacs-directory "skempo/python.el")))
 
+;; Enable only if you want def/if/class to auto-expand
+;; (setq python-skeleton-autoinsert t)
+
 (global-set-key (kbd "C-c C-n") #'tempo-forward-mark)
 (global-set-key (kbd "C-c C-p") #'tempo-backward-mark)
-(setq-default abbrev-mode t)
 
+(setq-default abbrev-mode t)
 
 (defun hook/eglot-save-hook ()
   (require 'eglot)
@@ -266,6 +270,8 @@
       (eglot-format-buffer)))
 
 (add-hook 'after-save-hook #'hook/eglot-save-hook)
+
+(setq eglot-report-progress nil)
 
 (use-package jinx
   :ensure t
@@ -285,8 +291,6 @@
   :ensure t
   :config
   (which-key-mode))
-
-
 
 (defun smarter-move-beginning-of-line (arg)
   "Move point back to indentation of beginning of line.
@@ -333,9 +337,54 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package haskell-mode
   :ensure t)
 
-
 (setq display-buffer-alist '(("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom)))))
+
 (use-package exec-path-from-shell
+  (exec-path-from-shell-initialize))
+
+(use-package dumb-jump
   :ensure t
   :config
-  (exec-path-from-shell-initialize))
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+
+(delete-selection-mode)
+
+
+(use-package crux
+  :ensure t
+  :bind (("C-k" . crux-smart-kill-line)
+         ("C-x 4 t" . crux-transpose-windows)
+         ("C-c M-d" . crux-duplicate-and-comment-current-line-or-region)
+         ("C-c S" . crux-find-user-init-file)))
+
+(use-package titlecase
+  :ensure t
+  :bind (("C-c M-c" . titlecase-dwim)))
+
+
+(use-package casual-isearch
+  :ensure t
+  :bind (:map isearch-mode-map
+              ("C-o" . casual-isearch-tmenu)))
+
+(use-package elm-mode
+  :ensure t)
+
+
+(use-package casual-calc
+  :ensure t
+  :bind (:map calc-mode-map ("C-o" . #'casual-calc-tmenu)))
+
+(use-package casual-dired
+  :ensure t
+  :bind (:map dired-mode-map ("C-o" . #'casual-dired-tmenu)))
+
+(use-package casual-info
+  :ensure t
+  :bind (:map Info-mode-map ("C-o" . #'casual-info-tmenu)))
+
+(use-package eglot-booster
+  :vc (:fetcher github :repo jdtsmith/eglot-booster)
+  :after eglot
+  :config (eglot-booster-mode))
+======= end
