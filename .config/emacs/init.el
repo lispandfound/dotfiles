@@ -340,6 +340,9 @@ point reaches the beginning or end of the buffer, stop there."
 
 (setq display-buffer-alist '(("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom)))))
 
+(use-package exec-path-from-shell
+  (exec-path-from-shell-initialize))
+
 (use-package dumb-jump
   :ensure t
   :config
