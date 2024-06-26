@@ -433,7 +433,11 @@ If the new path's directories does not exist, create them."
 
 (use-package apheleia
   :ensure t
-  :config (apheleia-global-mode +1))
+  :config
+  
+  (apheleia-global-mode +1)
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist)
+        '(isort black)))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
