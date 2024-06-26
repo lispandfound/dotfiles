@@ -2,6 +2,12 @@
 
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
+;; In case ELPA is not working
+;; (setq package-archives '(("gnu" . "https://raw.githubusercontent.com/d12frosted/elpa-mirror/master/gnu/")
+;;                          ("melpa" . "https://melpa.org/packages/")))
+
+
 ;; TODO: Remove after Emacs 30
 (unless (package-installed-p 'vc-use-package)
   (package-vc-install "https://github.com/slotThe/vc-use-package"))
@@ -66,7 +72,7 @@
   ;; `completion-list-mode-map'.
   :ensure t
   :bind (:map minibuffer-local-map
-         ("M-A" . marginalia-cycle))
+              ("M-A" . marginalia-cycle))
 
   ;; The :init section is always executed.
   :init
@@ -266,13 +272,6 @@
 
 (setq-default abbrev-mode t)
 
-(defun hook/eglot-save-hook ()
-  (require 'eglot)
-  (when (eglot-managed-p)
-      (eglot-format-buffer)))
-
-(add-hook 'after-save-hook #'hook/eglot-save-hook)
-
 (setq eglot-report-progress nil)
 
 (use-package jinx
@@ -286,8 +285,8 @@
   :after ibuffer
   :config
   (add-hook 'ibuffer-hook
-             (lambda ()
-               (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups)))))
+            (lambda ()
+              (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups)))))
 
 (use-package which-key
   :ensure t
@@ -386,3 +385,196 @@ point reaches the beginning or end of the buffer, stop there."
   :vc (:fetcher github :repo jdtsmith/eglot-booster)
   :after eglot
   :config (eglot-booster-mode))
+
+(use-package wgrep
+  :ensure t)
+
+(setq org-agenda-files '("~/todo.org")
+      org-directory "~/"
+      auth-sources '("~/.authinfo")
+      auto-revert-avoid-polling t
+      auto-revert-check-vc-info t
+      auto-revert-interval 5
+      sentence-end-double-space nil
+      column-number-mode t
+      initial-major-mode 'fundamental-mode
+      x-underline-at-descent-line nil
+      inhibit-splash-screen t)
+(blink-cursor-mode -1)
+(global-auto-revert-mode)
+(recentf-mode)
+
+
+
+(savehist-mode)
+
+(defun bedrock--backup-file-name (fpath)
+  "Return a new file path of a given file path.
+If the new path's directories does not exist, create them."
+  (let* ((backupRootDir (concat user-emacs-directory "emacs-backup/"))
+         (filePath (replace-regexp-in-string "[A-Za-z]:" "" fpath )) ; remove Windows driver letter in path
+         (backupFilePath (replace-regexp-in-string "//" "/" (concat backupRootDir filePath "~") )))
+    (make-directory (file-name-directory backupFilePath) (file-name-directory backupFilePath))
+    backupFilePath))
+(setq make-backup-file-name-function 'bedrock--backup-file-name)
+
+(transient-define-argument pandoc-input-formats ()
+  "Pandoc Input Format"
+  :argument "--from="
+  :class 'transient-option
+  :choices
+  '("bibtex"
+    "biblatex"
+    "bits"
+    "commonmark"
+    "commonmark_x"
+    "creole"
+    "csljson"
+    "csv"
+    "tsv"
+    "djot"
+    "docbook"
+    "docx"
+    "dokuwiki"
+    "endnotexml"
+    "epub"
+    "fb2"
+    "gfm"
+    "haddock"
+    "html"
+    "ipynb"
+    "jats"
+    "jira"
+    "json"
+    "latex"
+    "markdown"
+    "markdown_mmd"
+    "markdown_phpextra"
+    "markdown_strict"
+    "mediawiki"
+    "man"
+    "muse"
+    "native"
+    "odt"
+    "opml"
+    "org"
+    "ris"
+    "rtf"
+    "rst"
+    "t2t"
+    "textile"
+    "tikiwiki"
+    "twiki"
+    "typst"
+    "vimwiki"))
+
+(transient-define-argument pandoc-output-formats ()
+  "Pandoc Output Format"
+  :argument "--to="
+  :class 'transient-option
+  :choices '("asciidoc"
+             "asciidoc_legacy"
+             "asciidoctor"
+             "beamer"
+             "bibtex"
+             "biblatex"
+             "chunkedhtml"
+             "commonmark"
+             "commonmark_x"
+             "context"
+             "csljson"
+             "djot"
+             "docbook or docbook4"
+             "docbook5"
+             "docx"
+             "dokuwiki"
+             "epub or epub3"
+             "epub2"
+             "fb2"
+             "gfm"
+             "haddock"
+             "html or html5"
+             "html4"
+             "icml"
+             "ipynb"
+             "jats_archiving"
+             "jats_articleauthoring"
+             "jats_publishing"
+             "jats"
+             "jira"
+             "json"
+             "latex"
+             "man"
+             "markdown"
+             "markdown_mmd"
+             "markdown_phpextra"
+             "markdown_strict"
+             "markua"
+             "mediawiki"
+             "ms"
+             "muse"
+             "native"
+             "odt"
+             "opml"
+             "opendocument"
+             "org"
+             "pdf"
+             "plain"
+             "pptx"
+             "rst"
+             "rtf"
+             "texinfo"
+             "textile"
+             "slideous"
+             "slidy"
+             "dzslides"
+             "revealjs"
+             "s5"
+             "tei"
+             "typst"
+             "xwiki"
+             "zimwiki"))
+
+
+(transient-define-argument pandoc-output-file ()
+  :argument "--output="
+  :class 'transient-files
+  :prompt "Output file: ")
+
+
+(transient-define-prefix pandoc-interface ()
+  ["Pandoc Options"
+   ("-s" "Standalone file generation (i.e. with <head> or LaTeX preamble)" "-s")
+   ("--dpi" "Output DPI" "--dpi=" :prompt "Output DPI: ")]
+  ["Input/Output"
+   ("-f" "--from=" pandoc-input-formats)
+   ("-t" "--to=" pandoc-output-formats)
+   ("-o" "--output=" pandoc-output-file)]
+  ["File"
+   ("<return>" "Convert this file" pandoc-convert-this-file :transient nil)
+   ])
+
+(transient-define-suffix pandoc-convert-this-file (the-prefix-arg)
+  "Convert this file, using pandoc"
+  :transient 'transient--do-call
+  (interactive "P")
+  (let ((args (transient-args (oref transient-current-prefix command))))
+    (async-shell-command (s-concat "pandoc " (s-join " " (cons (buffer-file-name) args))))))
+
+
+
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-vc-selected-packages
+   '((vc-use-package :vc-backend Git :url "https://github.com/slotThe/vc-use-package"))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
