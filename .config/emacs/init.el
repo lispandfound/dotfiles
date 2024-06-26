@@ -250,7 +250,9 @@
 
 (use-package pyvenv
   :ensure t
-  :commands pyvenv-activate)
+  :config (pyvenv-mode))
+
+(add-hook 'python-mode-hook #'eglot-ensure)
 
 (use-package numpydoc
   :ensure t
