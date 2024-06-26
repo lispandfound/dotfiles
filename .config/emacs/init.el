@@ -429,6 +429,9 @@ If the new path's directories does not exist, create them."
   :bind (("C-c P" . pandoc-convert-transient)))
 
 
+(use-package apheleia
+  :ensure t
+  :config (apheleia-global-mode +1))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
