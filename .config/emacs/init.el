@@ -1,3 +1,5 @@
+(setq display-line-numbers t)
+
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;; TODO: Remove after Emacs 30
