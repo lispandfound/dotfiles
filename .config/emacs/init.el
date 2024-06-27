@@ -562,6 +562,15 @@ If the new path's directories does not exist, create them."
 
 (global-set-key (kbd "C-c b") #'clone-buffer-other-window)
 (add-hook 'write-file-hooks 'delete-trailing-whitespace nil t)
+
+
+(use-package transpose-frame
+  :ensure t
+  :bind (("C-x 4 t" . transpose-frame)))
+
+
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
