@@ -474,9 +474,10 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package crux
   :ensure t
   :bind (("C-k" . crux-smart-kill-line)
-         ("C-x 4 t" . crux-transpose-windows)
          ("C-c M-d" . crux-duplicate-and-comment-current-line-or-region)
-         ("C-c S" . crux-find-user-init-file)))
+         ("C-c S" . crux-find-user-init-file)
+         ("<C-return>" . crux-smart-open-line)
+         ("<C-S-return>" . crux-smart-open-line-above)))
 
 (use-package titlecase
   :ensure t
