@@ -556,6 +556,11 @@ If the new path's directories does not exist, create them."
   (setf (alist-get 'python-ts-mode apheleia-mode-alist)
         '(isort black)))
 
+(defun clone-buffer-other-window ()
+  (interactive)
+  (switch-to-buffer-other-window (current-buffer)))
+
+(global-set-key (kbd "C-c b") #'clone-buffer-other-window)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
