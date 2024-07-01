@@ -440,7 +440,9 @@ point reaches the beginning or end of the buffer, stop there."
 
 
 (setq dired-dwim-target t
-      dired-listing-switches "-alFh")
+      dired-auto-revert-buffer t
+      dired-listing-switches "-alFh"
+      isearch-lazy-count t)
 (setq tramp-use-ssh-controlmaster-options nil)
 
 (use-package yaml-mode
