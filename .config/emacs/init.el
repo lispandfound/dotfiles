@@ -1,4 +1,4 @@
-(setq display-line-numbers t)
+(setq-default display-line-numbers t)
 
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -25,7 +25,123 @@
 (keyboard-translate ?\C-t ?\C-x)
 (keyboard-translate ?\C-x ?\C-t)
 
+;; Example configuration for Consult
+(use-package consult
+  ;; Replace bindings. Lazily loaded due by `use-package'.
+  :bind (;; C-c bindings in `mode-specific-map'
+         ("C-c M-x" . consult-mode-command)
+         ("C-c h" . consult-history)
+         ("C-c k" . consult-kmacro)
+         ("C-c m" . consult-man)
+         ("C-c i" . consult-info)
+         ([remap Info-search] . consult-info)
+         ;; C-x bindings in `ctl-x-map'
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
+         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ;; Custom M-# bindings for fast register access
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-#" . consult-register)
+         ;; M-g bindings in `goto-map'
+         ("M-g e" . consult-compile-error)
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
+         ;; M-s bindings in `search-map'
+         ("M-s d" . consult-find)                  ;; Alternative: consult-fd
+         ("M-s c" . consult-locate)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s k" . consult-keep-lines)
+         ("M-s u" . consult-focus-lines)
+         ;; Isearch integration
+         ("M-s e" . consult-isearch-history)
+         :map isearch-mode-map
+         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ;; Minibuffer history
+         :map minibuffer-local-map
+         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
 
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0.5
+        register-preview-function #'consult-register-format)
+
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-bookmark consult--source-file-register
+   consult--source-recent-file consult--source-project-recent-file
+   ;; :preview-key "M-."
+   :preview-key '(:debounce 0.4 any))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; "C-+"
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+  ;; By default `consult-project-function' uses `project-root' from project.el.
+  ;; Optionally configure a different project root function.
+  ;;;; 1. project.el (the default)
+  ;; (setq consult-project-function #'consult--default-project--function)
+  ;;;; 2. vc.el (vc-root-dir)
+  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
+  ;;;; 3. locate-dominating-file
+  ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
+  ;;;; 4. projectile.el (projectile-project-root)
+  ;; (autoload 'projectile-project-root "projectile")
+  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
+  ;;;; 5. No project support
+  ;; (setq consult-project-function nil)
+  )
 (use-package better-defaults
   :ensure t
   :config
@@ -250,7 +366,9 @@
 
 (use-package pyvenv
   :ensure t
-  :commands pyvenv-activate)
+  :config (pyvenv-mode))
+
+(add-hook 'python-mode-hook #'eglot-ensure)
 
 (use-package numpydoc
   :ensure t
@@ -322,7 +440,9 @@ point reaches the beginning or end of the buffer, stop there."
 
 
 (setq dired-dwim-target t
-      dired-listing-switches "-alFh")
+      dired-auto-revert-buffer t
+      dired-listing-switches "-alFh"
+      isearch-lazy-count t)
 (setq tramp-use-ssh-controlmaster-options nil)
 
 (use-package yaml-mode
@@ -356,9 +476,10 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package crux
   :ensure t
   :bind (("C-k" . crux-smart-kill-line)
-         ("C-x 4 t" . crux-transpose-windows)
          ("C-c M-d" . crux-duplicate-and-comment-current-line-or-region)
-         ("C-c S" . crux-find-user-init-file)))
+         ("C-c S" . crux-find-user-init-file)
+         ("<C-return>" . crux-smart-open-line)
+         ("<C-S-return>" . crux-smart-open-line-above)))
 
 (use-package titlecase
   :ensure t
@@ -423,149 +544,31 @@ If the new path's directories does not exist, create them."
     backupFilePath))
 (setq make-backup-file-name-function 'bedrock--backup-file-name)
 
-(transient-define-argument pandoc-input-formats ()
-  "Pandoc Input Format"
-  :argument "--from="
-  :class 'transient-option
-  :choices
-  '("bibtex"
-    "biblatex"
-    "bits"
-    "commonmark"
-    "commonmark_x"
-    "creole"
-    "csljson"
-    "csv"
-    "tsv"
-    "djot"
-    "docbook"
-    "docx"
-    "dokuwiki"
-    "endnotexml"
-    "epub"
-    "fb2"
-    "gfm"
-    "haddock"
-    "html"
-    "ipynb"
-    "jats"
-    "jira"
-    "json"
-    "latex"
-    "markdown"
-    "markdown_mmd"
-    "markdown_phpextra"
-    "markdown_strict"
-    "mediawiki"
-    "man"
-    "muse"
-    "native"
-    "odt"
-    "opml"
-    "org"
-    "ris"
-    "rtf"
-    "rst"
-    "t2t"
-    "textile"
-    "tikiwiki"
-    "twiki"
-    "typst"
-    "vimwiki"))
 
-(transient-define-argument pandoc-output-formats ()
-  "Pandoc Output Format"
-  :argument "--to="
-  :class 'transient-option
-  :choices '("asciidoc"
-             "asciidoc_legacy"
-             "asciidoctor"
-             "beamer"
-             "bibtex"
-             "biblatex"
-             "chunkedhtml"
-             "commonmark"
-             "commonmark_x"
-             "context"
-             "csljson"
-             "djot"
-             "docbook or docbook4"
-             "docbook5"
-             "docx"
-             "dokuwiki"
-             "epub or epub3"
-             "epub2"
-             "fb2"
-             "gfm"
-             "haddock"
-             "html or html5"
-             "html4"
-             "icml"
-             "ipynb"
-             "jats_archiving"
-             "jats_articleauthoring"
-             "jats_publishing"
-             "jats"
-             "jira"
-             "json"
-             "latex"
-             "man"
-             "markdown"
-             "markdown_mmd"
-             "markdown_phpextra"
-             "markdown_strict"
-             "markua"
-             "mediawiki"
-             "ms"
-             "muse"
-             "native"
-             "odt"
-             "opml"
-             "opendocument"
-             "org"
-             "pdf"
-             "plain"
-             "pptx"
-             "rst"
-             "rtf"
-             "texinfo"
-             "textile"
-             "slideous"
-             "slidy"
-             "dzslides"
-             "revealjs"
-             "s5"
-             "tei"
-             "typst"
-             "xwiki"
-             "zimwiki"))
+(use-package pandoc-transient
+  :vc (:fetcher github :repo "lispandfound/pandoc-transient")
+  :bind (("C-c P" . pandoc-convert-transient)))
 
 
-(transient-define-argument pandoc-output-file ()
-  :argument "--output="
-  :class 'transient-files
-  :prompt "Output file: ")
+(use-package apheleia
+  :ensure t
+  :config
+  
+  (apheleia-global-mode +1)
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist)
+        '(isort black)))
+
+(defun clone-buffer-other-window ()
+  (interactive)
+  (switch-to-buffer-other-window (current-buffer)))
+
+(global-set-key (kbd "C-c b") #'clone-buffer-other-window)
+(add-hook 'write-file-hooks 'delete-trailing-whitespace nil t)
 
 
-(transient-define-prefix pandoc-interface ()
-  ["Pandoc Options"
-   ("-s" "Standalone file generation (i.e. with <head> or LaTeX preamble)" "-s")
-   ("--dpi" "Output DPI" "--dpi=" :prompt "Output DPI: ")]
-  ["Input/Output"
-   ("-f" "--from=" pandoc-input-formats)
-   ("-t" "--to=" pandoc-output-formats)
-   ("-o" "--output=" pandoc-output-file)]
-  ["File"
-   ("<return>" "Convert this file" pandoc-convert-this-file :transient nil)
-   ])
-
-(transient-define-suffix pandoc-convert-this-file (the-prefix-arg)
-  "Convert this file, using pandoc"
-  :transient 'transient--do-call
-  (interactive "P")
-  (let ((args (transient-args (oref transient-current-prefix command))))
-    (async-shell-command (s-concat "pandoc " (s-join " " (cons (buffer-file-name) args))))))
-
+(use-package transpose-frame
+  :ensure t
+  :bind (("C-x 4 t" . transpose-frame)))
 
 
 
