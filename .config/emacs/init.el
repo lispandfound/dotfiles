@@ -368,7 +368,7 @@
   :ensure t
   :config (pyvenv-mode))
 
-(add-hook 'python-mode-hook #'eglot-ensure)
+(add-hook 'python-ts-mode-hook #'eglot-ensure)
 
 (use-package numpydoc
   :ensure t
