@@ -578,7 +578,7 @@ If the new path's directories does not exist, create them."
 (use-package embrace
   :ensure t)
 
-
+(repeat-mode)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
