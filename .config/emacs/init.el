@@ -582,9 +582,11 @@ If the new path's directories does not exist, create them."
   :bind ("<C-return>" . er/expand-region))
 
 (use-package embrace
+  :bind ("C-," . #'embrace-commander)
   :ensure t)
 
 (repeat-mode)
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
