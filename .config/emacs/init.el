@@ -42,17 +42,6 @@
   ;; Enable use-package :ensure support for Elpaca.
   (elpaca-use-package-mode))
 
-;; In case ELPA is not working
-;; (setq package-archives '(("gnu" . "https://raw.githubusercontent.com/d12frosted/elpa-mirror/master/gnu/")
-;;                          ("melpa" . "https://melpa.org/packages/")))
-
-
-;; TODO: Remove after Emacs 30
-;; (unless (package-installed-p 'vc-use-package)
-;;   (package-vc-install "https://github.com/slotThe/vc-use-package"))
-;; (require 'vc-use-package)
-;; (setq package-install-upgrade-built-in t) 
-
 (load-theme 'modus-vivendi)
 (use-package moody
   :ensure t
