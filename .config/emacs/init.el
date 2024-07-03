@@ -422,10 +422,11 @@
   (setq numpydoc-insert-examples-block nil))
 
 
-;; (use-package skempo
-;;   :vc (:fetcher github :repo xFA25E/skempo)
-;;   :config
-;;   (load (concat user-emacs-directory "skempo/python.el")))
+(use-package skempo
+  :ensure (:host github :repo "xFA25E/skempo")
+  
+  :config
+  (load (concat user-emacs-directory "skempo/python.el")))
 
 ;; Enable only if you want def/if/class to auto-expand
 ;; (setq python-skeleton-autoinsert t)
@@ -590,9 +591,9 @@ If the new path's directories does not exist, create them."
 (setq make-backup-file-name-function 'bedrock--backup-file-name)
 
 
-;; (use-package pandoc-transient
-;;   :vc (:fetcher github :repo "lispandfound/pandoc-transient")
-;;   :bind (("C-c P" . pandoc-convert-transient)))
+(use-package pandoc-transient
+  :ensure (:host github :repo "lispandfound/pandoc-transient")
+  :bind (("C-c P" . pandoc-convert-transient)))
 
 
 (use-package apheleia
@@ -610,11 +611,9 @@ If the new path's directories does not exist, create them."
 (global-set-key (kbd "C-c b") #'clone-buffer-other-window)
 (add-hook 'write-file-hooks 'delete-trailing-whitespace nil t)
 
-
 (use-package transpose-frame
   :ensure t
   :bind (("C-x 4 t" . transpose-frame)))
-
 
 (use-package expand-region
   :ensure t
@@ -625,18 +624,3 @@ If the new path's directories does not exist, create them."
   :ensure t)
 
 (repeat-mode)
-
-
-;; (custom-set-variables
-;;  ;; custom-set-variables was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  '(package-vc-selected-packages
-;;    '((vc-use-package :vc-backend Git :url "https://github.com/slotThe/vc-use-package"))))
-;; (custom-set-faces
-;;  ;; custom-set-faces was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  )
