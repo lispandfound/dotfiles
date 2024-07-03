@@ -12,16 +12,7 @@ else
 fi
 
 
-$PIP install \
-    "python-lsp-server[all]" \
-    doq \
-    python-lsp-black \
-    python-lsp-isort \
-    black \
-    isort \
-    mypy \
-    pylsp-mypy \
-    bpython
+$PIP install python-lsp-server python-lsp-ruff
 
 if test -f requirements.txt; then
     $PIP install -r requirements.txt
