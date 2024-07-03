@@ -368,6 +368,12 @@
   :ensure t
   :config (pyvenv-mode))
 
+(use-package auto-virtualenv
+  :ensure t
+  :after pyvenv
+  :config
+  (add-hook 'python-ts-mode-hook 'auto-virtualenv-set-virtualenv))
+
 (add-hook 'python-ts-mode-hook #'eglot-ensure)
 
 (use-package numpydoc
