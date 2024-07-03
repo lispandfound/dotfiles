@@ -1,7 +1,46 @@
 (setq-default display-line-numbers t)
+(defvar elpaca-installer-version 0.7)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil :depth 1
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (< emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                 ,@(when-let ((depth (plist-get order :depth)))
+                                                     (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                 ,(plist-get order :repo) ,repo))))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
 
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(elpaca elpaca-use-package
+  ;; Enable use-package :ensure support for Elpaca.
+  (elpaca-use-package-mode))
 
 ;; In case ELPA is not working
 ;; (setq package-archives '(("gnu" . "https://raw.githubusercontent.com/d12frosted/elpa-mirror/master/gnu/")
@@ -9,10 +48,10 @@
 
 
 ;; TODO: Remove after Emacs 30
-(unless (package-installed-p 'vc-use-package)
-  (package-vc-install "https://github.com/slotThe/vc-use-package"))
-(require 'vc-use-package)
-(setq package-install-upgrade-built-in t) 
+;; (unless (package-installed-p 'vc-use-package)
+;;   (package-vc-install "https://github.com/slotThe/vc-use-package"))
+;; (require 'vc-use-package)
+;; (setq package-install-upgrade-built-in t) 
 
 (load-theme 'modus-vivendi)
 (use-package moody
@@ -383,10 +422,10 @@
   (setq numpydoc-insert-examples-block nil))
 
 
-(use-package skempo
-  :vc (:fetcher github :repo xFA25E/skempo)
-  :config
-  (load (concat user-emacs-directory "skempo/python.el")))
+;; (use-package skempo
+;;   :vc (:fetcher github :repo xFA25E/skempo)
+;;   :config
+;;   (load (concat user-emacs-directory "skempo/python.el")))
 
 ;; Enable only if you want def/if/class to auto-expand
 ;; (setq python-skeleton-autoinsert t)
@@ -513,10 +552,10 @@ point reaches the beginning or end of the buffer, stop there."
   :ensure t
   :bind (:map Info-mode-map ("C-o" . #'casual-info-tmenu)))
 
-(use-package eglot-booster
-  :vc (:fetcher github :repo jdtsmith/eglot-booster)
-  :after eglot
-  :config (eglot-booster-mode))
+;; (use-package eglot-booster
+;;   :vc (:fetcher github :repo jdtsmith/eglot-booster)
+;;   :after eglot
+;;   :config (eglot-booster-mode))
 
 (use-package wgrep
   :ensure t)
@@ -551,9 +590,9 @@ If the new path's directories does not exist, create them."
 (setq make-backup-file-name-function 'bedrock--backup-file-name)
 
 
-(use-package pandoc-transient
-  :vc (:fetcher github :repo "lispandfound/pandoc-transient")
-  :bind (("C-c P" . pandoc-convert-transient)))
+;; (use-package pandoc-transient
+;;   :vc (:fetcher github :repo "lispandfound/pandoc-transient")
+;;   :bind (("C-c P" . pandoc-convert-transient)))
 
 
 (use-package apheleia
@@ -588,16 +627,16 @@ If the new path's directories does not exist, create them."
 (repeat-mode)
 
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-vc-selected-packages
-   '((vc-use-package :vc-backend Git :url "https://github.com/slotThe/vc-use-package"))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; (custom-set-variables
+;;  ;; custom-set-variables was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(package-vc-selected-packages
+;;    '((vc-use-package :vc-backend Git :url "https://github.com/slotThe/vc-use-package"))))
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  )
