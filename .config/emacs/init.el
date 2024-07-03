@@ -562,7 +562,7 @@ If the new path's directories does not exist, create them."
   
   (apheleia-global-mode +1)
   (setf (alist-get 'python-ts-mode apheleia-mode-alist)
-        '(isort black)))
+        '(ruff ruff-isort)))
 
 (defun clone-buffer-other-window ()
   (interactive)
