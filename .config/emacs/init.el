@@ -42,6 +42,9 @@
   ;; Enable use-package :ensure support for Elpaca.
   (elpaca-use-package-mode))
 
+(use-package transient
+  :ensure t)
+
 (load-theme 'modus-vivendi)
 (use-package moody
   :ensure t
@@ -384,6 +387,8 @@
   :config
   (global-treesit-auto-mode))
 
+
+
 (use-package magit
   :ensure t
   :bind ("C-c g" . magit-status))
@@ -564,9 +569,6 @@ point reaches the beginning or end of the buffer, stop there."
 (blink-cursor-mode -1)
 (global-auto-revert-mode)
 (recentf-mode)
-
-
-
 (savehist-mode)
 
 (defun bedrock--backup-file-name (fpath)
