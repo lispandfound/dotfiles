@@ -547,10 +547,10 @@ point reaches the beginning or end of the buffer, stop there."
   :ensure t
   :bind (:map Info-mode-map ("C-o" . #'casual-info-tmenu)))
 
-;; (use-package eglot-booster
-;;   :vc (:fetcher github :repo jdtsmith/eglot-booster)
-;;   :after eglot
-;;   :config (eglot-booster-mode))
+(use-package eglot-booster
+  :ensure (:host github :repo "jdtsmith/eglot-booster")
+  :after eglot
+  :config (eglot-booster-mode))
 
 (use-package wgrep
   :ensure t)
