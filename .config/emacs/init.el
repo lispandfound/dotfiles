@@ -606,12 +606,56 @@ If the new path's directories does not exist, create them."
   :ensure t
   :bind (("C-x 4 t" . transpose-frame)))
 
-(use-package expand-region
-  :ensure t
-  :bind ("<C-return>" . er/expand-region))
-
 (use-package embrace
   :bind ("C-," . #'embrace-commander)
   :ensure t)
+
+(defvar treesit-region-stack '())
+
+(defun treesit-mark-bigger-node ()
+  (interactive)
+  (unless mark-active
+    (set-mark-command nil))
+  (unless (or (eq last-command 'treesit-mark-bigger-node) (eq last-command 'treesit-contract-region))
+    (setq treesit-region-stack nil))
+  (let* ((cur-node (treesit-node-on (region-beginning) (region-end)))
+         (next-node (if (not (and
+                              (= (region-beginning) (treesit-node-start cur-node))
+                              (= (region-end) (treesit-node-end cur-node)))) ;; check if the node containing the selection is already good
+                        cur-node
+                      (treesit-parent-until
+                       cur-node
+                       (lambda (n)
+                         (not (and
+                               (= (region-beginning) (treesit-node-start n))
+                               (= (region-end) (treesit-node-end n)))))))))
+    (setq treesit-region-stack (cons (list (region-beginning) (region-end)) treesit-region-stack))
+    (set-mark (treesit-node-end next-node))
+    (goto-char (treesit-node-start next-node))))
+
+(defun treesit-contract-region ()
+  (interactive)
+  
+  (unless (null treesit-region-stack)
+    (let ((last-region (car treesit-region-stack)))
+      (setq treesit-region-stack (cdr treesit-region-stack))
+      (set-mark (cadr last-region))
+      (goto-char (car last-region)))))
+
+(defun treesit-reset-region ()
+  (interactive)
+  (unless (null treesit-region-stack)
+    (let ((last-region (car (last treesit-region-stack))))
+      (setq treesit-region-stack nil)
+      (set-mark (cadr last-region))
+      (goto-char (car last-region)))))
+
+(defvar-keymap treesit-mark-bigger-node-repeat-map
+  :repeat (:exit (treesit-reset-region))
+  "<return>" #'treesit-mark-bigger-node
+  "-" #'treesit-contract-region
+  "C-g" #'treesit-reset-region)
+
+(bind-key "<C-return>" #'treesit-mark-bigger-node)
 
 (repeat-mode)
