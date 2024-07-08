@@ -613,6 +613,7 @@ If the new path's directories does not exist, create them."
 (defvar treesit-region-stack '())
 
 (defun treesit-mark-bigger-node ()
+  "Expand selection to the parent of the smallest node containing the region."
   (interactive)
   (unless mark-active
     (set-mark-command nil))
@@ -634,8 +635,8 @@ If the new path's directories does not exist, create them."
     (goto-char (treesit-node-start next-node))))
 
 (defun treesit-contract-region ()
+  "Contract a region to the last treesitter expansion."
   (interactive)
-  
   (unless (null treesit-region-stack)
     (let ((last-region (car treesit-region-stack)))
       (setq treesit-region-stack (cdr treesit-region-stack))
@@ -643,6 +644,7 @@ If the new path's directories does not exist, create them."
       (goto-char (car last-region)))))
 
 (defun treesit-reset-region ()
+  "Reset region to before the first invocation of `treesit-mark-bigger-node'."
   (interactive)
   (unless (null treesit-region-stack)
     (let ((last-region (car (last treesit-region-stack))))
@@ -653,6 +655,7 @@ If the new path's directories does not exist, create them."
         (deactivate-mark)))))
 
 (defvar-keymap treesit-mark-bigger-node-repeat-map
+  :doc "Repeatedly expand selection up tree sitter nodes."
   :repeat (:exit (treesit-reset-region))
   "<return>" #'treesit-mark-bigger-node
   "-" #'treesit-contract-region
