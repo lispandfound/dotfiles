@@ -648,7 +648,9 @@ If the new path's directories does not exist, create them."
     (let ((last-region (car (last treesit-region-stack))))
       (setq treesit-region-stack nil)
       (set-mark (cadr last-region))
-      (goto-char (car last-region)))))
+      (goto-char (car last-region))
+      (when (= (car last-region) (cadr last-region))
+        (deactivate-mark)))))
 
 (defvar-keymap treesit-mark-bigger-node-repeat-map
   :repeat (:exit (treesit-reset-region))
