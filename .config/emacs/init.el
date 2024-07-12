@@ -391,7 +391,9 @@
 
 (use-package magit
   :ensure t
-  :bind ("C-c g" . magit-status))
+  :bind ("C-c g" . magit-status)
+  :init (with-eval-after-load 'project
+          (add-to-list 'project-switch-commands '(magit-project-status "Magit" "m"))))
 
 (use-package forge
   :ensure t
