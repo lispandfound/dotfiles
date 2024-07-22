@@ -11,6 +11,7 @@ plugins.black.enabled = true
 plugins.pylint.enabled = true
 plugins.pyls_mypy.enabled = true
 plugins.isort.enabled = true
+plugins.ruff.format = [ "I" ]
 
 
 [[language]]

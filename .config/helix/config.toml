@@ -2,6 +2,9 @@ theme = "onedark"
 
 [editor]
 jump-label-alphabet = "aoeuidhtns"
+end-of-line-diagnostics = "hint"
+[editor.inline-diagnostics]
+cursor-line = "warning" # show warnings and errors on the cursorline inline
 
 [editor.cursor-shape]
 insert = "bar"
@@ -18,7 +21,6 @@ esc = ["collapse_selection", "keep_primary_selection"]
 [keys.normal."+"]
 d = ":pipe doq --formatter numpy"
 q = ":pipe fmt -w 80 -p '#'"
-g = ":sh gitu-popup"
 s = ":sh dashit-fzf-popup"
 
 [keys.select]
@@ -29,4 +31,3 @@ x = "extend_line"
 
 # Counterpart for normal mode V
 V = "extend_to_line_end"
-

@@ -323,6 +323,7 @@ $env.config = {
                 description_text: yellow
             }
         }
+              
     ]
 
     keybindings: [
@@ -781,6 +782,27 @@ $env.config = {
             keycode: char_c
             mode: emacs
             event: {edit: capitalizechar}
+
+        }
+        {
+              name: fuzzy_file
+              modifier: control
+              keycode: char_f
+              mode: emacs
+              event: {
+                send: executehostcommand
+                cmd: "commandline edit --insert (fzf --layout=reverse)"
+              }
+        }
+        {
+              name: fuzzy_directory
+              modifier: control
+              keycode: char_s
+              mode: emacs
+              event: {
+                send: executehostcommand
+                cmd: "commandline edit --insert (fzf --walker=dir --layout=reverse)"
+              }
         }
     ]
 }
