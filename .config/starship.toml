@@ -1,15 +1,12 @@
 format = """\
-[](bg:black fg:green)\
-[󰌽 ](bg:green fg:black)\
-[](fg:green bg:red)\
+$character\
 $python\
-[](fg:red bg:blue)\
+[](fg:#c678dd bg:blue)\
 $directory\
 [](fg:blue bg:yellow)\
 $git_branch\
 $git_status\
-$character\
-"""
+[](fg:yellow) """
 
 [directory]
 format = "[  $path ]($style)"
@@ -17,7 +14,7 @@ style = "fg:black bg:blue"
 
 [git_branch]
 format = '[ $symbol$branch(:$remote_branch) ]($style)'
-symbol = "  "
+symbol = " "
 style = "fg:black bg:yellow"
 
 [git_status]
@@ -33,10 +30,11 @@ format = "[  $duration ]($style)"
 style = "fg:bright-white bg:18"
 
 [character]
-success_symbol = '[](fg:yellow bg:green)[](fg:green) '
-error_symbol = '[](fg:yellow bg:red)[](fg:red) '
+format = '$symbol'
+success_symbol = '[](fg:green)[󰌽 ](bg:green fg:black)[](fg:green bg:#c678dd)'
+error_symbol = '[](fg:red)[󰌽 ](bg:red fg:black)[](fg:red bg:#c678dd)'
 
 [python]
 format = "[ $symbol$virtualenv $version ]($style)"
-style = "bg:red fg:black"
+style = "bg:#c678dd fg:black"
 symbol = " "
