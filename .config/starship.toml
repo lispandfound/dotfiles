@@ -1,7 +1,9 @@
 format = """\
 [](bg:#282c34 fg:#7DF9AA)\
 [󰌽 ](bg:#7DF9AA fg:#090c0c)\
-[](fg:#7DF9AA bg:#3B76F0)\
+[](fg:#7DF9AA bg:#e5c07b )\
+$python\
+[](fg:#e5c07b bg:#3B76F0)\
 $directory\
 [](fg:#3B76F0 bg:#FCF392)\
 $git_branch\
@@ -35,3 +37,7 @@ style = "fg:bright-white bg:18"
 success_symbol = '[ ➜](bold green) '
 error_symbol = '[ ✗](#E84D44) '
 
+[python]
+format = "[ $symbol$virtualenv $version ]($style)"
+style = "bg:#e5c07b fg:#090c0c"
+symbol = " "

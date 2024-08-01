@@ -101,3 +101,4 @@ $env.NU_PLUGIN_DIRS = [
 $env.PATH = ($env.PATH | split row (char esep) | prepend ['~/.local/bin' '~/.ghcup/bin' $"(pyenv root)/shims" "~/.cargo/bin"])
 
 $env.EDITOR = (which hx | first).path
+$env.VIRTUAL_ENV_DISABLE_PROMPT = true
