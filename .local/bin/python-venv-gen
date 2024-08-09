@@ -12,7 +12,7 @@ else
 fi
 
 
-$PIP install python-lsp-server python-lsp-ruff bpython doq
+$PIP install python-lsp-server python-lsp-ruff bpython doq pylsp-mypy
 
 if test -f requirements.txt; then
     $PIP install -r requirements.txt
