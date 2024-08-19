@@ -41,11 +41,13 @@
 (elpaca elpaca-use-package
   ;; Enable use-package :ensure support for Elpaca.
   (elpaca-use-package-mode))
-
+(set-frame-font "Jetbrains Mono-10")
 (use-package transient
   :ensure t)
+(use-package doom-themes
+  :ensure t
+  :config (load-theme 'doom-one t))
 
-(load-theme 'modus-vivendi)
 (use-package moody
   :ensure t
   :config
@@ -612,61 +614,34 @@ If the new path's directories does not exist, create them."
   :bind ("C-," . #'embrace-commander)
   :ensure t)
 
-(defvar treesit--region-stack '())
+(use-package expreg
+  :ensure t
+  :init
+  (defvar-keymap expreg-expand-repeat-map
+    :doc "Repeatedly expand selection up tree sitter nodes."
+    :repeat t
+    "<return>" #'expreg-expand
+    "-" #'expreg-contract)
+  (bind-key "<C-return>" #'expreg-expand))
 
-(defun treesit-node-bounds-match-region-p (node beg end)
-  "Returns `t' if the bounds of the region marked `beg' and `end' match the bounds of `node'."
-  (and
-   (= beg (treesit-node-start node))
-   (= end (treesit-node-end node))))
 
-(defun treesit-mark-bigger-node ()
-  "Expand selection to the parent of the smallest node containing the region."
-  (interactive)
-  (unless mark-active
-    (set-mark-command nil))
-  (unless (or (eq last-command 'treesit-mark-bigger-node) (eq last-command 'treesit-contract-region))
-    (setq treesit--region-stack nil))
-  (let* ((cur-node (treesit-node-on (region-beginning) (region-end)))
-         (next-node (if
-                        ;; check if the node containing the selection is already good
-                        (not (treesit-node-bounds-match-region-p cur-node (region-beginning) (region-end)))
-                        cur-node
-                      (treesit-parent-until
-                       cur-node
-                       (lambda (n)
-                         (not (treesit-node-bounds-match-region-p n (region-beginning) (region-end))))))))
-    (unless (null next-node)
-      (push (cons (region-beginning) (region-end)) treesit--region-stack)
-      (set-mark (treesit-node-end next-node))
-      (goto-char (treesit-node-start next-node)))))
+(use-package ligature
+  :ensure t
+  :config
+  (ligature-set-ligatures 'prog-mode '("--" "---" "==" "===" "!=" "!==" "=!="
+                                       "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
+                                       "??" "???" "?:" "?." "?=" "<:" ":<" ":>" ">:" "<:<" "<>" "<<<" ">>>"
+                                       "<<" ">>" "||" "-|" "_|_" "|-" "||-" "|=" "||=" "##" "###" "####"
+                                       "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#=" "^=" "<$>" "<$"
+                                       "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</" "</>" "/>" "<!--" "<#--"
+                                       "-->" "->" "->>" "<<-" "<-" "<=<" "=<<" "<<=" "<==" "<=>" "<==>"
+                                       "==>" "=>" "=>>" ">=>" ">>=" ">>-" ">-" "-<" "-<<" ">->" "<-<" "<-|"
+                                       "<=|" "|=>" "|->" "<->" "<~~" "<~" "<~>" "~~" "~~>" "~>" "~-" "-~"
+                                       "~@" "[||]" "|]" "[|" "|}" "{|" "[<" ">]" "|>" "<|" "||>" "<||"
+                                       "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
+                                       ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
+                                       "<:<" ";;;"))
+  (global-ligature-mode t))
 
-(defun treesit-contract-region ()
-  "Contract a region to the last expansion."
-  (interactive)
-  (unless (null treesit--region-stack)
-    (let ((last-region (pop treesit--region-stack)))
-      (set-mark (cdr last-region))
-      (goto-char (car last-region)))))
-
-(defun treesit-reset-region ()
-  "Reset region to before the first invocation of `treesit-mark-bigger-node'."
-  (interactive)
-  (unless (null treesit--region-stack)
-    (let ((last-region (car (last treesit--region-stack))))
-      (setq treesit--region-stack nil)
-      (set-mark (cdr last-region))
-      (goto-char (car last-region))
-      (when (= (car last-region) (cdr last-region))
-        (deactivate-mark)))))
-
-(defvar-keymap treesit-mark-bigger-node-repeat-map
-  :doc "Repeatedly expand selection up tree sitter nodes."
-  :repeat (:exit (treesit-reset-region))
-  "<return>" #'treesit-mark-bigger-node
-  "-" #'treesit-contract-region
-  "C-g" #'treesit-reset-region)
-
-(bind-key "<C-return>" #'treesit-mark-bigger-node)
 
 (repeat-mode)
