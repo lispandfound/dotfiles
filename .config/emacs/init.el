@@ -643,5 +643,6 @@ If the new path's directories does not exist, create them."
                                        "<:<" ";;;"))
   (global-ligature-mode t))
 
-
+(use-package just-mode
+  :ensure t)
 (repeat-mode)
