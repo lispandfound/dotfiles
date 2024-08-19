@@ -399,25 +399,12 @@
 
 (use-package forge
   :ensure t
-  :bind ("C-c '" . forge-dispatch)
-  :config
-  (defun btv-forge-browse-buffer-file ()
-    (interactive)
-    (browse-url
-     (let
-         ((rev (magit-rev-abbrev "HEAD"))
-          (repo (forge-get-repository :stub))
-          (file (magit-file-relative-name buffer-file-name))
-          (highlight
-           (if
-               (use-region-p)
-               (let ((l1 (line-number-at-pos (region-beginning)))
-                     (l2 (line-number-at-pos (- (region-end) 1))))
-                 (format "#L%d-L%d" l1 l2))
-             "")))
-       (forge--format repo "https://%h/%o/%n/blob/%r/%f%L"
-                      `((?r . ,rev) (?f . ,file) (?L . ,highlight))))))
-  (transient-append-suffix 'forge-dispatch "b t"  '("b f" "browse file" btv-forge-browse-buffer-file)))
+  :bind ("C-c '" . forge-dispatch))
+
+(use-package browse-at-remote
+  :ensure t
+  :bind ("C-c C-o" . browse-at-remote))
+
 
 (use-package pyvenv
   :ensure t
