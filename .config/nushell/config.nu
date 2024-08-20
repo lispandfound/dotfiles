@@ -787,7 +787,7 @@ $env.config = {
         {
               name: fuzzy_file
               modifier: control
-              keycode: char_f
+              keycode: char_t
               mode: emacs
               event: {
                 send: executehostcommand
