@@ -650,4 +650,9 @@ If the new path's directories does not exist, create them."
 
 (use-package just-mode
   :ensure t)
+
+(use-package devdocs
+  :ensure t
+  :bind ("C-h D" . devdocs-lookup))
+
 (repeat-mode)
