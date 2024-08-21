@@ -656,4 +656,12 @@ If the new path's directories does not exist, create them."
   :ensure t
   :bind ("C-h D" . devdocs-lookup))
 
+(use-package otpp
+  :ensure (:host github :repo "abougouffa/one-tab-per-project")
+  :after project
+  :init
+  (otpp-mode 1)
+  ;; If you want to advice the commands in `otpp-override-commands`
+  ;; to be run in the current's tab (so, current project's) root directory
+  (otpp-override-mode 1))
 (repeat-mode)
