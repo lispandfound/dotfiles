@@ -664,4 +664,13 @@ If the new path's directories does not exist, create them."
   ;; If you want to advice the commands in `otpp-override-commands`
   ;; to be run in the current's tab (so, current project's) root directory
   (otpp-override-mode 1))
+
+(use-package visual-regexp
+  :ensure t)
+
+(use-package visual-regexp-steroids
+  :ensure (:host github :repo "benma/visual-regexp-steroids.el")
+  :bind (("C-c r" . vr/replace)
+         ("C-c q" . vr/query-replace)))
+
 (repeat-mode)
