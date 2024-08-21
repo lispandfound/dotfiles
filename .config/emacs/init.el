@@ -429,7 +429,8 @@
   :ensure (:host github :repo "xFA25E/skempo")
   
   :config
-  (load (concat user-emacs-directory "skempo/python.el")))
+  (load (concat user-emacs-directory "skempo/python.el"))
+  (load (concat user-emacs-directory "skempo/markdown.el")))
 
 ;; Enable only if you want def/if/class to auto-expand
 ;; (setq python-skeleton-autoinsert t)
