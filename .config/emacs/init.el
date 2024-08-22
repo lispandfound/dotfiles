@@ -673,4 +673,10 @@ If the new path's directories does not exist, create them."
   :bind (("C-c r" . vr/replace)
          ("C-c q" . vr/query-replace)))
 
+
+(use-package avy
+  :ensure t
+  :bind (("C-'" . avy-goto-word-0)
+         ("C-c C-j" . avy-resume))
+  :custom (avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
 (repeat-mode)
