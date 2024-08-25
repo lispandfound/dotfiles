@@ -370,7 +370,7 @@
   ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
 
   :config
-  
+
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -427,7 +427,7 @@
 
 (use-package skempo
   :ensure (:host github :repo "xFA25E/skempo")
-  
+
   :config
   (load (concat user-emacs-directory "skempo/python.el"))
   (load (concat user-emacs-directory "skempo/markdown.el")))
@@ -600,7 +600,7 @@ If the new path's directories does not exist, create them."
 (use-package apheleia
   :ensure t
   :config
-  
+
   (apheleia-global-mode +1)
   (setf (alist-get 'python-ts-mode apheleia-mode-alist)
         '(ruff ruff-isort)))
@@ -679,4 +679,8 @@ If the new path's directories does not exist, create them."
   :bind (("C-'" . avy-goto-word-0)
          ("C-c C-j" . avy-resume))
   :custom (avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
+
+(use-package ascii-art-to-unicode
+  :ensure t)
+
 (repeat-mode)
