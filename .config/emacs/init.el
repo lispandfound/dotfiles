@@ -600,7 +600,6 @@ If the new path's directories does not exist, create them."
 (use-package apheleia
   :ensure t
   :config
-
   (apheleia-global-mode +1)
   (setf (alist-get 'python-ts-mode apheleia-mode-alist)
         '(ruff ruff-isort)))
@@ -684,3 +683,8 @@ If the new path's directories does not exist, create them."
   :ensure t)
 
 (repeat-mode)
+
+(defun hl-todo-and-notes ()
+  (font-lock-add-keywords nil'(("\\<\\(TODO\\|NOTE\\):" 1 font-lock-warning-face t))))
+
+(add-hook 'prog-mode-hook #'hl-todo-and-notes)
