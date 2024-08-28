@@ -557,6 +557,11 @@ point reaches the beginning or end of the buffer, stop there."
   :ensure t
   :bind (:map Info-mode-map ("C-o" . #'casual-info-tmenu)))
 
+(use-package casual-avy
+  :ensure t
+  :bind ("C-c <return>" . casual-avy-tmenu))
+
+
 (use-package eglot-booster
   :ensure (:host github :repo "jdtsmith/eglot-booster")
   :after eglot
