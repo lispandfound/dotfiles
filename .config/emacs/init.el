@@ -557,9 +557,17 @@ point reaches the beginning or end of the buffer, stop there."
   :ensure t
   :bind (:map Info-mode-map ("C-o" . #'casual-info-tmenu)))
 
+
 (use-package casual-avy
   :ensure t
-  :bind ("C-c <return>" . casual-avy-tmenu))
+  :bind ("M-g" . casual-avy-tmenu)
+  :config
+  (transient-append-suffix 'casual-avy-tmenu "M-n"  '("E" "Error" consult-compile-error))
+  (transient-append-suffix 'casual-avy-tmenu "E"  '("f" "Flymake Error" consult-flymake))
+  (transient-append-suffix 'casual-avy-tmenu "p"  '("o" "Outline Item" consult-outline))
+  (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-outline))
+  
+  )
 
 
 (use-package eglot-booster
