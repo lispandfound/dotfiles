@@ -570,9 +570,11 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package wgrep
   :ensure t)
 
-(setq org-agenda-files '("~/todo.org")
-      org-directory "~/"
+(setq org-agenda-files '("~/org/todo.org")
+      org-directory "~/org"
       auth-sources '("~/.authinfo")
+      org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL"))
+      org-use-speed-commands t
       auto-revert-avoid-polling t
       auto-revert-check-vc-info t
       auto-revert-interval 5
