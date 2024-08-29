@@ -697,3 +697,15 @@ If the new path's directories does not exist, create them."
   (font-lock-add-keywords nil'(("\\<\\(TODO\\|NOTE\\):" 1 font-lock-warning-face t))))
 
 (add-hook 'prog-mode-hook #'hl-todo-and-notes)
+
+(use-package edit-indirect
+  :ensure t)
+
+(use-package mermaid-mode
+  :ensure t)
+
+
+(use-package markdown-mode
+  :ensure t)
+
+

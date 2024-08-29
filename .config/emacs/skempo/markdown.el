@@ -8,3 +8,13 @@
   "> [!NOTE]" n> r>
   ">" p
   )
+
+
+(skempo-define-skeleton wstage (:tag t :abbrev t :mode (markdown-mode))
+  nil
+  "## " (skeleton-read "Stage Name: ") \n
+  "- **Description:** " (skeleton-read "Stage Description: ") \n
+  "- **Inputs:**" \n \n
+  "- **Outputs:**" \n \n
+  "- **Environment:** " \n \n
+  "- **For More Help:** See the output of `" (skeleton-read "Stage Executable: ") " --help` or")
