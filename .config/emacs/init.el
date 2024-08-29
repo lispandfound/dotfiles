@@ -566,19 +566,25 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package wgrep
   :ensure t)
 
-(setq org-agenda-files '("~/org/todo.org")
-      org-directory "~/org"
-      auth-sources '("~/.authinfo")
-      org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL"))
-      org-use-speed-commands t
-      auto-revert-avoid-polling t
-      auto-revert-check-vc-info t
-      auto-revert-interval 5
-      sentence-end-double-space nil
-      column-number-mode t
-      initial-major-mode 'fundamental-mode
-      x-underline-at-descent-line nil
-      inhibit-splash-screen t)
+(use-package org
+  :ensure t
+  :bind (("C-c a" . 'org-agenda))
+  :config (setq
+           org-agenda-files '("~/org/todo.org")
+           org-directory "~/org"
+           org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL"))
+           org-use-speed-commands t))
+
+(setq 
+ auth-sources '("~/.authinfo")
+ auto-revert-avoid-polling t
+ auto-revert-check-vc-info t
+ auto-revert-interval 5
+ sentence-end-double-space nil
+ column-number-mode t
+ initial-major-mode 'fundamental-mode
+ x-underline-at-descent-line nil
+ inhibit-splash-screen t)
 (blink-cursor-mode -1)
 (global-auto-revert-mode)
 (recentf-mode)
