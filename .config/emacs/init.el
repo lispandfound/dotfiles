@@ -568,9 +568,11 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package org
   :ensure t
-  :bind (("C-c a" . 'org-agenda))
+  :bind (("C-c a" . 'org-agenda)
+         ("C-c x" . 'org-capture))
   :config (setq
            org-agenda-files '("~/org/todo.org")
+           org-default-notes-file "~/org/todo.org"
            org-directory "~/org"
            org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL"))
            org-use-speed-commands t))
