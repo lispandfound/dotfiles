@@ -133,15 +133,15 @@
   ;;;; 5. No project support
   ;; (setq consult-project-function nil)
   )
+
 (use-package better-defaults
-  :ensure t
+  :demand t
   :config
   (ido-mode -1))
 
 (add-hook 'after-init-hook #'electric-pair-mode)
 
 (use-package corfu
-  :ensure t
   ;; Optional customizations
   :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -162,11 +162,12 @@
   ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
   ;; be used globally (M-/).  See also the customization variable
   ;; `global-corfu-modes' to exclude certain modes.
+  :bind (:map corfu-map ("SPC" . corfu-insert-separator))
   :init
   (global-corfu-mode))
 
+
 (use-package orderless
-  :ensure t
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
@@ -177,7 +178,6 @@
   ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
   ;; available in the *Completions* buffer, add it to the
   ;; `completion-list-mode-map'.
-  :ensure t
   :bind (:map minibuffer-local-map
               ("M-A" . marginalia-cycle))
 
@@ -191,7 +191,6 @@
 
 ;; Enable vertico
 (use-package vertico
-  :ensure t
   :init
   (vertico-mode)
 
@@ -209,8 +208,9 @@
   )
 
 (use-package vertico-directory
+  :ensure nil
   :after vertico
-  :config
+  :init
   (keymap-set vertico-map "RET" #'vertico-directory-enter)
   (keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
   (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
@@ -219,6 +219,7 @@
 
 ;; A few more useful configurations...
 (use-package emacs
+  :ensure nil
   :init
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
@@ -247,6 +248,7 @@
 
 ;; A few more useful configurations...
 (use-package emacs
+  :ensure nil
   :init
   ;; TAB cycle if there are only few candidates
   ;; (setq completion-cycle-threshold 3)
@@ -254,6 +256,8 @@
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete)
+  (setq tab-first-completion 'word-or-paren-or-punct)
+
 
   ;; Emacs 30 and newer: Disable Ispell completion function. As an alternative,
   ;; try `cape-dict'.
@@ -268,7 +272,6 @@
 (use-package cape
   ;; Bind dedicated completion commands
   ;; Alternative prefix keys: C-c p, M-p, M-+, ...
-  :ensure t
   :bind (("C-c p p" . completion-at-point) ;; capf
          ("C-c p t" . complete-tag)        ;; etags
          ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
@@ -306,7 +309,6 @@
   )
 
 (use-package embark
-  :ensure t
 
   :bind
   (("C-." . embark-act)         ;; pick some comfortable binding
@@ -337,85 +339,77 @@
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :ensure t ; only need to install it, embark loads it after consult if found
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
 
 (use-package treesit-auto
-  :ensure t
+  :demand t
   :config
   (global-treesit-auto-mode))
 
 
 
 (use-package magit
-  :ensure t
   :bind ("C-c g" . magit-status)
   :init (with-eval-after-load 'project
           (add-to-list 'project-switch-commands '(magit-project-status "Magit" "m"))))
 
 (use-package forge
-  :ensure t
   :bind ("C-c '" . forge-dispatch))
 
 (use-package browse-at-remote
-  :ensure t
   :bind ("C-c C-o" . browse-at-remote))
 
 
-(use-package pyvenv
-  :ensure t
-  :config (pyvenv-mode))
+(use-package pyvenv)
 
 (use-package auto-virtualenv
-  :ensure t
-  :after pyvenv
-  :config
-  (add-hook 'python-ts-mode-hook 'auto-virtualenv-set-virtualenv))
+  :hook (python-ts-mode . auto-virtualenv-set-virtualenv))
 
 (add-hook 'python-ts-mode-hook #'eglot-ensure)
 
-(use-package numpydoc
-  :ensure t
-  :bind ("C-c M-n" . numpydoc-generate)
-  :config
-  (setq numpydoc-insert-examples-block nil))
 
+(global-set-key [remap newline] #'newline-and-indent)
+
+(use-package numpydoc
+  :bind ("C-c M-n" . numpydoc-generate)
+  :custom
+  (numpydoc-insert-examples-block nil))
 
 (use-package skempo
-  :ensure (:host github :repo "xFA25E/skempo")
-
+  :demand t
+  :vc (:url "https://github.com/xFA25E/skempo")
   :config
+  (global-set-key (kbd "C-c C-n") #'tempo-forward-mark)
+  (global-set-key (kbd "C-c C-p") #'tempo-backward-mark)
   (load (concat user-emacs-directory "skempo/python.el"))
   (load (concat user-emacs-directory "skempo/markdown.el")))
 
-;; Enable only if you want def/if/class to auto-expand
-;; (setq python-skeleton-autoinsert t)
-
-(global-set-key (kbd "C-c C-n") #'tempo-forward-mark)
-(global-set-key (kbd "C-c C-p") #'tempo-backward-mark)
+(use-package ws-butler
+  :hook (prog-mode markdown-mode org-mode))
 
 (setq-default abbrev-mode t)
 
-(setq eglot-report-progress nil)
+(use-package eglot
+  :custom
+  (eglot-report-progress nil))
 
 (use-package jinx
-  :ensure t
   :hook (emacs-startup . global-jinx-mode)
   :bind (([remap ispell-word] . jinx-correct)
          ("C-M-$" . jinx-languages)))
 
 (use-package ibuffer-project
-  :ensure t
-  :after ibuffer
-  :config
+  :custom (ibuffer-use-other-window t)
+  :init
   (add-hook 'ibuffer-hook
             (lambda ()
-              (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups)))))
+              (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+              (unless (eq ibuffer-sorting-mode 'project-file-relative)
+                (ibuffer-do-sort-by-project-file-relative)))))
 
 (use-package which-key
-  :ensure t
   :config
   (which-key-mode))
 
@@ -451,38 +445,33 @@ point reaches the beginning or end of the buffer, stop there."
       dired-auto-revert-buffer t
       dired-listing-switches "-alFh"
       isearch-lazy-count t)
+
 (setq tramp-use-ssh-controlmaster-options nil)
 
-(use-package yaml-mode
-  :ensure t)
+(use-package yaml-mode)
 
 (use-package csv-mode
-  :ensure t
   :hook (csv-mode . csv-align-mode))
 
 (setq vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
 (setq use-short-answers t)
 
-(use-package haskell-mode
-  :ensure t)
+(use-package haskell-mode)
 
 (add-to-list 'display-buffer-alist '("\\`.*-e?shell\\*" (display-buffer-in-side-window (side . bottom))))
 
 (use-package exec-path-from-shell
-  :ensure t
   :config
   (exec-path-from-shell-initialize))
 
 (use-package dumb-jump
-  :ensure t
-  :config
+  :init
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (delete-selection-mode)
 
 
 (use-package crux
-  :ensure t
   :bind (("C-k" . crux-smart-kill-line)
          ("C-c M-d" . crux-duplicate-and-comment-current-line-or-region)
          ("C-c S" . crux-find-user-init-file)
@@ -490,34 +479,27 @@ point reaches the beginning or end of the buffer, stop there."
          ("<M-S-return>" . crux-smart-open-line-above)))
 
 (use-package titlecase
-  :ensure t
   :bind (("C-c M-c" . titlecase-dwim)))
 
 
 (use-package casual-isearch
-  :ensure t
   :bind (:map isearch-mode-map
               ("C-o" . casual-isearch-tmenu)))
 
-(use-package elm-mode
-  :ensure t)
+(use-package elm-mode)
 
 
 (use-package casual-calc
-  :ensure t
   :bind (:map calc-mode-map ("C-o" . #'casual-calc-tmenu)))
 
 (use-package casual-dired
-  :ensure t
   :bind (:map dired-mode-map ("C-o" . #'casual-dired-tmenu)))
 
 (use-package casual-info
-  :ensure t
   :bind (:map Info-mode-map ("C-o" . #'casual-info-tmenu)))
 
 
 (use-package casual-avy
-  :ensure t
   :bind ("M-g" . casual-avy-tmenu)
   :config
   (transient-append-suffix 'casual-avy-tmenu "M-n"  '("E" "Error" consult-compile-error))
@@ -525,27 +507,19 @@ point reaches the beginning or end of the buffer, stop there."
   (transient-append-suffix 'casual-avy-tmenu "p"  '("o" "Outline Item" consult-outline))
   (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu)))
 
-
-(use-package eglot-booster
-  :ensure (:host github :repo "jdtsmith/eglot-booster")
-  :after eglot
-  :config (eglot-booster-mode))
-
-(use-package wgrep
-  :ensure t)
+(use-package wgrep)
 
 (use-package org
-  :ensure t
   :bind (("C-c a" . 'org-agenda)
          ("C-c x" . 'org-capture))
-  :config (setq
-           org-agenda-files '("~/org/todo.org")
-           org-default-notes-file "~/org/todo.org"
-           org-directory "~/org"
-           org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL"))
-           org-use-speed-commands t))
+  :custom
+  (org-agenda-files '("~/org/todo.org"))
+  (org-default-notes-file "~/org/todo.org")
+  (org-directory "~/org")
+  (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
+  (org-use-speed-commands t))
 
-(setq 
+(setq
  auth-sources '("~/.authinfo")
  auto-revert-avoid-polling t
  auto-revert-check-vc-info t
@@ -572,12 +546,11 @@ If the new path's directories does not exist, create them."
 
 
 (use-package pandoc-transient
-  :ensure (:host github :repo "lispandfound/pandoc-transient")
+  :vc (:url "https://github.com/lispandfound/pandoc-transient")
   :bind (("C-c P" . pandoc-convert-transient)))
 
 
 (use-package apheleia
-  :ensure t
   :config
   (apheleia-global-mode +1)
   (setf (alist-get 'python-ts-mode apheleia-mode-alist)
@@ -591,15 +564,12 @@ If the new path's directories does not exist, create them."
 (add-hook 'write-file-hooks 'delete-trailing-whitespace nil t)
 
 (use-package transpose-frame
-  :ensure t
   :bind (("C-x 4 t" . transpose-frame)))
 
 (use-package embrace
-  :bind ("C-," . #'embrace-commander)
-  :ensure t)
+  :bind ("C-," . #'embrace-commander))
 
 (use-package expreg
-  :ensure t
   :init
   (defvar-keymap expreg-expand-repeat-map
     :doc "Repeatedly expand selection up tree sitter nodes."
@@ -610,7 +580,6 @@ If the new path's directories does not exist, create them."
 
 
 (use-package ligature
-  :ensure t
   :config
   (ligature-set-ligatures 'prog-mode '("--" "---" "==" "===" "!=" "!==" "=!="
                                        "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
@@ -627,39 +596,18 @@ If the new path's directories does not exist, create them."
                                        "<:<" ";;;"))
   (global-ligature-mode t))
 
-(use-package just-mode
-  :ensure t)
+(use-package just-mode)
 
 (use-package devdocs
-  :ensure t
   :bind ("C-h D" . devdocs-lookup))
-
-(use-package otpp
-  :ensure (:host github :repo "abougouffa/one-tab-per-project")
-  :after project
-  :init
-  (otpp-mode 1)
-  ;; If you want to advice the commands in `otpp-override-commands`
-  ;; to be run in the current's tab (so, current project's) root directory
-  (otpp-override-mode 1))
-
-(use-package visual-regexp
-  :ensure t)
-
-(use-package visual-regexp-steroids
-  :ensure (:host github :repo "benma/visual-regexp-steroids.el")
-  :bind (("C-c r" . vr/replace)
-         ("C-c q" . vr/query-replace)))
 
 
 (use-package avy
-  :ensure t
   :bind (("C-'" . avy-goto-word-0)
          ("C-c C-j" . avy-resume))
   :custom (avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
 
-(use-package ascii-art-to-unicode
-  :ensure t)
+(use-package ascii-art-to-unicode)
 
 (repeat-mode)
 
@@ -668,14 +616,13 @@ If the new path's directories does not exist, create them."
 
 (add-hook 'prog-mode-hook #'hl-todo-and-notes)
 
-(use-package edit-indirect
-  :ensure t)
+(use-package edit-indirect)
 
-(use-package mermaid-mode
-  :ensure t)
-
+(use-package mermaid-mode)
 
 (use-package markdown-mode
-  :ensure t)
+  :mode ("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
 
-
+(use-package grip-mode
+  :bind (:map markdown-mode-command-map
+         ("g" . grip-mode)))
