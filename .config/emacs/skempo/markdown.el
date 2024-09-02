@@ -13,8 +13,9 @@
 (skempo-define-skeleton wstage (:tag t :abbrev t :mode (markdown-mode))
   nil
   "## " (skeleton-read "Stage Name: ") \n
-  "- **Description:** " (skeleton-read "Stage Description: ") \n
-  "- **Inputs:**" \n \n
-  "- **Outputs:**" \n \n
-  "- **Environment:** " \n \n
-  "- **For More Help:** See the output of `" (skeleton-read "Stage Executable: ") " --help` or")
+  "### Description" \n (skeleton-read "Stage Description: ") \n
+  "### Inputs" \n \n
+  "### Outputs" \n \n
+  "### Environment " \n \n
+  "### Usage" \n \n
+  "### For More Help"\n "See the output of `" (skeleton-read "Stage Executable: ") " --help` or")
