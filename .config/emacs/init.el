@@ -256,7 +256,7 @@
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete)
-  (setq tab-first-completion 'word-or-paren-or-punct)
+  (setq tab-first-completion nil)
 
 
   ;; Emacs 30 and newer: Disable Ispell completion function. As an alternative,
