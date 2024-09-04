@@ -481,54 +481,128 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package titlecase
   :bind (("C-c M-c" . titlecase-dwim)))
 
-
-(use-package casual-isearch
-  :bind (:map isearch-mode-map
-              ("C-o" . casual-isearch-tmenu)))
-
-(use-package elm-mode)
-
-
-(use-package casual-calc
-  :bind (:map calc-mode-map ("C-o" . #'casual-calc-tmenu)))
-
-(use-package casual-dired
-  :bind (:map dired-mode-map ("C-o" . #'casual-dired-tmenu)))
-
-(use-package casual-info
-  :bind (:map Info-mode-map ("C-o" . #'casual-info-tmenu)))
-
-
-(use-package casual-avy
-  :bind ("M-g" . casual-avy-tmenu)
+(use-package casual-suite
+  :bind
+  (
+   ("M-g" . #'casual-avy-tmenu)
+   :map calc-mode-map
+   ("C-o" . #'casual-calc-tmenu)
+   :map dired-mode-map
+   ("C-o" . #'casual-dired-tmenu)
+   :map isearch-mode-map
+   ("C-o" . #'casual-isearch-tmenu)
+   :map ibuffer-mode-map
+   ("C-o" . #'casual-ibuffer-tmenu)
+   ("F" . #'casual-ibuffer-filter-tmenu)
+   ("s" . #'casual-ibuffer-sortby-tmenu)
+   :map Info-mode-map
+   ("C-o" . #'casual-info-tmenu)
+   :map reb-mode-map
+   ("C-o" . #'casual-re-builder-tmenu)
+   :map reb-lisp-mode-map
+   ("C-o" . #'casual-re-builder-tmenu)
+   :map bookmark-bmenu-mode-map
+   ("C-o" . #'casual-bookmarks-tmenu)
+   :map org-agenda-mode-map
+   ("C-o" . #'casual-agenda-tmenu))
   :config
   (transient-append-suffix 'casual-avy-tmenu "M-n"  '("E" "Error" consult-compile-error))
   (transient-append-suffix 'casual-avy-tmenu "E"  '("f" "Flymake Error" consult-flymake))
   (transient-append-suffix 'casual-avy-tmenu "p"  '("o" "Outline Item" consult-outline))
   (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu)))
 
+
+(use-package elm-mode)
+
 (use-package wgrep)
 
 (use-package org
   :bind (("C-c a" . 'org-agenda)
-         ("C-c x" . 'org-capture))
+         ("C-c x" . 'org-capture)
+         :map org-mode-map
+         ("C-o"  . #'org-speed-keys-transient))
   :custom
   (org-agenda-files '("~/org/todo.org"))
   (org-default-notes-file "~/org/todo.org")
   (org-directory "~/org")
   (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
-  (org-use-speed-commands t))
+  (org-use-speed-commands t)
+  :config
+  (defun quick-set-priority-clear ()
+    (interactive)
+    (org-priority ? ))
+  (defun quick-set-priority-A ()
+    (interactive)
+    (org-priority ?A))
+  (defun quick-set-priority-B ()
+    (interactive)
+    (org-priority ?B))
+  (defun quick-set-priority-C ()
+    (interactive)
+    (org-priority ?C))
 
-(setq
- auth-sources '("~/.authinfo")
- auto-revert-avoid-polling t
- auto-revert-check-vc-info t
- auto-revert-interval 5
- sentence-end-double-space nil
- column-number-mode t
- initial-major-mode 'fundamental-mode
- x-underline-at-descent-line nil
- inhibit-splash-screen t)
+  (defun quick-restrict-subtree ()
+    (interactive)
+    (org-agenda-set-restriction-lock 'subtree))
+  (transient-define-prefix org-speed-keys-transient ()
+    "Org speed keys, as a transient"
+    [["Outline Navigation"
+      ("n" "Next heading" org-next-visible-heading :transient t)
+      ("p" "Previous heading" org-previous-visible-heading :transient t)
+      ("f" "Forward heading (same level)" org-forward-heading-same-level :transient t)
+      ("b" "Backward heading (same level)" org-backward-heading-same-level :transient t)
+      ("F" "Next block" org-next-block :transient t)
+      ("B" "Previous block" org-previous-block :transient t)
+      ("u" "Up heading" outline-up-heading :transient t)
+      ("j" "Jump to heading" org-goto)
+      ]
+     ["Outline Visibility"
+      ("c" "Toggle contents" org-cycle :transient t)
+      ("C" "Globally toggle contents" org-shifttab :transient t)
+      ("s" "Toggle narrow to subtree" org-toggle-narrow-to-subtree :transient t)
+      ("S" "Widen" widen :transient t)
+      ("k" "Cut subtree" org-cut-subtree :transient t)
+      ("=" "Toggle column mode" org-columns :transient t)
+      ]
+     ["Outline Structure Editing"
+      ("U" "Drag thing up" org-metaup :transient t)
+      ("D" "Drag thing down" org-metadown :transient t)
+      ("r" "Demote thing" org-metaright :transient t)
+      ("l" "Promote thing" org-metaleft :transient t)
+      ("R" "Demote or insert column right" org-shiftmetaright :transient t)
+      ("L" "Promote or insert column left" org-shiftmetaleft :transient t)
+      ("i" "Insert heading" org-insert-heading-respect-content :transient t)
+      ("^" "Sort headings" org-sort :transient t)
+      ("w" "Refile" org-refile :transient t)
+      ("a" "Archive" org-archive-subtree-default-with-confirmation :transient t)
+      ("A" "Archive (no confirmation)" org-archive-subtree-default :transient t)
+      ("@" "Mark subtree" org-mark-subtree :transient t)
+      ("#" "Toggle coment" org-toggle-comment :transient t)]]
+
+    [["Clock"
+      ("I" "Clock in" org-clock-in :transient t)
+      ("O" "Clock out" org-clock-out :transient t)]
+     ["Metadata Editing"
+      ("t" "Set todo status" org-todo :transient t)
+      ("," "Set priority" org-priority :transient t)
+      ("0" "Reset priority" quick-set-priority-clear :transient t)
+      ("1" "Set priority A" quick-set-priority-A :transient t)
+      ("2" "Set priority B" quick-set-priority-B :transient t)
+      ("3" "Set priority C" quick-set-priority-C :transient t)
+      (":" "Set tags" org-set-tags-command :transient t)
+      ("e" "Set effort" org-set-effort :transient t)
+      ("E" "Increment effort" org-inc-effort :transient t)
+      ("z" "Add a note" org-add-note :transient t)
+
+      ]
+     ["Views"
+      ("v" "Agenda" org-agenda)
+      ("/" "Sparse tree" org-sparse-tree)]
+     ["Misc"
+      ("o" "Open at point" org-open-at-point)
+      ("C-/" "Undo" undo)
+      ("<" "Restrict agenda to subtree" quick-restrict-subtree :transient t)
+      (">" "Remove agenda restrictions" org-agenda-remove-restriction-lock :transient t)]]))
 (blink-cursor-mode -1)
 (global-auto-revert-mode)
 (recentf-mode)
