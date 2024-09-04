@@ -699,7 +699,11 @@ If the new path's directories does not exist, create them."
 
 (use-package grip-mode
   :bind (:map markdown-mode-command-map
-         ("g" . grip-mode)))
+              ("g" . grip-mode)))
 
 ;; The default bind for query-replace-regexp is stupid... C-M-%... who thought that was less useful than `move-to-window-line'!
 (bind-key "M-r" #'query-replace-regexp)
+
+(use-package ox-reveal
+  :after org
+  :init (require 'ox-reveal))
