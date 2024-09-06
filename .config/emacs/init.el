@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 (require 'package)
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file 'noerror)
@@ -10,7 +12,8 @@
 
 (set-frame-font "Jetbrains Mono-10")
 
-(use-package transient)
+(use-package transient
+  :demand t)
 
 (use-package doom-themes
   :demand t
@@ -372,11 +375,6 @@
 
 (global-set-key [remap newline] #'newline-and-indent)
 
-(use-package numpydoc
-  :bind ("C-c M-n" . numpydoc-generate)
-  :custom
-  (numpydoc-insert-examples-block nil))
-
 (use-package skempo
   :demand t
   :vc (:url "https://github.com/xFA25E/skempo")
@@ -484,7 +482,7 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package casual-suite
   :bind
   (
-   ("M-g" . #'casual-avy-tmenu)
+   ("M-g" . #'my/custom-avy-tmenu)
    :map calc-mode-map
    ("C-o" . #'casual-calc-tmenu)
    :map dired-mode-map
@@ -505,11 +503,15 @@ point reaches the beginning or end of the buffer, stop there."
    ("C-o" . #'casual-bookmarks-tmenu)
    :map org-agenda-mode-map
    ("C-o" . #'casual-agenda-tmenu))
-  :config
-  (transient-append-suffix 'casual-avy-tmenu "M-n"  '("E" "Error" consult-compile-error))
-  (transient-append-suffix 'casual-avy-tmenu "E"  '("f" "Flymake Error" consult-flymake))
-  (transient-append-suffix 'casual-avy-tmenu "p"  '("o" "Outline Item" consult-outline))
-  (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu)))
+  :init
+  (defun my/custom-avy-tmenu ()
+    (interactive)
+    (require 'casual-avy)
+    (transient-append-suffix 'casual-avy-tmenu "M-n"  '("E" "Error" consult-compile-error))
+    (transient-append-suffix 'casual-avy-tmenu "E"  '("f" "Flymake Error" consult-flymake))
+    (transient-append-suffix 'casual-avy-tmenu "p"  '("o" "Outline Item" consult-outline))
+    (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu))
+    (casual-avy-tmenu)))
 
 
 (use-package elm-mode)
@@ -527,8 +529,8 @@ point reaches the beginning or end of the buffer, stop there."
   (org-directory "~/org")
   (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
   (org-use-speed-commands t)
-  :config
-  (defun quick-set-priority-clear ()
+  :init
+    (defun quick-set-priority-clear ()
     (interactive)
     (org-priority ? ))
   (defun quick-set-priority-A ()
@@ -707,3 +709,123 @@ If the new path's directories does not exist, create them."
 (use-package ox-reveal
   :after org
   :init (require 'ox-reveal))
+
+
+(use-package gptel
+  :init
+  (gptel-make-gemini "Gemini" :key "AIzaSyC25FzBpqPYkYz5G7NAXDx4xDy5qgenq5c" :stream t)
+  (defun gptel-add-numpydoc ()
+    (interactive)
+    (gptel-request nil
+      :system (s-concat (alist-get 'default gptel-directives) " For each function and class in the following code, return the same function but with numpy-style docstrings. Do not include the ```python code block, just return the code. The docstring MUST have documentation of every argument and return value. Here is an example for a function function_with_pep484_type_annotations(param1: int, param2: str) -> bool:
+
+Example function with PEP 484 type annotations.
+
+    The return type must be duplicated in the docstring to comply
+    with the NumPy docstring style.
+
+    Parameters
+    ----------
+    param1 : int
+        The first parameter.
+    param2 : str
+        The second parameter.
+
+    Returns
+    -------
+    bool
+        True if successful, False otherwise.")
+      :callback
+      (lambda (response info)
+        (if response
+            (let ((posn (marker-position (plist-get info :position)))
+                  (original-buffer (buffer-name (plist-get info :buffer)))
+                  (response-buffer (generate-new-buffer "*Numpydoc*")))
+              (with-current-buffer response-buffer
+                (insert response)
+                (mark-whole-buffer))
+              (ediff-regions-wordwise original-buffer response-buffer))
+          (message "gptel-request failed with message: %s" (plist-get info :status)))))))
+
+(defun python-get-treesit-def ()
+  (treesit-parent-until (treesit-node-at (point)) (lambda (node) (s-equals? (treesit-node-type node) "function_definition"))))
+
+(defun python-parameters (node)
+  (-map (lambda (node) (cons (python-parameter-name node) (python-parameter-type node)))
+        (-filter #'python-parameter-name (treesit-node-children (treesit-node-child-by-field-name node "parameters") t))))
+
+(defun python-function-is-method-p (node)
+  (if-let ((grandparent (treesit-node-parent (treesit-node-parent node))))
+      (s-equals? (treesit-node-type grandparent) "class_definition")))
+
+(defun python-parameter-name (node)
+  (if-let ((parameter-name (treesit-node-text (treesit-search-subtree node "identifier"))))
+      (substring-no-properties parameter-name)))
+
+(defun python-parameter-type (node)
+  (if-let ((parameter-type (treesit-node-text (treesit-node-child-by-field-name node "type"))))
+      (s-replace-regexp "[[:space:]\n]+" " " (substring-no-properties parameter-type))))
+
+(defun python-return-type (node)
+  (if-let ((return (treesit-node-text (treesit-node-child-by-field-name node "return_type"))))
+      (s-replace-regexp "[[:space:]\n]+" " " (substring-no-properties return))))
+
+(defun python-extract-docstring (node)
+  (alist-get 'c (treesit-query-capture (python-get-treesit-def) '((function_definition) body: (block :anchor (expression_statement (string) @c))))))
+
+(defun insert-numpydoc ()
+  (interactive)
+  (save-excursion
+    (let* ((function-definition (python-get-treesit-def))
+           (parameters (-filter (lambda (param) (or (not (python-function-is-method-p function-definition))
+                                                    (and
+                                                     (not (s-equals? (car param) "self"))
+                                                     (not (s-equals? (car param) "cls")))))
+                                (python-parameters function-definition)))
+           (return (python-return-type function-definition))
+           (existing-doc (python-extract-docstring function-definition)))
+      (when (and existing-doc (yes-or-no-p "Overwrite Existing Docstring "))
+        (delete-region  (treesit-node-start existing-doc) (treesit-node-end existing-doc)))
+      (goto-char (treesit-node-start (treesit-node-child-by-field-name function-definition "body")))
+      (insert "\"\"\"")
+      (newline-and-indent)
+      (insert "\"\"\"")
+      (newline-and-indent)
+      (previous-line 2)
+      (end-of-line)
+      (let ((description (s-trim (read-from-minibuffer "Short Description: "))))
+        (insert description)
+        (unless (s-equals? (substring description -1) ".")
+          (insert ".")))
+      (newline-and-indent 2)
+      (insert (read-from-minibuffer "Long Description: "))
+      (fill-paragraph)
+      (when parameters
+        (newline-and-indent 2)
+        (insert "Parameters")
+        (newline-and-indent)
+        (insert "----------")
+        (newline-and-indent)
+        (dolist (parameter parameters)
+          (let ((name (car parameter))
+                (type (cdr parameter)))
+            (insert name)
+            (when type
+              (insert " : ")
+              (insert type)
+              )
+            (newline-and-indent)
+            (insert (read-from-minibuffer (s-concat "Description for " name ": ")))
+
+            (call-interactively #'python-indent-shift-right))
+          (newline-and-indent)))
+      (when (and return (not (s-equals? return "None")))
+        (newline-and-indent 2)
+        (insert "Returns")
+        (newline-and-indent)
+        (insert "-------")
+        (newline-and-indent)
+        (insert return)
+        (newline-and-indent)
+        (insert (read-from-minibuffer "Description of return value: "))
+        (call-interactively #'python-indent-shift-right)))))
