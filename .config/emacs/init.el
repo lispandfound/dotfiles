@@ -776,40 +776,6 @@ If the new path's directories does not exist, create them."
   :init (require 'ox-reveal))
 
 
-(use-package gptel
-  :init
-  (gptel-make-gemini "Gemini" :key "AIzaSyC25FzBpqPYkYz5G7NAXDx4xDy5qgenq5c" :stream t)
-  (defun gptel-add-numpydoc ()
-    (interactive)
-    (gptel-request nil
-      :system (s-concat (alist-get 'default gptel-directives) " For each function and class in the following code, return the same function but with numpy-style docstrings. Do not include the ```python code block, just return the code. The docstring MUST have documentation of every argument and return value. Here is an example for a function function_with_pep484_type_annotations(param1: int, param2: str) -> bool:
 
-Example function with PEP 484 type annotations.
-
-    The return type must be duplicated in the docstring to comply
-    with the NumPy docstring style.
-
-    Parameters
-    ----------
-    param1 : int
-        The first parameter.
-    param2 : str
-        The second parameter.
-
-    Returns
-    -------
-    bool
-        True if successful, False otherwise.")
-      :callback
-      (lambda (response info)
-        (if response
-            (let ((posn (marker-position (plist-get info :position)))
-                  (original-buffer (buffer-name (plist-get info :buffer)))
-                  (response-buffer (generate-new-buffer "*Numpydoc*")))
-              (with-current-buffer response-buffer
-                (insert response)
-                (mark-whole-buffer))
-              (ediff-regions-wordwise original-buffer response-buffer))
-          (message "gptel-request failed with message: %s" (plist-get info :status)))))))
 
 (setq sentence-end-double-space nil)
