@@ -371,6 +371,7 @@
   :bind (:map python-ts-mode-map
          ("M-n" . insert-numpydoc))
   :config
+  (add-hook 'python-ts-mode-hook (lambda () (setq-local transpose-sexps-function #'treesit-transpose-sexps)))
   (require 's)
   (require 'dash)
   (defun python-get-treesit-def ()
@@ -389,10 +390,14 @@
   (defun python-parameter-name (node)
     (if-let ((parameter-name (treesit-node-text (treesit-search-subtree node "identifier"))))
         (substring-no-properties parameter-name)))
+  (defun python-annotated-type-extraction (node)
+    (alist-get 't (treesit-query-capture node '(((type (generic_type (identifier ) @gener  (type_parameter (type (identifier) @t) _) ))
+                                                (:match "Annotated" @gener))))))
 
   (defun python-parameter-type (node)
     (if-let ((parameter-type (treesit-node-text (treesit-node-child-by-field-name node "type"))))
-        (s-replace-regexp "[[:space:]\n]+" " " (substring-no-properties parameter-type))))
+        (let ((unannotated-type (python-annotated-type-extraction (treesit-node-child-by-field-name node "type"))))
+          (s-replace-regexp "[[:space:]\n]+" " " (substring-no-properties (if unannotated-type (treesit-node-text unannotated-type) parameter-type))))))
 
   (defun python-return-type (node)
     (if-let ((return (treesit-node-text (treesit-node-child-by-field-name node "return_type"))))
