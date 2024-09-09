@@ -752,7 +752,8 @@ If the new path's directories does not exist, create them."
 (add-hook 'write-file-hooks 'delete-trailing-whitespace nil t)
 
 (use-package transpose-frame
-  :bind (("C-x 4 t" . transpose-frame)))
+  :bind (("C-x 4 x" . transpose-frame)
+         ("C-x 4 t" . rotate-frame)))
 
 (use-package embrace
   :bind ("C-," . #'embrace-commander))
