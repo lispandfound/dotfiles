@@ -812,6 +812,9 @@ If the new path's directories does not exist, create them."
 (use-package markdown-mode
   :mode ("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
 
+(use-package visual-fill-column
+  :hook (gfm-mode))
+
 (use-package grip-mode
   :bind (:map markdown-mode-command-map
               ("g" . grip-mode)))
