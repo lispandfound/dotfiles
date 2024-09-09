@@ -632,28 +632,25 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package org
   :bind (("C-c a" . 'org-agenda)
-         ("C-c x" . 'org-capture)
-         :map org-mode-map
-         ("C-o"  . #'org-speed-keys-transient))
+         ("C-c x" . 'transient-org-capture))
   :custom
   (org-agenda-files '("~/org/todo.org"))
   (org-default-notes-file "~/org/todo.org")
   (org-directory "~/org")
   (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
-  (org-use-speed-commands t)
-  :init
-    (defun quick-set-priority-clear ()
-    (interactive)
-    (org-priority ? ))
-  (defun quick-set-priority-A ()
-    (interactive)
-    (org-priority ?A))
-  (defun quick-set-priority-B ()
-    (interactive)
-    (org-priority ?B))
-  (defun quick-set-priority-C ()
-    (interactive)
-    (org-priority ?C))
+  :config
+  (transient-define-suffix org-transient-capture--task (arg)
+    (interactive "P")
+    (org-capture arg "t"))
+  (transient-define-suffix org-transient-capture--note (arg)
+    (interactive "P")
+    (org-capture arg "n"))
+  (transient-define-prefix transient-org-capture ()
+    "Org capture with transient."
+    ["Template"
+     ("t" "Task" org-transient-capture--task)
+     ("n" "Note" org-transient-capture--note)]))
+
 
   (defun quick-restrict-subtree ()
     (interactive)
