@@ -869,3 +869,5 @@ Example function with PEP 484 type annotations.
                 (mark-whole-buffer))
               (ediff-regions-wordwise original-buffer response-buffer))
           (message "gptel-request failed with message: %s" (plist-get info :status)))))))
+
+(setq sentence-end-double-space nil)
