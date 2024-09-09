@@ -652,68 +652,13 @@ point reaches the beginning or end of the buffer, stop there."
      ("n" "Note" org-transient-capture--note)]))
 
 
-  (defun quick-restrict-subtree ()
-    (interactive)
-    (org-agenda-set-restriction-lock 'subtree))
-  (transient-define-prefix org-speed-keys-transient ()
-    "Org speed keys, as a transient"
-    [["Outline Navigation"
-      ("n" "Next heading" org-next-visible-heading :transient t)
-      ("p" "Previous heading" org-previous-visible-heading :transient t)
-      ("f" "Forward heading (same level)" org-forward-heading-same-level :transient t)
-      ("b" "Backward heading (same level)" org-backward-heading-same-level :transient t)
-      ("F" "Next block" org-next-block :transient t)
-      ("B" "Previous block" org-previous-block :transient t)
-      ("u" "Up heading" outline-up-heading :transient t)
-      ("j" "Jump to heading" org-goto)
-      ]
-     ["Outline Visibility"
-      ("c" "Toggle contents" org-cycle :transient t)
-      ("C" "Globally toggle contents" org-shifttab :transient t)
-      ("s" "Toggle narrow to subtree" org-toggle-narrow-to-subtree :transient t)
-      ("S" "Widen" widen :transient t)
-      ("k" "Cut subtree" org-cut-subtree :transient t)
-      ("=" "Toggle column mode" org-columns :transient t)
-      ]
-     ["Outline Structure Editing"
-      ("U" "Drag thing up" org-metaup :transient t)
-      ("D" "Drag thing down" org-metadown :transient t)
-      ("r" "Demote thing" org-metaright :transient t)
-      ("l" "Promote thing" org-metaleft :transient t)
-      ("R" "Demote or insert column right" org-shiftmetaright :transient t)
-      ("L" "Promote or insert column left" org-shiftmetaleft :transient t)
-      ("i" "Insert heading" org-insert-heading-respect-content :transient t)
-      ("^" "Sort headings" org-sort :transient t)
-      ("w" "Refile" org-refile :transient t)
-      ("a" "Archive" org-archive-subtree-default-with-confirmation :transient t)
-      ("A" "Archive (no confirmation)" org-archive-subtree-default :transient t)
-      ("@" "Mark subtree" org-mark-subtree :transient t)
-      ("#" "Toggle coment" org-toggle-comment :transient t)]]
+(use-package org-menu
+  :vc (:url "https://github.com/sheijk/org-menu")
+  :after org
+  :bind (:map org-mode-map
+              ("C-o" . 'org-menu)))
 
-    [["Clock"
-      ("I" "Clock in" org-clock-in :transient t)
-      ("O" "Clock out" org-clock-out :transient t)]
-     ["Metadata Editing"
-      ("t" "Set todo status" org-todo :transient t)
-      ("," "Set priority" org-priority :transient t)
-      ("0" "Reset priority" quick-set-priority-clear :transient t)
-      ("1" "Set priority A" quick-set-priority-A :transient t)
-      ("2" "Set priority B" quick-set-priority-B :transient t)
-      ("3" "Set priority C" quick-set-priority-C :transient t)
-      (":" "Set tags" org-set-tags-command :transient t)
-      ("e" "Set effort" org-set-effort :transient t)
-      ("E" "Increment effort" org-inc-effort :transient t)
-      ("z" "Add a note" org-add-note :transient t)
 
-      ]
-     ["Views"
-      ("v" "Agenda" org-agenda)
-      ("/" "Sparse tree" org-sparse-tree)]
-     ["Misc"
-      ("o" "Open at point" org-open-at-point)
-      ("C-/" "Undo" undo)
-      ("<" "Restrict agenda to subtree" quick-restrict-subtree :transient t)
-      (">" "Remove agenda restrictions" org-agenda-remove-restriction-lock :transient t)]]))
 (blink-cursor-mode -1)
 (global-auto-revert-mode)
 (recentf-mode)
