@@ -815,6 +815,13 @@ If the new path's directories does not exist, create them."
 (use-package visual-fill-column
   :hook (gfm-mode))
 
+(use-package cylc-mode
+  :ensure nil
+  :commands (cylc-mode)
+  :load-path "lisp/")
+
+
+
 (use-package grip-mode
   :bind (:map markdown-mode-command-map
               ("g" . grip-mode)))
