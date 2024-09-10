@@ -594,7 +594,7 @@ point reaches the beginning or end of the buffer, stop there."
   :bind (("C-c M-c" . titlecase-dwim)))
 
 (use-package casual-suite
-  :bind
+  :bind*
   (
    ("M-g" . #'my/custom-avy-tmenu)
    :map calc-mode-map
