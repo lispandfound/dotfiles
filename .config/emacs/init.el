@@ -333,7 +333,6 @@
   ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
 
   :config
-
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -369,9 +368,12 @@
 
 (use-package python
   :bind (:map python-ts-mode-map
-         ("M-n" . insert-numpydoc))
+              ("M-n" . insert-numpydoc))
+
   :config
-  (add-hook 'python-ts-mode-hook (lambda () (setq-local transpose-sexps-function #'treesit-transpose-sexps)))
+  (add-hook 'python-ts-mode-hook (lambda ()
+                                   (setq-local transpose-sexps-function #'treesit-transpose-sexps
+                                               devdocs-current-docs '("pandas~2" "numpy~1.23" "python~3.12"))))
   (require 's)
   (require 'dash)
   (defun python-get-treesit-def ()
@@ -381,7 +383,7 @@
   (defun python-parameters (node)
     (if-let ((parameters (treesit-node-child-by-field-name node "parameters")))
         (-map (lambda (node) (cons (python-parameter-name node) (python-parameter-type node)))
-          (-filter #'python-parameter-name (treesit-node-children  parameters t)))))
+              (-filter #'python-parameter-name (treesit-node-children  parameters t)))))
 
   (defun python-function-is-method-p (node)
     (if-let ((grandparent (treesit-node-parent (treesit-node-parent node))))
@@ -391,8 +393,8 @@
     (if-let ((parameter-name (treesit-node-text (treesit-search-subtree node "identifier"))))
         (substring-no-properties parameter-name)))
   (defun python-annotated-type-extraction (node)
-    (alist-get 't (treesit-query-capture node '(((type (generic_type (identifier ) @gener  (type_parameter (type (identifier) @t) _) ))
-                                                (:match "Annotated" @gener))))))
+    (alist-get 't (treesit-query-capture node '(((type (generic_type (identifier ) @gener (type_parameter (type (identifier) @t) _)))
+                                                 (:match "Annotated" @gener))))))
 
   (defun python-parameter-type (node)
     (if-let ((parameter-type (treesit-node-text (treesit-node-child-by-field-name node "type"))))
@@ -477,7 +479,7 @@
             (newline-and-indent)
             (insert (read-from-minibuffer (s-concat "Description for exception " exception ": ")))
             (call-interactively #'python-indent-shift-right))
-            (newline-and-indent))))))
+          (newline-and-indent))))))
 
 (use-package auto-virtualenv
   :hook (python-ts-mode . auto-virtualenv-set-virtualenv))
