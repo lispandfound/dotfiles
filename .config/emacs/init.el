@@ -521,6 +521,15 @@
               (unless (eq ibuffer-sorting-mode 'project-file-relative)
                 (ibuffer-do-sort-by-project-file-relative)))))
 
+(use-package project
+  :bind ("C-x p t" . project-test)
+  :init
+  (defcustom project-test-command "just test" "Default test command for `project-test'")
+  (defun project-test ()
+    (interactive)
+    (let ((compile-command project-test-command))
+      (call-interactively #'project-compile))))
+
 (use-package which-key
   :config
   (which-key-mode))
