@@ -778,6 +778,13 @@ If the new path's directories does not exist, create them."
   :init (require 'ox-reveal))
 
 
-
-
 (setq sentence-end-double-space nil)
+
+(defun to-snake-case (start end)
+  "Change selected text to snake case format"
+  (interactive "r")
+  (if (use-region-p)
+      (let ((camel-case-str (buffer-substring start end)))
+        (delete-region start end)
+        (insert (s-snake-case camel-case-str)))
+    (message "No region selected")))
