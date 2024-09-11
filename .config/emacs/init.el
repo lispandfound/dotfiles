@@ -580,7 +580,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package haskell-mode)
 
-(add-to-list 'display-buffer-alist '("\\`.*-e?shell\\*" (display-buffer-in-side-window (side . bottom))))
+(add-to-list 'display-buffer-alist '("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom))))
 
 (use-package exec-path-from-shell
   :config
