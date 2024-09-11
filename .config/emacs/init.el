@@ -844,3 +844,5 @@ If the new path's directories does not exist, create them."
         (delete-region start end)
         (insert (s-snake-case camel-case-str)))
     (message "No region selected")))
+(setq inhibit-startup-screen t)
+(setq initial-scratch-message "")
