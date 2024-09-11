@@ -696,7 +696,7 @@ point reaches the beginning or end of the buffer, stop there."
   (org-default-notes-file "~/org/todo.org")
   (org-directory "~/org")
   (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
-  :config
+  :init
   (transient-define-suffix org-transient-capture--task (arg)
     (interactive "P")
     (org-capture arg "t"))
