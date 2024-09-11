@@ -605,8 +605,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package casual-suite
   :bind*
-  (
-   ("M-g" . #'my/custom-avy-tmenu)
+  (("M-g" . #'my/custom-avy-tmenu)
    :map calc-mode-map
    ("C-o" . #'casual-calc-tmenu)
    :map dired-mode-map
@@ -631,7 +630,7 @@ point reaches the beginning or end of the buffer, stop there."
   (defun my/custom-avy-tmenu ()
     (interactive)
     (require 'casual-avy)
-    (transient-append-suffix 'casual-avy-tmenu "M-n"  '("E" "Error" consult-compile-error))
+    (transient-append-suffix 'casual-avy-tmenu "M-n"  '("E" "Error" consult-compile-error :transient nil))
     (transient-append-suffix 'casual-avy-tmenu "E"  '("f" "Flymake Error" consult-flymake))
     (transient-append-suffix 'casual-avy-tmenu "p"  '("o" "Outline Item" consult-outline))
     (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu))
