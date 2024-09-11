@@ -636,6 +636,53 @@ point reaches the beginning or end of the buffer, stop there."
     (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu))
     (casual-avy-tmenu)))
 
+(use-package consult-dir
+  :bind (("C-x C-d" . consult-dir)
+         :map vertico-map
+         ("C-x C-d" . consult-dir)
+         ("C-x C-j" . consult-dir-jump-file))
+  :init
+  (defun eshell--previous-directories ()
+    (delete-dups (mapcar 'abbreviate-file-name
+                         (ring-elements eshell-last-dir-ring))))
+  (defun eshell/z (&optional regexp)
+    "Navigate to a previously visited directory in eshell."
+    (cond
+     ((and (not regexp) (featurep 'consult-dir))
+      (eshell/cd (substring-no-properties (consult-dir--pick "Switch directory: "))))
+     (t (eshell/cd (if regexp (eshell-find-previous-directory regexp)
+                     (completing-read "cd: " (eshell--previous-directories)))))))
+
+  (defvar consult-dir--source-eshell `(:name "Eshell"
+                                             :narrow ?e
+                                             :category file
+                                             :face consult-file
+                                             :enabled ,(lambda () (and (boundp 'eshell-last-dir-ring) eshell-last-dir-ring))
+                                             :items ,#'eshell--previous-directories))
+  (defun consult-dir--zoxide-dirs ()
+    "Return list of zoxide dirs."
+    (mapcar (lambda (line) (concat line "/")) (split-string (shell-command-to-string "zoxide query --list") "\n" t)))
+
+  ;; A consult source that calls this function
+  (defvar consult-dir--source-zoxide
+    `(:name     "Zoxide dirs"
+                :narrow   ?z
+                :category file
+                :face     consult-file
+                :history  file-name-history
+                :enabled  ,(lambda () (executable-find "zoxide"))
+                :items    ,#'consult-dir--zoxide-dirs)
+    "Zoxide directory source for `consult-dir'.")
+
+  ;; Adding to the list of consult-dir sources
+
+  :config
+  (add-to-list 'consult-dir-sources 'consult-dir--source-eshell t)
+  (add-to-list 'consult-dir-sources 'consult-dir--source-zoxide t))
+
+
+
+
 
 (use-package elm-mode)
 
