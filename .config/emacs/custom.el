@@ -12,13 +12,14 @@
       "* %?\12 %U\12 %a\12 %i")
      ("t" "Todo" entry (file+headline "~/org/todo.org" "Tasks")
       "* TODO %?\12 %U\12 %a\12 %i")))
+ '(package-install-upgrade-built-in t)
  '(package-selected-packages
    '(adaptive-wrap apheleia ascii-art-to-unicode auto-virtualenv
                    better-defaults browse-at-remote cape casual-avy
                    casual-calc casual-dired casual-info casual-isearch
-                   casual-suite consult-dir corfu crux csv-mode
-                   devdocs doom-themes dumb-jump edit-indirect
-                   elm-mode embark-consult embrace
+                   casual-suite consult-dir consult-eglot corfu crux
+                   csv-mode devdocs doom-themes dumb-jump
+                   edit-indirect elm-mode embark-consult embrace
                    exec-path-from-shell expreg forge gptel grip-mode
                    haskell-mode htmlize ibuffer-project jinx just-mode
                    ligature marginalia mermaid-mode moody numpydoc
