@@ -1,55 +1,19 @@
-(setq-default display-line-numbers t)
-(defvar elpaca-installer-version 0.7)
-(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
-(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
-(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                              :ref nil :depth 1
-                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                              :build (:not elpaca--activate-package)))
-(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
-       (build (expand-file-name "elpaca/" elpaca-builds-directory))
-       (order (cdr elpaca-order))
-       (default-directory repo))
-  (add-to-list 'load-path (if (file-exists-p build) build repo))
-  (unless (file-exists-p repo)
-    (make-directory repo t)
-    (when (< emacs-major-version 28) (require 'subr-x))
-    (condition-case-unless-debug err
-        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                 ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
-                                                 ,@(when-let ((depth (plist-get order :depth)))
-                                                     (list (format "--depth=%d" depth) "--no-single-branch"))
-                                                 ,(plist-get order :repo) ,repo))))
-                 ((zerop (call-process "git" nil buffer t "checkout"
-                                       (or (plist-get order :ref) "--"))))
-                 (emacs (concat invocation-directory invocation-name))
-                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                 ((require 'elpaca))
-                 ((elpaca-generate-autoloads "elpaca" repo)))
-            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-          (error "%s" (with-current-buffer buffer (buffer-string))))
-      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
-  (unless (require 'elpaca-autoloads nil t)
-    (require 'elpaca)
-    (elpaca-generate-autoloads "elpaca" repo)
-    (load "./elpaca-autoloads")))
-(add-hook 'after-init-hook #'elpaca-process-queues)
-(elpaca `(,@elpaca-order))
+;;; -*- lexical-binding: t -*-
 
-(elpaca elpaca-use-package
-  ;; Enable use-package :ensure support for Elpaca.
-  (elpaca-use-package-mode))
-(set-frame-font "Jetbrains Mono-10")
+(require 'package)
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(load custom-file 'noerror)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
 (use-package transient
-  :ensure t)
+  :demand t)
+
 (use-package doom-themes
-  :ensure t
+  :demand t
   :config (load-theme 'doom-one t))
 
 (use-package moody
-  :ensure t
+  :demand t
   :config
   (moody-replace-mode-line-front-space)
   (moody-replace-mode-line-buffer-identification)
@@ -80,18 +44,8 @@
          ("M-#" . consult-register-load)
          ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
          ("C-M-#" . consult-register)
-         ;; M-g bindings in `goto-map'
-         ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
-         ("M-g g" . consult-goto-line)             ;; orig. goto-line
-         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-         ("M-g m" . consult-mark)
-         ("M-g k" . consult-global-mark)
-         ("M-g i" . consult-imenu)
-         ("M-g I" . consult-imenu-multi)
          ;; M-s bindings in `search-map'
-         ("M-s d" . consult-find)                  ;; Alternative: consult-fd
+         ("M-s d" . consult-fd)                  ;; Alternative: consult-fd
          ("M-s c" . consult-locate)
          ("M-s g" . consult-grep)
          ("M-s G" . consult-git-grep)
@@ -122,8 +76,7 @@
   ;; Optionally configure the register formatting. This improves the register
   ;; preview for `consult-register', `consult-register-load',
   ;; `consult-register-store' and the Emacs built-ins.
-  (setq register-preview-delay 0.5
-        register-preview-function #'consult-register-format)
+  (setq register-preview-function #'consult-register-format)
 
   ;; Optionally tweak the register preview window.
   ;; This adds thin lines, sorting and hides the mode line of the window.
@@ -152,38 +105,16 @@
    consult--source-recent-file consult--source-project-recent-file
    ;; :preview-key "M-."
    :preview-key '(:debounce 0.4 any))
-
-  ;; Optionally configure the narrowing key.
-  ;; Both < and C-+ work reasonably well.
-  (setq consult-narrow-key "<") ;; "C-+"
-
-  ;; Optionally make narrowing help available in the minibuffer.
-  ;; You may want to use `embark-prefix-help-command' or which-key instead.
-  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
-
-  ;; By default `consult-project-function' uses `project-root' from project.el.
-  ;; Optionally configure a different project root function.
-  ;;;; 1. project.el (the default)
-  ;; (setq consult-project-function #'consult--default-project--function)
-  ;;;; 2. vc.el (vc-root-dir)
-  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
-  ;;;; 3. locate-dominating-file
-  ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
-  ;;;; 4. projectile.el (projectile-project-root)
-  ;; (autoload 'projectile-project-root "projectile")
-  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
-  ;;;; 5. No project support
-  ;; (setq consult-project-function nil)
   )
+
 (use-package better-defaults
-  :ensure t
+  :demand t
   :config
   (ido-mode -1))
 
 (add-hook 'after-init-hook #'electric-pair-mode)
 
 (use-package corfu
-  :ensure t
   ;; Optional customizations
   :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -204,11 +135,12 @@
   ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
   ;; be used globally (M-/).  See also the customization variable
   ;; `global-corfu-modes' to exclude certain modes.
+  :bind (:map corfu-map ("SPC" . corfu-insert-separator))
   :init
   (global-corfu-mode))
 
+
 (use-package orderless
-  :ensure t
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
@@ -219,7 +151,6 @@
   ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
   ;; available in the *Completions* buffer, add it to the
   ;; `completion-list-mode-map'.
-  :ensure t
   :bind (:map minibuffer-local-map
               ("M-A" . marginalia-cycle))
 
@@ -233,7 +164,6 @@
 
 ;; Enable vertico
 (use-package vertico
-  :ensure t
   :init
   (vertico-mode)
 
@@ -251,8 +181,9 @@
   )
 
 (use-package vertico-directory
+  :ensure nil
   :after vertico
-  :config
+  :init
   (keymap-set vertico-map "RET" #'vertico-directory-enter)
   (keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
   (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
@@ -261,6 +192,7 @@
 
 ;; A few more useful configurations...
 (use-package emacs
+  :ensure nil
   :init
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
@@ -289,6 +221,7 @@
 
 ;; A few more useful configurations...
 (use-package emacs
+  :ensure nil
   :init
   ;; TAB cycle if there are only few candidates
   ;; (setq completion-cycle-threshold 3)
@@ -296,6 +229,8 @@
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete)
+  (setq tab-first-completion nil)
+
 
   ;; Emacs 30 and newer: Disable Ispell completion function. As an alternative,
   ;; try `cape-dict'.
@@ -310,24 +245,23 @@
 (use-package cape
   ;; Bind dedicated completion commands
   ;; Alternative prefix keys: C-c p, M-p, M-+, ...
-  :ensure t
-  :bind (("C-c p p" . completion-at-point) ;; capf
-         ("C-c p t" . complete-tag)        ;; etags
-         ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
-         ("C-c p h" . cape-history)
-         ("C-c p f" . cape-file)
-         ("C-c p k" . cape-keyword)
-         ("C-c p s" . cape-elisp-symbol)
-         ("C-c p e" . cape-elisp-block)
-         ("C-c p a" . cape-abbrev)
-         ("C-c p l" . cape-line)
-         ("C-c p w" . cape-dict)
-         ("C-c p :" . cape-emoji)
-         ("C-c p \\" . cape-tex)
-         ("C-c p _" . cape-tex)
-         ("C-c p ^" . cape-tex)
-         ("C-c p &" . cape-sgml)
-         ("C-c p r" . cape-rfc1345))
+  :bind (("M-p p" . completion-at-point) ;; capf
+         ("M-p t" . complete-tag)        ;; etags
+         ("M-p d" . cape-dabbrev)        ;; or dabbrev-completion
+         ("M-p h" . cape-history)
+         ("M-p f" . cape-file)
+         ("M-p k" . cape-keyword)
+         ("M-p s" . cape-elisp-symbol)
+         ("M-p e" . cape-elisp-block)
+         ("M-p a" . cape-abbrev)
+         ("M-p l" . cape-line)
+         ("M-p w" . cape-dict)
+         ("M-p :" . cape-emoji)
+         ("M-p \\" . cape-tex)
+         ("M-p _" . cape-tex)
+         ("M-p ^" . cape-tex)
+         ("M-p &" . cape-sgml)
+         ("M-p r" . cape-rfc1345))
   :init
   ;; Add to the global default value of `completion-at-point-functions' which is
   ;; used by `completion-at-point'.  The order of the functions matters, the
@@ -348,7 +282,6 @@
   )
 
 (use-package embark
-  :ensure t
 
   :bind
   (("C-." . embark-act)         ;; pick some comfortable binding
@@ -370,7 +303,7 @@
   ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
 
   :config
-  
+  (bind-key "E" #'eshell embark-file-map)
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -379,84 +312,196 @@
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :ensure t ; only need to install it, embark loads it after consult if found
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
 
 (use-package treesit-auto
-  :ensure t
+  :demand t
   :config
   (global-treesit-auto-mode))
 
 
 
 (use-package magit
-  :ensure t
   :bind ("C-c g" . magit-status)
   :init (with-eval-after-load 'project
           (add-to-list 'project-switch-commands '(magit-project-status "Magit" "m"))))
 
 (use-package forge
-  :ensure t
   :bind ("C-c '" . forge-dispatch))
 
 (use-package browse-at-remote
-  :ensure t
   :bind ("C-c C-o" . browse-at-remote))
 
 
-(use-package pyvenv
-  :ensure t
-  :config (pyvenv-mode))
+(use-package pyvenv)
+
+(use-package python
+  :bind (:map python-ts-mode-map
+              ("M-n" . insert-numpydoc))
+
+  :config
+  (add-hook 'python-ts-mode-hook (lambda ()
+                                   (setq-local transpose-sexps-function #'treesit-transpose-sexps
+                                               devdocs-current-docs '("pandas~2" "numpy~1.23" "python~3.12"))))
+  (require 's)
+  (require 'dash)
+  (defun python-get-treesit-def ()
+    (treesit-parent-until (treesit-node-at (point)) (lambda (node) (or (s-equals? (treesit-node-type node) "function_definition")
+                                                                       (s-equals? (treesit-node-type node) "class_definition")))))
+
+  (defun python-parameters (node)
+    (if-let ((parameters (treesit-node-child-by-field-name node "parameters")))
+        (-map (lambda (node) (cons (python-parameter-name node) (python-parameter-type node)))
+              (-filter #'python-parameter-name (treesit-node-children  parameters t)))))
+
+  (defun python-function-is-method-p (node)
+    (if-let ((grandparent (treesit-node-parent (treesit-node-parent node))))
+        (s-equals? (treesit-node-type grandparent) "class_definition")))
+
+  (defun python-parameter-name (node)
+    (if-let ((parameter-name (treesit-node-text (treesit-search-subtree node "identifier"))))
+        (substring-no-properties parameter-name)))
+  (defun python-annotated-type-extraction (node)
+    (alist-get 't (treesit-query-capture node '(((type (generic_type (identifier ) @gener (type_parameter (type (identifier) @t) _)))
+                                                 (:match "Annotated" @gener))))))
+
+  (defun python-parameter-type (node)
+    (if-let ((parameter-type (treesit-node-text (treesit-node-child-by-field-name node "type"))))
+        (let ((unannotated-type (python-annotated-type-extraction (treesit-node-child-by-field-name node "type"))))
+          (s-replace-regexp "[[:space:]\n]+" " " (substring-no-properties (if unannotated-type (treesit-node-text unannotated-type) parameter-type))))))
+
+  (defun python-return-type (node)
+    (if-let ((return (treesit-node-text (treesit-node-child-by-field-name node "return_type"))))
+        (s-replace-regexp "[[:space:]\n]+" " " (substring-no-properties return))))
+
+  (defun python-extract-docstring (node)
+    (alist-get 'c (treesit-query-capture (python-get-treesit-def) '((function_definition) body: (block :anchor (expression_statement (string) @c))))))
+
+  (defun python-raises (node)
+    (-map (lambda (node) (treesit-node-text (cdr node))) (treesit-query-capture node '((raise_statement (call function: (_) @e))))))
+
+  (defun insert-numpydoc ()
+    (interactive)
+    (save-excursion
+      (let* ((function-definition (python-get-treesit-def))
+             (parameters (-filter (lambda (param) (or (not (python-function-is-method-p function-definition))
+                                                      (and
+                                                       (not (s-equals? (car param) "self"))
+                                                       (not (s-equals? (car param) "cls")))))
+                                  (python-parameters function-definition)))
+             (return (python-return-type function-definition))
+             (raises (python-raises function-definition))
+             (existing-doc (python-extract-docstring function-definition)))
+        (when (and existing-doc (yes-or-no-p "Overwrite Existing Docstring "))
+          (delete-region  (treesit-node-start existing-doc) (treesit-node-end existing-doc)))
+        (goto-char (treesit-node-start (treesit-node-child-by-field-name function-definition "body")))
+        (insert "\"\"\"")
+        (newline-and-indent)
+        (insert "\"\"\"")
+        (newline-and-indent)
+        (previous-line 2)
+        (end-of-line)
+        (let ((description (s-trim (read-from-minibuffer "Short Description: "))))
+          (insert description)
+          (unless (s-equals? (substring description -1) ".")
+            (insert ".")))
+        (newline-and-indent 2)
+        (insert (read-from-minibuffer "Long Description: "))
+        (fill-paragraph)
+        (when parameters
+          (newline-and-indent 2)
+          (insert "Parameters")
+          (newline-and-indent)
+          (insert "----------")
+          (newline-and-indent)
+          (dolist (parameter parameters)
+            (let ((name (car parameter))
+                  (type (cdr parameter)))
+              (insert name)
+              (when type
+                (insert " : ")
+                (insert type)
+                )
+              (newline-and-indent)
+              (insert (read-from-minibuffer (s-concat "Description for " name ": ")))
+
+              (call-interactively #'python-indent-shift-right))
+            (newline-and-indent)))
+        (when (and return (not (s-equals? return "None")))
+          (newline-and-indent 2)
+          (insert "Returns")
+          (newline-and-indent)
+          (insert "-------")
+          (newline-and-indent)
+          (insert return)
+          (newline-and-indent)
+          (insert (read-from-minibuffer "Description of return value: "))
+          (call-interactively #'python-indent-shift-right))
+        (when raises
+          (newline-and-indent 2)
+          (insert "Raises")
+          (newline-and-indent)
+          (insert "------")
+          (newline-and-indent)
+          (dolist (exception raises)
+            (insert exception)
+            (newline-and-indent)
+            (insert (read-from-minibuffer (s-concat "Description for exception " exception ": ")))
+            (call-interactively #'python-indent-shift-right))
+          (newline-and-indent))))))
 
 (use-package auto-virtualenv
-  :ensure t
-  :after pyvenv
-  :config
-  (add-hook 'python-ts-mode-hook 'auto-virtualenv-set-virtualenv))
+  :hook (python-ts-mode . auto-virtualenv-set-virtualenv))
 
 (add-hook 'python-ts-mode-hook #'eglot-ensure)
 
-(use-package numpydoc
-  :ensure t
-  :bind ("C-c M-n" . numpydoc-generate)
-  :config
-  (setq numpydoc-insert-examples-block nil))
 
+(global-set-key [remap newline] #'newline-and-indent)
 
 (use-package skempo
-  :ensure (:host github :repo "xFA25E/skempo")
-  
+  :demand t
+  :vc (:url "https://github.com/xFA25E/skempo")
   :config
-  (load (concat user-emacs-directory "skempo/python.el")))
+  (global-set-key (kbd "C-c C-n") #'tempo-forward-mark)
+  (global-set-key (kbd "C-c C-p") #'tempo-backward-mark)
+  (load (concat user-emacs-directory "skempo/python.el"))
+  (load (concat user-emacs-directory "skempo/markdown.el")))
 
-;; Enable only if you want def/if/class to auto-expand
-;; (setq python-skeleton-autoinsert t)
-
-(global-set-key (kbd "C-c C-n") #'tempo-forward-mark)
-(global-set-key (kbd "C-c C-p") #'tempo-backward-mark)
+(use-package ws-butler
+  :hook (prog-mode markdown-mode org-mode))
 
 (setq-default abbrev-mode t)
 
-(setq eglot-report-progress nil)
+(use-package eglot
+  :custom
+  (eglot-report-progress nil))
 
 (use-package jinx
-  :ensure t
   :hook (emacs-startup . global-jinx-mode)
   :bind (([remap ispell-word] . jinx-correct)
          ("C-M-$" . jinx-languages)))
 
 (use-package ibuffer-project
-  :ensure t
-  :after ibuffer
-  :config
+  :custom (ibuffer-use-other-window t)
+  :init
   (add-hook 'ibuffer-hook
             (lambda ()
-              (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups)))))
+              (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+              (unless (eq ibuffer-sorting-mode 'project-file-relative)
+                (ibuffer-do-sort-by-project-file-relative)))))
+
+(use-package project
+  :bind ("C-x p t" . project-test)
+  :init
+  (defcustom project-test-command "just test" "Default test command for `project-test'")
+  (defun project-test ()
+    (interactive)
+    (let ((compile-command project-test-command))
+      (call-interactively #'project-compile))))
 
 (use-package which-key
-  :ensure t
   :config
   (which-key-mode))
 
@@ -492,38 +537,33 @@ point reaches the beginning or end of the buffer, stop there."
       dired-auto-revert-buffer t
       dired-listing-switches "-alFh"
       isearch-lazy-count t)
+
 (setq tramp-use-ssh-controlmaster-options nil)
 
-(use-package yaml-mode
-  :ensure t)
+(use-package yaml-mode)
 
 (use-package csv-mode
-  :ensure t
   :hook (csv-mode . csv-align-mode))
 
 (setq vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
 (setq use-short-answers t)
 
-(use-package haskell-mode
-  :ensure t)
+(use-package haskell-mode)
 
-(add-to-list 'display-buffer-alist '("\\`.*-e?shell\\*" (display-buffer-in-side-window (side . bottom))))
+(add-to-list 'display-buffer-alist '("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom))))
 
 (use-package exec-path-from-shell
-  :ensure t
   :config
   (exec-path-from-shell-initialize))
 
 (use-package dumb-jump
-  :ensure t
-  :config
+  :init
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (delete-selection-mode)
 
 
 (use-package crux
-  :ensure t
   :bind (("C-k" . crux-smart-kill-line)
          ("C-c M-d" . crux-duplicate-and-comment-current-line-or-region)
          ("C-c S" . crux-find-user-init-file)
@@ -531,50 +571,122 @@ point reaches the beginning or end of the buffer, stop there."
          ("<M-S-return>" . crux-smart-open-line-above)))
 
 (use-package titlecase
-  :ensure t
   :bind (("C-c M-c" . titlecase-dwim)))
 
+(use-package casual-suite
+  :bind*
+  (("M-g" . #'my/custom-avy-tmenu)
+   :map calc-mode-map
+   ("C-o" . #'casual-calc-tmenu)
+   :map dired-mode-map
+   ("C-o" . #'casual-dired-tmenu)
+   :map isearch-mode-map
+   ("C-o" . #'casual-isearch-tmenu)
+   :map ibuffer-mode-map
+   ("C-o" . #'casual-ibuffer-tmenu)
+   ("F" . #'casual-ibuffer-filter-tmenu)
+   ("s" . #'casual-ibuffer-sortby-tmenu)
+   :map Info-mode-map
+   ("C-o" . #'casual-info-tmenu)
+   :map reb-mode-map
+   ("C-o" . #'casual-re-builder-tmenu)
+   :map reb-lisp-mode-map
+   ("C-o" . #'casual-re-builder-tmenu)
+   :map bookmark-bmenu-mode-map
+   ("C-o" . #'casual-bookmarks-tmenu)
+   :map org-agenda-mode-map
+   ("C-o" . #'casual-agenda-tmenu))
+  :init
+  (defun my/custom-avy-tmenu ()
+    (interactive)
+    (require 'casual-avy)
+    (transient-append-suffix 'casual-avy-tmenu "M-n"  '("E" "Error" consult-compile-error :transient nil))
+    (transient-append-suffix 'casual-avy-tmenu "E"  '("f" "Flymake Error" consult-flymake))
+    (transient-append-suffix 'casual-avy-tmenu "p"  '("o" "Outline Item" consult-outline))
+    (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu))
+    (casual-avy-tmenu)))
 
-(use-package casual-isearch
-  :ensure t
-  :bind (:map isearch-mode-map
-              ("C-o" . casual-isearch-tmenu)))
+(use-package consult-dir
+  :bind (("C-x C-d" . consult-dir)
+         :map vertico-map
+         ("C-x C-d" . consult-dir)
+         ("C-x C-j" . consult-dir-jump-file))
+  :init
+  (defun eshell--previous-directories ()
+    (delete-dups (mapcar 'abbreviate-file-name
+                         (ring-elements eshell-last-dir-ring))))
+  (defun eshell/z (&optional regexp)
+    "Navigate to a previously visited directory in eshell."
+    (cond
+     ((and (not regexp) (featurep 'consult-dir))
+      (eshell/cd (substring-no-properties (consult-dir--pick "Switch directory: "))))
+     (t (eshell/cd (if regexp (eshell-find-previous-directory regexp)
+                     (completing-read "cd: " (eshell--previous-directories)))))))
 
-(use-package elm-mode
-  :ensure t)
+  (defvar consult-dir--source-eshell `(:name "Eshell"
+                                             :narrow ?e
+                                             :category file
+                                             :face consult-file
+                                             :enabled ,(lambda () (and (boundp 'eshell-last-dir-ring) eshell-last-dir-ring))
+                                             :items ,#'eshell--previous-directories))
+  (defun consult-dir--zoxide-dirs ()
+    "Return list of zoxide dirs."
+    (mapcar (lambda (line) (concat line "/")) (split-string (shell-command-to-string "zoxide query --list") "\n" t)))
+
+  ;; A consult source that calls this function
+  (defvar consult-dir--source-zoxide
+    `(:name     "Zoxide dirs"
+                :narrow   ?z
+                :category file
+                :face     consult-file
+                :history  file-name-history
+                :enabled  ,(lambda () (executable-find "zoxide"))
+                :items    ,#'consult-dir--zoxide-dirs)
+    "Zoxide directory source for `consult-dir'.")
+
+  ;; Adding to the list of consult-dir sources
+
+  :config
+  (add-to-list 'consult-dir-sources 'consult-dir--source-eshell t)
+  (add-to-list 'consult-dir-sources 'consult-dir--source-zoxide t))
 
 
-(use-package casual-calc
-  :ensure t
-  :bind (:map calc-mode-map ("C-o" . #'casual-calc-tmenu)))
 
-(use-package casual-dired
-  :ensure t
-  :bind (:map dired-mode-map ("C-o" . #'casual-dired-tmenu)))
 
-(use-package casual-info
-  :ensure t
-  :bind (:map Info-mode-map ("C-o" . #'casual-info-tmenu)))
 
-(use-package eglot-booster
-  :ensure (:host github :repo "jdtsmith/eglot-booster")
-  :after eglot
-  :config (eglot-booster-mode))
+(use-package elm-mode)
 
-(use-package wgrep
-  :ensure t)
+(use-package wgrep)
 
-(setq org-agenda-files '("~/todo.org")
-      org-directory "~/"
-      auth-sources '("~/.authinfo")
-      auto-revert-avoid-polling t
-      auto-revert-check-vc-info t
-      auto-revert-interval 5
-      sentence-end-double-space nil
-      column-number-mode t
-      initial-major-mode 'fundamental-mode
-      x-underline-at-descent-line nil
-      inhibit-splash-screen t)
+(use-package org
+  :bind (("C-c a" . 'org-agenda)
+         ("C-c x" . 'transient-org-capture))
+  :custom
+  (org-agenda-files '("~/org/todo.org"))
+  (org-default-notes-file "~/org/todo.org")
+  (org-directory "~/org")
+  (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
+  :init
+  (transient-define-suffix org-transient-capture--task (arg)
+    (interactive "P")
+    (org-capture arg "t"))
+  (transient-define-suffix org-transient-capture--note (arg)
+    (interactive "P")
+    (org-capture arg "n"))
+  (transient-define-prefix transient-org-capture ()
+    "Org capture with transient."
+    ["Template"
+     ("t" "Task" org-transient-capture--task)
+     ("n" "Note" org-transient-capture--note)]))
+
+
+(use-package org-menu
+  :vc (:url "https://github.com/sheijk/org-menu")
+  :after org
+  :bind (:map org-mode-map
+              ("C-o" . 'org-menu)))
+
+
 (blink-cursor-mode -1)
 (global-auto-revert-mode)
 (recentf-mode)
@@ -592,14 +704,12 @@ If the new path's directories does not exist, create them."
 
 
 (use-package pandoc-transient
-  :ensure (:host github :repo "lispandfound/pandoc-transient")
+  :vc (:url "https://github.com/lispandfound/pandoc-transient")
   :bind (("C-c P" . pandoc-convert-transient)))
 
 
 (use-package apheleia
-  :ensure t
   :config
-  
   (apheleia-global-mode +1)
   (setf (alist-get 'python-ts-mode apheleia-mode-alist)
         '(ruff ruff-isort)))
@@ -612,15 +722,13 @@ If the new path's directories does not exist, create them."
 (add-hook 'write-file-hooks 'delete-trailing-whitespace nil t)
 
 (use-package transpose-frame
-  :ensure t
-  :bind (("C-x 4 t" . transpose-frame)))
+  :bind (("C-x 4 x" . transpose-frame)
+         ("C-x 4 t" . rotate-frame)))
 
 (use-package embrace
-  :bind ("C-," . #'embrace-commander)
-  :ensure t)
+  :bind ("C-," . #'embrace-commander))
 
 (use-package expreg
-  :ensure t
   :init
   (defvar-keymap expreg-expand-repeat-map
     :doc "Repeatedly expand selection up tree sitter nodes."
@@ -631,7 +739,7 @@ If the new path's directories does not exist, create them."
 
 
 (use-package ligature
-  :ensure t
+  :demand t
   :config
   (ligature-set-ligatures 'prog-mode '("--" "---" "==" "===" "!=" "!==" "=!="
                                        "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
@@ -648,11 +756,144 @@ If the new path's directories does not exist, create them."
                                        "<:<" ";;;"))
   (global-ligature-mode t))
 
-(use-package just-mode
-  :ensure t)
+(use-package just-mode)
 
 (use-package devdocs
-  :ensure t
   :bind ("C-h D" . devdocs-lookup))
 
+
+(use-package avy
+  :bind (("C-'" . avy-goto-word-0)
+         ("C-c C-j" . avy-resume))
+  :custom (avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
+
+(use-package ascii-art-to-unicode)
+
 (repeat-mode)
+
+(defun hl-todo-and-notes ()
+  (font-lock-add-keywords nil'(("\\<\\(TODO\\|NOTE\\):" 1 font-lock-warning-face t))))
+
+(add-hook 'prog-mode-hook #'hl-todo-and-notes)
+
+(use-package edit-indirect)
+
+(use-package mermaid-mode)
+
+(use-package markdown-mode
+  :mode ("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
+
+(use-package visual-fill-column
+  :hook (gfm-mode))
+
+(use-package cylc-mode
+  :ensure nil
+  :commands (cylc-mode)
+  :load-path "lisp/")
+
+
+
+(use-package grip-mode
+  :bind (:map markdown-mode-command-map
+              ("g" . grip-mode)))
+
+;; The default bind for query-replace-regexp is stupid... C-M-%... who thought that was less useful than `move-to-window-line'!
+(bind-key "M-r" #'query-replace-regexp)
+
+(use-package ox-reveal
+  :after org
+  :init (require 'ox-reveal))
+
+
+(setq sentence-end-double-space nil)
+
+(defun to-snake-case (start end)
+  "Change selected text to snake case format"
+  (interactive "r")
+  (if (use-region-p)
+      (let ((camel-case-str (buffer-substring start end)))
+        (delete-region start end)
+        (insert (s-snake-case camel-case-str)))
+    (message "No region selected")))
+
+(use-package casual-suite)
+
+(use-package casual-calc
+  :ensure nil
+  :bind (:map calc-mode-map ("C-o" . casual-calc-tmenu))
+  :after (calc))
+
+(use-package casual-info
+  :ensure nil
+  :bind (:map Info-mode-map ("C-o" . casual-info-tmenu))
+  :after (info))
+
+(use-package casual-dired
+  :ensure nil
+  :bind (:map dired-mode-map ("C-o" . casual-dired-tmenu))
+  :after (dired))
+
+(use-package casual-avy
+  :ensure nil
+  :bind ("M-g" . my/custom-avy-tmenu)
+  :init
+  (defun my/custom-avy-tmenu ()
+    (interactive)
+    (require 'casual-avy)
+    (transient-append-suffix 'casual-avy-tmenu "M-n"  '("E" "Error" consult-compile-error :transient nil))
+    (transient-append-suffix 'casual-avy-tmenu "E"  '("f" "Flymake Error" consult-flymake))
+    (transient-append-suffix 'casual-avy-tmenu "p"  '("o" "Outline Item" consult-outline))
+    (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu))
+    (casual-avy-tmenu)))
+
+(use-package casual-isearch
+  :ensure nil
+  :bind (:map isearch-mode-map ("C-o" . casual-isearch-tmenu)))
+
+(use-package ibuffer
+  :hook (ibuffer-mode . ibuffer-auto-mode)
+  :defer t)
+
+(use-package casual-ibuffer
+  :ensure nil
+  :bind (:map
+         ibuffer-mode-map
+         ("C-o" . casual-ibuffer-tmenu)
+         ("F" . casual-ibuffer-filter-tmenu)
+         ("s" . casual-ibuffer-sortby-tmenu)
+         ("<double-mouse-1>" . ibuffer-visit-buffer) ; optional
+         ("M-<double-mouse-1>" . ibuffer-visit-buffer-other-window) ; optional
+         ("{" . ibuffer-backwards-next-marked) ; optional
+         ("}" . ibuffer-forward-next-marked)   ; optional
+         ("[" . ibuffer-backward-filter-group) ; optional
+         ("]" . ibuffer-forward-filter-group)  ; optional
+         ("$" . ibuffer-toggle-filter-group))  ; optional
+  :after (ibuffer))
+
+(use-package re-builder
+  :defer t)
+
+(use-package casual-re-builder
+  :ensure nil
+  :bind (:map
+         reb-mode-map ("C-o" . casual-re-builder-tmenu)
+         :map
+         reb-lisp-mode-map ("C-o" . casual-re-builder-tmenu))
+  :after (re-builder))
+
+(use-package casual-bookmarks
+  :ensure nil
+  :bind (:map bookmark-bmenu-mode-map
+              ("C-o" . casual-bookmarks-tmenu)
+              ("S" . casual-bookmarks-sortby-tmenu)
+              ("J" . bookmark-jump))
+  :after (bookmark))
+
+(use-package casual-agenda
+  :ensure nil
+  :after org
+  :bind (:map
+         org-agenda-mode-map
+         ("C-o" . casual-agenda-tmenu)
+         ("M-j" . org-agenda-clock-goto) ; optional
+         ("J" . bookmark-jump))) ; optional
