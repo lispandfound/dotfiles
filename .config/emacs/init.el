@@ -739,6 +739,7 @@ If the new path's directories does not exist, create them."
 
 
 (use-package ligature
+  :demand t
   :config
   (ligature-set-ligatures 'prog-mode '("--" "---" "==" "===" "!=" "!==" "=!="
                                        "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
