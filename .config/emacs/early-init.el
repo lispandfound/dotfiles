@@ -9,3 +9,5 @@
 (setq inhibit-startup-echo-area-message (user-login-name))
 ;; must be set *before* use-package is loaded to be effective
 (setq use-package-enable-imenu-support t)
+(setq inhibit-startup-screen t)
+(setq initial-scratch-message "")
