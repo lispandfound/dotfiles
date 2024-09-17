@@ -502,6 +502,7 @@
       (call-interactively #'project-compile))))
 
 (use-package which-key
+  :demand t
   :config
   (which-key-mode))
 
