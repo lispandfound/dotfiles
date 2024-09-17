@@ -674,10 +674,14 @@ point reaches the beginning or end of the buffer, stop there."
   (transient-define-suffix org-transient-capture--note (arg)
     (interactive "P")
     (org-capture arg "n"))
+  (transient-define-suffix org-transient-capture--log-completed-task (arg)
+    (interactive "P")
+    (org-capture arg "l"))
   (transient-define-prefix transient-org-capture ()
     "Org capture with transient."
     ["Template"
      ("t" "Task" org-transient-capture--task)
+     ("l" "Log Completed Task" org-transient-capture--log-completed-task)
      ("n" "Note" org-transient-capture--note)]))
 
 
