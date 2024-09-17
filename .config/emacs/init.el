@@ -921,3 +921,8 @@ If the new path's directories does not exist, create them."
          ("s-?" . winner-redo))
   :demand t
   :config (winner-mode))
+
+
+(use-package apptainer-mode
+  :vc (:url "https://github.com/jrgant/apptainer-mode")
+  :mode ("\\.def\\'" . apptainer-mode))
