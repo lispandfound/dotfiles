@@ -902,3 +902,22 @@ If the new path's directories does not exist, create them."
          ("C-o" . casual-agenda-tmenu)
          ("M-j" . org-agenda-clock-goto) ; optional
          ("J" . bookmark-jump))) ; optional
+(use-package popper
+  :bind (("C-=" . popper-toggle)
+         (:repeat-map popper-toggle-repeat-map
+                      ("=" . popper-cycle)
+                      ("-" . popper-toggle)
+                      ("t" . popper-toggle-type))
+         )
+  :demand t
+  :config
+  (popper-mode))
+
+
+
+(use-package winner
+  :ensure nil
+  :bind (("s-/" . winner-undo)
+         ("s-?" . winner-redo))
+  :demand t
+  :config (winner-mode))
