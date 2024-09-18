@@ -904,3 +904,8 @@ If the new path's directories does not exist, create them."
 (use-package apptainer-mode
   :vc (:url "https://github.com/jrgant/apptainer-mode")
   :mode ("\\.def\\'" . apptainer-mode))
+
+
+(use-package tldr
+  :bind ("C-h t" . tldr)
+  :init (add-to-list 'display-buffer-alist '("\\*tldr\\*" (display-buffer-in-side-window (side . bottom)))))
