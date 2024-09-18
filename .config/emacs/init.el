@@ -757,7 +757,14 @@ If the new path's directories does not exist, create them."
 (use-package mermaid-mode)
 
 (use-package markdown-mode
-  :mode ("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
+  :bind (:map markdown-mode-map
+              ("<C-return>" . markdown-insert-header-like-org))
+  :mode ("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode)
+  :init
+  (defun markdown-insert-header-like-org ()
+    (interactive)
+    (let ((outline-regexp "[#]+"))
+      (outline-insert-heading))))
 
 (use-package visual-fill-column
   :hook (gfm-mode))
