@@ -19,18 +19,18 @@
  '(package-selected-packages
    '(adaptive-wrap apheleia apptainer-mode ascii-art-to-unicode
                    auto-virtualenv better-defaults browse-at-remote
-                   cape casual-avy casual-calc casual-dired
-                   casual-info casual-isearch casual-suite consult-dir
+                   cape casual-suite comment-dwim-2 consult-dir
                    consult-eglot corfu counsel-pydoc crux csv-mode
                    devdocs doom-themes dumb-jump edit-indirect
                    elm-mode embark-consult embrace
                    exec-path-from-shell expreg forge gptel grip-mode
                    haskell-mode htmlize ibuffer-project jinx just-mode
-                   ligature marginalia mermaid-mode moody numpydoc
-                   orderless org-menu org-reveal ox-reveal
+                   ligature marginalia meow mermaid-mode moody
+                   numpydoc orderless org-menu ox-reveal
                    pandoc-transient popper pydoc shackle skempo
-                   titlecase transpose-frame treesit-auto vertico
-                   visual-fill-column wgrep ws-butler yaml-mode zoxide))
+                   titlecase tldr transpose-frame treesit-auto try
+                   vertico visual-fill-column wgrep ws-butler
+                   yaml-mode zoxide))
  '(package-vc-selected-packages
    '((apptainer-mode :vc-backend Git :url
                      "https://github.com/jrgant/apptainer-mode")
@@ -39,8 +39,9 @@
                        "https://github.com/lispandfound/pandoc-transient")
      (skempo :url "https://github.com/xFA25E/skempo")))
  '(popper-reference-buffers
-   '("Output\\*$" "\\*Async Shell Command\\*" compilation-mode help-mode
-     eshell-mode "\\*Messages\\*$" devdocs-mode))
+   '("\\*tldr\\*" "Output\\*$" "\\*Async Shell Command\\*"
+     compilation-mode help-mode eshell-mode "\\*Messages\\*$"
+     devdocs-mode))
  '(popper-window-height 20)
  '(register-preview-delay 0.5)
  '(shackle-mode t)
