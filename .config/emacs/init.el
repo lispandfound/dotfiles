@@ -563,49 +563,20 @@ point reaches the beginning or end of the buffer, stop there."
 
 (delete-selection-mode)
 
+(use-package comment-dwim-2
+  :bind ("M-;" . #'comment-dwim-2))
 
 (use-package crux
   :bind (("C-k" . crux-smart-kill-line)
          ("C-c M-d" . crux-duplicate-and-comment-current-line-or-region)
          ("C-c S" . crux-find-user-init-file)
          ("<M-return>" . crux-smart-open-line)
+         ("C-^" . crux-top-join-line)
          ("<M-S-return>" . crux-smart-open-line-above)))
 
 (use-package titlecase
   :bind (("C-c M-c" . titlecase-dwim)))
 
-(use-package casual-suite
-  :bind*
-  (("M-g" . #'my/custom-avy-tmenu)
-   :map calc-mode-map
-   ("C-o" . #'casual-calc-tmenu)
-   :map dired-mode-map
-   ("C-o" . #'casual-dired-tmenu)
-   :map isearch-mode-map
-   ("C-o" . #'casual-isearch-tmenu)
-   :map ibuffer-mode-map
-   ("C-o" . #'casual-ibuffer-tmenu)
-   ("F" . #'casual-ibuffer-filter-tmenu)
-   ("s" . #'casual-ibuffer-sortby-tmenu)
-   :map Info-mode-map
-   ("C-o" . #'casual-info-tmenu)
-   :map reb-mode-map
-   ("C-o" . #'casual-re-builder-tmenu)
-   :map reb-lisp-mode-map
-   ("C-o" . #'casual-re-builder-tmenu)
-   :map bookmark-bmenu-mode-map
-   ("C-o" . #'casual-bookmarks-tmenu)
-   :map org-agenda-mode-map
-   ("C-o" . #'casual-agenda-tmenu))
-  :init
-  (defun my/custom-avy-tmenu ()
-    (interactive)
-    (require 'casual-avy)
-    (transient-append-suffix 'casual-avy-tmenu "M-n"  '("E" "Error" consult-compile-error :transient nil))
-    (transient-append-suffix 'casual-avy-tmenu "E"  '("f" "Flymake Error" consult-flymake))
-    (transient-append-suffix 'casual-avy-tmenu "p"  '("o" "Outline Item" consult-outline))
-    (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu))
-    (casual-avy-tmenu)))
 
 (use-package consult-dir
   :bind (("C-x C-d" . consult-dir)
