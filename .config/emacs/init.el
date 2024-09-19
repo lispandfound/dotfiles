@@ -662,6 +662,10 @@ point reaches the beginning or end of the buffer, stop there."
   :bind (:map org-mode-map
               ("C-o" . 'org-menu)))
 
+(use-package ox-md
+  :ensure nil
+  :after org)
+
 
 (blink-cursor-mode -1)
 (global-auto-revert-mode)
