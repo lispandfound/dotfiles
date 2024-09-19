@@ -301,7 +301,8 @@
 
   ;; (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
   ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
-
+  (with-eval-after-load 'em-term
+    (add-to-list 'eshell-visual-commands "watch"))
   :config
   (bind-key "E" #'eshell embark-file-map)
   ;; Hide the mode line of the Embark live/completions buffers
