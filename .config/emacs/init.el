@@ -12,13 +12,13 @@
   :demand t
   :config (load-theme 'doom-one t))
 
-(use-package moody
+(use-package mood-line
   :demand t
   :config
-  (moody-replace-mode-line-front-space)
-  (moody-replace-mode-line-buffer-identification)
-  (moody-replace-vc-mode))
+  (mood-line-mode)
+  :custom (mood-line-glyph-alist mood-line-glyphs-unicode))
 
+(display-time-mode)
 (keyboard-translate ?\C-t ?\C-x)
 (keyboard-translate ?\C-x ?\C-t)
 
