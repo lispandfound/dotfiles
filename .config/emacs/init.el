@@ -340,7 +340,10 @@
 
 (use-package python
   :bind (:map python-ts-mode-map
-              ("M-n" . insert-numpydoc))
+              ("M-n" . insert-numpydoc)
+              (:repeat-map python-indent-shift-right-repeat-map
+                           (">" . python-indent-shift-right)
+                           ("<" . python-indent-shift-left)))
 
   :config
   (add-hook 'python-ts-mode-hook (lambda ()
@@ -454,7 +457,7 @@
           (newline-and-indent))))))
 
 (use-package auto-virtualenv
-  :hook (python-ts-mode . auto-virtualenv-set-virtualenv))
+  :hook (python-ts-mode . auto-virtualenv-find-and-activate))
 
 (add-hook 'python-ts-mode-hook #'eglot-ensure)
 
