@@ -944,3 +944,4 @@ If the new path's directories does not exist, create them."
   :after dwim-shell-command)
 (add-to-list 'display-buffer-alist
              '("^\\*vc-git" display-buffer-no-window (allow-no-window . t)))
+(bind-key "M-/" #'hippie-expand)
