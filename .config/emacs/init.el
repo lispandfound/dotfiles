@@ -487,14 +487,7 @@
   :bind (([remap ispell-word] . jinx-correct)
          ("C-M-$" . jinx-languages)))
 
-(use-package ibuffer-project
-  :custom (ibuffer-use-other-window t)
-  :init
-  (add-hook 'ibuffer-hook
-            (lambda ()
-              (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
-              (unless (eq ibuffer-sorting-mode 'project-file-relative)
-                (ibuffer-do-sort-by-project-file-relative)))))
+
 
 (use-package project
   :bind ("C-x p t" . project-test)
@@ -808,7 +801,7 @@ If the new path's directories does not exist, create them."
         (insert (s-snake-case camel-case-str)))
     (message "No region selected")))
 
-(use-package casual-suite)
+(use-package casual)
 
 (use-package casual-calc
   :ensure nil
