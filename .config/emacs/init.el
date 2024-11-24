@@ -687,8 +687,9 @@ If the new path's directories does not exist, create them."
 
 
 (use-package apheleia
-  :config
+  :init
   (apheleia-global-mode +1)
+  :config
   (setf (alist-get 'python-ts-mode apheleia-mode-alist)
         '(ruff ruff-isort)))
 
