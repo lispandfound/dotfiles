@@ -698,7 +698,7 @@ If the new path's directories does not exist, create them."
   (switch-to-buffer-other-window (current-buffer)))
 
 (global-set-key (kbd "C-c b") #'clone-buffer-other-window)
-(add-hook 'write-file-hooks 'delete-trailing-whitespace nil t)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (use-package transpose-frame
   :bind (("C-x 4 x" . transpose-frame)
