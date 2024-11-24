@@ -837,8 +837,10 @@ If the new path's directories does not exist, create them."
   :bind (:map isearch-mode-map ("C-o" . casual-isearch-tmenu)))
 
 (use-package ibuffer
-  :hook (ibuffer-mode . ibuffer-auto-mode)
-  :defer t)
+  :hook (ibuffer-mode . ibuffer-auto-mode))
+
+(use-package all-the-icons-ibuffer
+  :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
 
 (use-package casual-ibuffer
   :ensure nil
