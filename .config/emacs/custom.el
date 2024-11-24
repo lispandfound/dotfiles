@@ -4,8 +4,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(casual-lib-use-unicode t)
  '(compile-command "just ")
  '(consult-narrow-key "<")
+ '(dired-compress-file-default-suffix ".xz")
  '(display-line-numbers t)
  '(display-time-default-load-average nil)
  '(display-time-format "%H:%M")
@@ -19,22 +21,14 @@
       "* TODO %?\12 %U\12 %a\12 %i")))
  '(package-install-upgrade-built-in t)
  '(package-selected-packages
-   '(adaptive-wrap apheleia apptainer-mode ascii-art-to-unicode
-                   auto-virtualenv better-defaults browse-at-remote
-                   cape casual-suite comment-dwim-2 consult-dir
-                   consult-eglot corfu counsel-pydoc crux csv-mode
-                   devdocs doom-themes dumb-jump edit-indirect
-                   elm-mode embark-consult embrace
-                   exec-path-from-shell expreg forge gist gptel
-                   grip-mode haskell-mode htmlize ibuffer-project jinx
-                   just-mode ligature marginalia meow mermaid-mode
-                   mood-line moody numpydoc orderless org-menu
-                   ox-reveal pandoc-transient popper pydoc shackle
-                   skempo titlecase tldr transpose-frame treesit-auto
-                   try vertico visual-fill-column wgrep ws-butler
-                   yaml-mode zoxide))
+   '(apptainer-mode copilot copilot-chat org-menu pandoc-transient
+                    projectile skempo))
  '(package-vc-selected-packages
-   '((apptainer-mode :vc-backend Git :url
+   '((copilot-chat :url "https://github.com/chep/copilot-chat.el" :branch
+                   "shell-maker-update")
+     (copilot :url "https://github.com/copilot-emacs/copilot.el"
+              :branch "main")
+     (apptainer-mode :vc-backend Git :url
                      "https://github.com/jrgant/apptainer-mode")
      (org-menu :url "https://github.com/sheijk/org-menu")
      (pandoc-transient :url
@@ -43,7 +37,7 @@
  '(popper-reference-buffers
    '("\\*tldr\\*" "Output\\*$" "\\*Async Shell Command\\*"
      compilation-mode help-mode eshell-mode "\\*Messages\\*$"
-     devdocs-mode))
+     devdocs-mode "\\*Detached Shell Command\\*"))
  '(popper-window-height 20)
  '(proced-auto-update-flag 'visible)
  '(proced-auto-update-interval 1)
