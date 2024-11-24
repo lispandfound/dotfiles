@@ -942,6 +942,12 @@ If the new path's directories does not exist, create them."
 (use-package dwim-shell-commands
   :ensure dwim-shell-command
   :after dwim-shell-command)
+(use-package copilot-chat
+  :vc (:url "https://github.com/chep/copilot-chat.el"
+            :rev :newest
+            :branch "shell-maker-update")
+  :custom ((copilot-chat-frontend 'shell-maker))
+  :after (request org markdown-mode shell-maker))
 (add-to-list 'display-buffer-alist
              '("^\\*vc-git" display-buffer-no-window (allow-no-window . t)))
 (bind-key "M-/" #'hippie-expand)
