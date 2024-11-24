@@ -914,3 +914,31 @@ If the new path's directories does not exist, create them."
 (use-package tldr
   :bind ("C-h t" . tldr)
   :init (add-to-list 'display-buffer-alist '("\\*tldr\\*" (display-buffer-in-side-window (side . bottom)))))
+(use-package detached
+  :init
+  (detached-init)
+  (add-to-list 'display-buffer-alist '("\\*Detached Shell Command\\*" (display-buffer-in-side-window (side . bottom))))
+  :bind (;; Replace `async-shell-command' with `detached-shell-command'
+         ([remap async-shell-command] . detached-shell-command)
+         ;; Replace `compile' with `detached-compile'
+         ([remap compile] . detached-compile)
+         ([remap recompile] . detached-compile-recompile)
+         ;; Replace built in completion of sessions with `consult'
+         ([remap detached-open-session] . detached-consult-session))
+
+  :custom ((detached-show-output-on-attach t)
+           (detached-terminal-data-command system-type)))
+
+
+
+(use-package dwim-shell-command
+  :bind (([remap shell-command] . dwim-shell-command)
+         :map dired-mode-map
+         ([remap dired-do-async-shell-command] . dwim-shell-command)
+         ([remap dired-do-shell-command] . dwim-shell-command)
+         ([remap dired-smart-shell-command] . dwim-shell-command)))
+
+
+(use-package dwim-shell-commands
+  :ensure dwim-shell-command
+  :after dwim-shell-command)
