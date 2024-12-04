@@ -961,3 +961,8 @@ If the new path's directories does not exist, create them."
              '("^\\*vc-git" display-buffer-no-window (allow-no-window . t)))
 
 (bind-key "M-/" #'hippie-expand)
+(global-prettify-symbols-mode)
+
+
+(use-package uniline
+  :ensure t)

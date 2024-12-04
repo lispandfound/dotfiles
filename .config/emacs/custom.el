@@ -22,7 +22,7 @@
  '(package-install-upgrade-built-in t)
  '(package-selected-packages
    '(apptainer-mode copilot copilot-chat org-menu pandoc-transient
-                    projectile skempo))
+                    projectile skempo uniline))
  '(package-vc-selected-packages
    '((copilot-chat :url "https://github.com/chep/copilot-chat.el" :branch
                    "shell-maker-update")
