@@ -550,7 +550,12 @@ point reaches the beginning or end of the buffer, stop there."
 (setq vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
 (setq use-short-answers t)
 
-(use-package haskell-mode)
+(use-package haskell-mode
+  :bind (:map haskell-mode-map
+              (("C-c C-c" . haskell-compile)))
+  :init
+  (add-hook 'haskell-mode-hook #'eglot-ensure)
+  (add-to-list 'display-buffer-alist '("\\*haskell-compilation\\*.*" (display-buffer-in-side-window (side . bottom)))))
 
 (add-to-list 'display-buffer-alist '("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom))))
 
@@ -694,7 +699,12 @@ If the new path's directories does not exist, create them."
   :config
   (apheleia-global-mode +1)
   (setf (alist-get 'python-ts-mode apheleia-mode-alist)
-        '(ruff ruff-isort)))
+        '(ruff ruff-isort))
+  (setf (alist-get 'fourmolu apheleia-formatters)
+        '("fourmolu" filepath))
+  (setf (alist-get 'haskell-mode apheleia-mode-alist)
+        'fourmolu)
+  )
 
 (defun clone-buffer-other-window ()
   (interactive)
@@ -886,6 +896,7 @@ If the new path's directories does not exist, create them."
          ("C-o" . casual-agenda-tmenu)
          ("M-j" . org-agenda-clock-goto) ; optional
          ("J" . bookmark-jump))) ; optional
+
 (use-package popper
   :bind (("C-=" . popper-toggle)
          (:repeat-map popper-toggle-repeat-map
