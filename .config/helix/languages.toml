@@ -7,11 +7,8 @@ name = "latex"
 language-servers = [ { name = "ltex" }, { name = "texlab"}]
 
 [language-server.pylsp.config.pylsp]
-plugins.black.enabled = true
 plugins.pylint.enabled = true
 plugins.pyls_mypy.enabled = true
-plugins.isort.enabled = true
-plugins.ruff.format = [ "I" ]
 
 
 [[language]]
@@ -22,25 +19,7 @@ language-servers = [ { name = "ltex" } ]
 name = "haskell"
 auto-format = true
 
-
 [[language]]
 name = "python"
-language-servers = [ 'ruff', 'pylsp', "scls" ]
+language-servers = [ 'ruff', {"name" = "pylsp", except-features = ["format"]}]
 auto-format = true
-
-[language-server.scls]
-command = "simple-completion-language-server"
-
-[language-server.scls.config]
-max_completion_items = 20     # set max completion results len for each group: words, snippets, unicode-input
-snippets_first = true         # completions will return before snippets by default
-feature_words = true          # enable completion by word
-feature_snippets = true       # enable snippets
-feature_unicode_input = true  # enable "unicode input"
-feature_paths = true          # enable path completion
-
-
-# write logs to /tmp/completion.log
-[language-server.scls.environment]
-RUST_LOG = "info,simple-completion-language-server=info"
-LOG_FILE = "/tmp/completion.log"

@@ -6,13 +6,12 @@ PIP=pip
 if command -v uv &> /dev/null
 then
     PIP="uv pip"
-    uv venv $UV_OPTIONS
+    uv venv .venv
 else
     python -m venv .venv
 fi
 
-
-$PIP install python-lsp-server python-lsp-ruff bpython doq pylsp-mypy
+$PIP install python-lsp-server bpython doq pylsp-mypy pylint ruff
 
 if test -f requirements.txt; then
     $PIP install -r requirements.txt

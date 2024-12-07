@@ -340,7 +340,10 @@
 
 (use-package python
   :bind (:map python-ts-mode-map
-              ("M-n" . insert-numpydoc))
+              ("M-n" . insert-numpydoc)
+              (:repeat-map python-indent-shift-right-repeat-map
+                           (">" . python-indent-shift-right)
+                           ("<" . python-indent-shift-left)))
 
   :config
   (add-hook 'python-ts-mode-hook (lambda ()
@@ -454,7 +457,7 @@
           (newline-and-indent))))))
 
 (use-package auto-virtualenv
-  :hook (python-ts-mode . auto-virtualenv-set-virtualenv))
+  :hook (python-ts-mode . auto-virtualenv-find-and-activate))
 
 (add-hook 'python-ts-mode-hook #'eglot-ensure)
 
@@ -484,14 +487,7 @@
   :bind (([remap ispell-word] . jinx-correct)
          ("C-M-$" . jinx-languages)))
 
-(use-package ibuffer-project
-  :custom (ibuffer-use-other-window t)
-  :init
-  (add-hook 'ibuffer-hook
-            (lambda ()
-              (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
-              (unless (eq ibuffer-sorting-mode 'project-file-relative)
-                (ibuffer-do-sort-by-project-file-relative)))))
+
 
 (use-package project
   :bind ("C-x p t" . project-test)
@@ -696,8 +692,9 @@ If the new path's directories does not exist, create them."
 
 
 (use-package apheleia
-  :config
+  :init
   (apheleia-global-mode +1)
+  :config
   (setf (alist-get 'python-ts-mode apheleia-mode-alist)
         '(ruff ruff-isort))
   (setf (alist-get 'fourmolu apheleia-formatters)
@@ -711,7 +708,7 @@ If the new path's directories does not exist, create them."
   (switch-to-buffer-other-window (current-buffer)))
 
 (global-set-key (kbd "C-c b") #'clone-buffer-other-window)
-(add-hook 'write-file-hooks 'delete-trailing-whitespace nil t)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (use-package transpose-frame
   :bind (("C-x 4 x" . transpose-frame)
@@ -815,7 +812,7 @@ If the new path's directories does not exist, create them."
         (insert (s-snake-case camel-case-str)))
     (message "No region selected")))
 
-(use-package casual-suite)
+(use-package casual)
 
 (use-package casual-calc
   :ensure nil
@@ -850,8 +847,10 @@ If the new path's directories does not exist, create them."
   :bind (:map isearch-mode-map ("C-o" . casual-isearch-tmenu)))
 
 (use-package ibuffer
-  :hook (ibuffer-mode . ibuffer-auto-mode)
-  :defer t)
+  :hook (ibuffer-mode . ibuffer-auto-mode))
+
+(use-package all-the-icons-ibuffer
+  :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
 
 (use-package casual-ibuffer
   :ensure nil
@@ -897,13 +896,17 @@ If the new path's directories does not exist, create them."
          ("M-j" . org-agenda-clock-goto) ; optional
          ("J" . bookmark-jump))) ; optional
 
+(use-package casual-editkit
+  :ensure nil
+  :bind (("C-c C-h" . casual-editkit-main-tmenu)))
+
+
 (use-package popper
   :bind (("C-=" . popper-toggle)
          (:repeat-map popper-toggle-repeat-map
                       ("=" . popper-cycle)
                       ("-" . popper-toggle)
-                      ("t" . popper-toggle-type))
-         )
+                      ("t" . popper-toggle-type)))
   :demand t
   :config
   (popper-mode))
@@ -926,3 +929,50 @@ If the new path's directories does not exist, create them."
 (use-package tldr
   :bind ("C-h t" . tldr)
   :init (add-to-list 'display-buffer-alist '("\\*tldr\\*" (display-buffer-in-side-window (side . bottom)))))
+
+
+(use-package detached
+  :init
+  (detached-init)
+  (add-to-list 'display-buffer-alist '("\\*Detached Shell Command\\*" (display-buffer-in-side-window (side . bottom))))
+  :bind (;; Replace `async-shell-command' with `detached-shell-command'
+         ([remap async-shell-command] . detached-shell-command)
+         ;; Replace `compile' with `detached-compile'
+         ([remap compile] . detached-compile)
+         ([remap recompile] . detached-compile-recompile)
+         ;; Replace built in completion of sessions with `consult'
+         ([remap detached-open-session] . detached-consult-session))
+
+  :custom ((detached-show-output-on-attach t)
+           (detached-terminal-data-command system-type)))
+
+
+
+(use-package dwim-shell-command
+  :bind (([remap shell-command] . dwim-shell-command)
+         :map dired-mode-map
+         ([remap dired-do-async-shell-command] . dwim-shell-command)
+         ([remap dired-do-shell-command] . dwim-shell-command)
+         ([remap dired-smart-shell-command] . dwim-shell-command)))
+
+
+(use-package dwim-shell-commands
+  :ensure dwim-shell-command
+  :after dwim-shell-command)
+
+(use-package copilot-chat
+  :vc (:url "https://github.com/chep/copilot-chat.el"
+            :rev :newest
+            :branch "shell-maker-update")
+  :custom ((copilot-chat-frontend 'shell-maker))
+  :after (request org markdown-mode shell-maker))
+
+(add-to-list 'display-buffer-alist
+             '("^\\*vc-git" display-buffer-no-window (allow-no-window . t)))
+
+(bind-key "M-/" #'hippie-expand)
+(global-prettify-symbols-mode)
+
+
+(use-package uniline
+  :ensure t)
