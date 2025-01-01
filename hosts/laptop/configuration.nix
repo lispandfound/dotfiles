@@ -94,6 +94,7 @@
 
   # Install firefox.
   programs.firefox.enable = true;
+  nix.optimise.automatic = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
