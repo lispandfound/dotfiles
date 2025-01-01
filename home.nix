@@ -188,8 +188,8 @@
     set -g fish_greeting ""
     '';
     shellAbbrs = {
-      rebuild = "sudo nixos-rebuild switch --flake ~/nixos#laptop";
-      conf = "hx ~/nixos";
+      rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles#laptop";
+      conf = "hx ~/.dotfiles";
     };
   };
 
