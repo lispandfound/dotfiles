@@ -1,3 +1,0 @@
-#!/usr/bin/env nu
-
-kitten @ launch --cwd $env.PWD gitu

@@ -1,6 +1,0 @@
-#!/usr/bin/env nu
-
-def main [dash_path: string] { 
-  let result = dashit $dash_path list | fzf --preview $"w3m -dump \$\(dashit ($dash_path) lookup {1} {2}\) | grep -H5 --label='' {2} " | parse "{docset} {symbol}" | first
-  w3m (dashit $dash_path lookup $result.docset $result.symbol)
-}

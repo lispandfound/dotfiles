@@ -1,5 +1,0 @@
-#!/usr/bin/env nu
-
-zellij run --close-on-exit -- dashit-fzf ~/.docs/
-
-

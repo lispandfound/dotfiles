@@ -1,3 +1,0 @@
-[submodule ".config/zellij"]
-	path = .config/zellij
-	url = https://github.com/lispandfound/zellij
