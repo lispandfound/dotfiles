@@ -27,6 +27,7 @@
     eza # A modern replacement for ‘ls’
     fzf # A command-line fuzzy finder
     yazi
+    nixfmt-classic
 
     # misc
     cowsay
@@ -45,7 +46,6 @@
     keepassxc
     syncthing
 
-
     gnomeExtensions.hide-minimized
 
   ];
@@ -53,9 +53,7 @@
   dconf.settings = {
     "org/gnome/shell" = {
       disable-user-extensions = false;
-      enabled-extensions = [
-        "hide-minimized@danigm"
-      ];
+      enabled-extensions = [ "hide-minimized@danigm" ];
     };
   };
 
@@ -71,22 +69,16 @@
         side-by-side = true;
       };
     };
-    extraConfig = {    
-        github = {
-          user = "lispandfound";
-        };
-        push = {
-          default = "current";
-        };
-        pull = {
-          rebase = false;
-        };
-        merge = {
-          conflictstyle = "diff3";
-          tool = "vimdiff";
-        };
-    }; 
+    extraConfig = {
+      github = { user = "lispandfound"; };
+      push = { default = "current"; };
+      pull = { rebase = false; };
+      merge = {
+        conflictstyle = "diff3";
+        tool = "vimdiff";
+      };
     };
+  };
 
   programs.helix = {
     enable = true;
@@ -95,7 +87,8 @@
       theme = "onedark"; # Set the theme
 
       editor = {
-        jump-label-alphabet = "aoeuidhtnsfygpcrlqjkbxmwvz";  # Set jump label alphabet
+        jump-label-alphabet =
+          "aoeuidhtnsfygpcrlqjkbxmwvz"; # Set jump label alphabet
         # 25.01
         # end-of-line-diagnostics = "hint"; # Set end-of-line diagnostics level
 
@@ -104,7 +97,7 @@
         # };
 
         cursor-shape = {
-          insert = "bar";   # Cursor shape in insert mode
+          insert = "bar"; # Cursor shape in insert mode
           normal = "block"; # Cursor shape in normal mode
           select = "underline"; # Cursor shape in select mode
         };
@@ -112,12 +105,12 @@
 
       # Keybindings for normal mode
       keys.normal = {
-        V = ["goto_first_nonwhitespace" "extend_to_line_end"];
-        D = ["ensure_selections_forward" "extend_to_line_end"];
+        V = [ "goto_first_nonwhitespace" "extend_to_line_end" ];
+        D = [ "ensure_selections_forward" "extend_to_line_end" ];
         x = "extend_line";
         # 25.01
         # W = "@miw";
-        esc = ["collapse_selection" "keep_primary_selection"];
+        esc = [ "collapse_selection" "keep_primary_selection" ];
       };
 
       # Keybindings for "+" in normal mode
@@ -129,11 +122,17 @@
 
       # Keybindings for select mode
       keys.select = {
-        ";" = ["collapse_selection" "normal_mode"];
+        ";" = [ "collapse_selection" "normal_mode" ];
         x = "extend_line"; # Same behavior as normal mode x
         V = "extend_to_line_end"; # Same behavior as normal mode V
       };
     };
+    languages.language = [{
+      name = "nix";
+      auto-format = true;
+      formatter.command = "${pkgs.nixfmt-classic}/bin/nixfmt";
+    }];
+
   };
 
   # starship - an customizable prompt for any shell
@@ -146,7 +145,8 @@
       gcloud.disabled = true;
       line_break.disabled = true;
       # General format configuration
-      format = "$character$python[](fg:#c678dd bg:blue)$directory[](fg:blue bg:yellow)$git_branch$git_status[](fg:yellow) ";
+      format =
+        "$character$python[](fg:#c678dd bg:blue)$directory[](fg:blue bg:yellow)$git_branch$git_status[](fg:yellow) ";
       # Directory configuration
       directory = {
         format = "[  $path ]($style)";
@@ -181,7 +181,8 @@
       # Character configuration (prompt symbols)
       character = {
         format = "$symbol";
-        success_symbol = "[](fg:green)[󰌽 ](bg:green fg:black)[](fg:green bg:#c678dd)";
+        success_symbol =
+          "[](fg:green)[󰌽 ](bg:green fg:black)[](fg:green bg:#c678dd)";
         error_symbol = "[](fg:red)[󰌽 ](bg:red fg:black)[](fg:red bg:#c678dd)";
       };
 
@@ -197,7 +198,7 @@
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
-    set -g fish_greeting ""
+      set -g fish_greeting ""
     '';
     shellAbbrs = {
       rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles#laptop";
@@ -205,10 +206,9 @@
     };
   };
 
-
   programs.zoxide = {
     enable = true;
-    options = ["--cmd" "cd"];
+    options = [ "--cmd" "cd" ];
   };
 
   programs.kitty = {
@@ -238,14 +238,12 @@
       color14 = "#56b6c2";
       color15 = "#abb2bf";
 
-
-      active_tab_foreground   = "#282c34";
-      active_tab_background   = "#979eab";
+      active_tab_foreground = "#282c34";
+      active_tab_background = "#979eab";
       inactive_tab_foreground = "#abb2bf";
       inactive_tab_background = "#282c34";
     };
   };
-
 
   # This value determines the home Manager release that your
   # configuration is compatible with. This helps avoid breakage
@@ -260,8 +258,5 @@
   # Let home Manager install and manage itself.
   programs.home-manager.enable = true;
 
-
-  services.syncthing = {
-    enable = true;
-  };
+  services.syncthing = { enable = true; };
 }

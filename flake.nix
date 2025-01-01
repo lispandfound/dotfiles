@@ -15,14 +15,14 @@
       modules = [
         ./hosts/laptop/configuration.nix
         home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
 
-            # TODO replace ryan with your own username
-            home-manager.users.jake= import ./home.nix;
+          # TODO replace ryan with your own username
+          home-manager.users.jake = import ./home.nix;
 
-          }
+        }
       ];
     };
   };
