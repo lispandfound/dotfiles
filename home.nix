@@ -216,7 +216,7 @@
     settings = {
       allow_remote_control = true;
       enabled_layouts = "splits";
-      wayland_titlebar_color = "#000000";
+      wayland_titlebar_color = "#282c34";
       font_family = "JetbrainsMono Nerd Font";
       foreground = "#979eab";
       background = "#282c34";
