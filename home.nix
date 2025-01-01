@@ -45,7 +45,19 @@
     keepassxc
     syncthing
 
+
+    gnomeExtensions.hide-minimized
+
   ];
+
+  dconf.settings = {
+    "org/gnome/shell" = {
+      disable-user-extensions = false;
+      enabled-extensions = [
+        "hide-minimized@danigm"
+      ];
+    };
+  };
 
   # basic configuration of git, please change to your own
   programs.git = {
