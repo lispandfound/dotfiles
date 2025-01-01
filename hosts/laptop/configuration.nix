@@ -95,6 +95,12 @@
   # Install firefox.
   programs.firefox.enable = true;
   nix.optimise.automatic = true;
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 30d";
+  };
+
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
