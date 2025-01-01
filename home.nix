@@ -49,6 +49,13 @@
 
     gnomeExtensions.hide-minimized
 
+    (pkgs.emacsWithPackagesFromUsePackage {
+      config = ./emacs/init.el;
+      defaultInitFile = ture;
+      package = pkgs.emacs-pgtk;
+      alwaysEnsure = true;
+    })
+
   ];
 
   dconf.settings = {
