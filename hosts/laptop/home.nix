@@ -47,15 +47,16 @@
     keepassxc
     syncthing
 
-    gnomeExtensions.hide-minimized
+    emacs-pgtk
 
   ];
 
-  dconf.settings = {
-    "org/gnome/shell" = {
-      disable-user-extensions = false;
-      enabled-extensions = [ "hide-minimized@danigm" ];
-    };
+  programs.gnome-shell = {
+    enable = true;
+    extensions = [
+      { package = pkgs.gnomeExtensions.gsconnect; }
+      { package = pkgs.gnomeExtensions.hide-minimized; }
+    ];
   };
 
   # basic configuration of git, please change to your own

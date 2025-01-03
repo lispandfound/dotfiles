@@ -154,4 +154,21 @@
     localNetworkGameTransfers.openFirewall =
       true; # Open ports in the firewall for Steam Local Network Game Transfers
   };
+  services.emacs.package = pkgs.emacs-unstable;
+  nixpkgs.overlays = [
+    (import (builtins.fetchTarball {
+      url =
+        "https://github.com/nix-community/emacs-overlay/archive/master.tar.gz";
+      sha256 = "1x21r6dk67xxcrhlqj3qz0980ij4g77h48q19yg62l2gbvl8xxky";
+    }))
+  ];
+
+  networking.firewall = rec {
+    allowedTCPPortRanges = [{
+      from = 1714;
+      to = 1764;
+    }];
+    allowedUDPPortRanges = allowedTCPPortRanges;
+  };
+
 }
