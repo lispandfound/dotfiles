@@ -20,7 +20,7 @@
           home-manager.useUserPackages = true;
 
           # TODO replace ryan with your own username
-          home-manager.users.jake = import ./home.nix;
+          home-manager.users.jake = import ./hosts/laptop/home.nix;
 
         }
       ];
