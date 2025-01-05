@@ -26,7 +26,7 @@
     ripgrep # recursively searches directories for a regex pattern
     jq # A lightweight and flexible command-line JSON processor
     eza # A modern replacement for ‘ls’
-    fzf # A command-line fuzzy finder
+    television # A command-line fuzzy finder
     yazi
     nixfmt-classic
 
@@ -201,6 +201,7 @@
     enable = true;
     interactiveShellInit = ''
       set -g fish_greeting ""
+      tv init fish | source
     '';
     shellAbbrs = {
       rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles#laptop";
