@@ -81,6 +81,7 @@
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   programs.fish.enable = true;
+
   users.users.jake = {
     isNormalUser = true;
     description = "Jake Faulkner";
@@ -90,7 +91,7 @@
         #  thunderbird
         steam
       ];
-    shell = pkgs.bash;
+    shell = pkgs.fish;
   };
 
   # Install firefox.
