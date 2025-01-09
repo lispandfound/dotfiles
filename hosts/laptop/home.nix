@@ -13,6 +13,7 @@
     starship
     kitty
     delta
+    fd
     git
     gitu
 
@@ -26,7 +27,7 @@
     ripgrep # recursively searches directories for a regex pattern
     jq # A lightweight and flexible command-line JSON processor
     eza # A modern replacement for ‘ls’
-    television # A command-line fuzzy finder
+    fzf # A command-line fuzzy finder
     yazi
     nixfmt-classic
 
@@ -46,8 +47,6 @@
 
     keepassxc
     syncthing
-
-    emacs-pgtk
 
   ];
 
@@ -136,6 +135,10 @@
     }];
 
   };
+  programs.fzf = {
+    enable = true;
+    enableFishIntegration = false; # provided by the fish fzf plugin instead.
+  };
 
   # starship - an customizable prompt for any shell
   programs.starship = {
@@ -201,10 +204,14 @@
     enable = true;
     interactiveShellInit = ''
       set -g fish_greeting ""
-      tv init fish | source
+      fzf_configure_bindings
     '';
+    plugins = [{
+      name = "fzf-fish";
+      src = pkgs.fishPlugins.fzf-fish.src;
+    }];
     shellAbbrs = {
-      rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles#laptop";
+      rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)";
       conf = "hx ~/.dotfiles";
     };
   };
