@@ -1,0 +1,1 @@
+hosts/laptop/home.nix
