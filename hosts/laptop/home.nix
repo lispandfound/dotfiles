@@ -6,6 +6,7 @@
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
+    bash
     devenv
     helix
     python313
@@ -135,6 +136,7 @@
     }];
 
   };
+
   programs.fzf = {
     enable = true;
     enableFishIntegration = false; # provided by the fish fzf plugin instead.
@@ -199,7 +201,15 @@
       };
     };
   };
-
+  programs.bash = {
+    initExtra = ''
+      if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "fish" && -z ''${BASH_EXECUTION_STRING} ]]
+      then
+        shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=""
+        exec ${pkgs.fish}/bin/fish $LOGIN_OPTION
+      fi
+    '';
+  };
   programs.fish = {
     enable = true;
     interactiveShellInit = ''

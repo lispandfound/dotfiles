@@ -90,7 +90,7 @@
         #  thunderbird
         steam
       ];
-    shell = pkgs.fish;
+    shell = pkgs.bash;
   };
 
   # Install firefox.
