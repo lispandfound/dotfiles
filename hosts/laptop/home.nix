@@ -1,15 +1,14 @@
 { config, pkgs, ... }:
 
 {
-  imports = [ ../../modules/helix.nix ../../modules/shell.nix ];
+  imports =
+    [ ../../modules/helix.nix ../../modules/shell.nix ../../modules/git.nix ];
   home.username = "jake";
   home.homeDirectory = "/home/jake";
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
     kitty
-    git
-    gitu
 
     # archives
 
@@ -29,31 +28,6 @@
       { package = pkgs.gnomeExtensions.hide-minimized; }
     ];
   };
-
-  # basic configuration of git, please change to your own
-  programs.git = {
-    enable = true;
-    userName = "Jake Faulkner";
-    userEmail = "jakefaulkn@gmail.com";
-    delta = {
-      enable = true;
-      options = {
-        navigate = true;
-        side-by-side = true;
-      };
-    };
-    extraConfig = {
-      github = { user = "lispandfound"; };
-      push = { default = "current"; };
-      pull = { rebase = false; };
-      merge = {
-        conflictstyle = "diff3";
-        tool = "vimdiff";
-      };
-    };
-  };
-
-  # starship - an customizable prompt for any shell
 
   programs.kitty = {
     enable = true;
