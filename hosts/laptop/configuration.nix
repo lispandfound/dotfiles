@@ -7,6 +7,8 @@
 {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    ../../modules/avahi.nix
+    ../../modules/steam.nix
   ];
 
   # Bootloader.
@@ -81,16 +83,6 @@
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   programs.fish.enable = true;
-  services.avahi = {
-    enable = true;
-    nssmdns = true;
-    openFirewall = true;
-    publish = {
-      enable = true;
-      userServices = true;
-      addresses = true;
-    };
-  };
 
   users.users.jake = {
     isNormalUser = true;
@@ -155,16 +147,6 @@
     evdev:atkbd:*
       KEYBOARD_KEY_3a=esc
   '';
-  services.flatpak.enable = true;
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall =
-      true; # Open ports in the firewall for Steam Remote Play
-    dedicatedServer.openFirewall =
-      true; # Open ports in the firewall for Source Dedicated Server
-    localNetworkGameTransfers.openFirewall =
-      true; # Open ports in the firewall for Steam Local Network Game Transfers
-  };
 
   networking.firewall = rec {
     allowedTCPPortRanges = [{
