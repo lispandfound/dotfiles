@@ -5,10 +5,9 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [ # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -77,6 +76,27 @@
     #media-session.enable = true;
   };
 
+  services.avahi = {
+    enable = true;
+    nssmdns = true;
+    openFirewall = true;
+    publish = {
+      enable = true;
+      userServices = true;
+      addresses = true;
+    };
+  };
+  services.openssh = {
+    enable = true;
+    ports = [ 22 ];
+    settings = {
+      PasswordAuthentication = true;
+      AllowUsers = [ "jake" ];
+      UseDns = true;
+      PermitRootLogin = "yes";
+    };
+  };
+
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
@@ -94,8 +114,6 @@
     shell = pkgs.fish;
   };
 
-
-
   # Install firefox.
   programs.firefox.enable = true;
 
@@ -104,10 +122,12 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
-  ];
+  environment.systemPackages = with pkgs;
+    [
+      #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+      #  wget
+      transmission_4-gtk
+    ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -123,7 +143,6 @@
   # services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -149,6 +168,24 @@
       true; # Open ports in the firewall for Source Dedicated Server
     localNetworkGameTransfers.openFirewall =
       true; # Open ports in the firewall for Steam Local Network Game Transfers
+  };
+
+  services.transmission = {
+    user = "jake";
+    enable = true; # Enable transmission daemon
+    openRPCPort = true; # Open firewall for RPC
+    settings = { # Override default settings
+      download-dir = "${config.services.transmission.home}/Downloads";
+      rpc-bind-address = "0.0.0.0"; # Bind to own IP
+      rpc-whitelist-enabled = false;
+    };
+  };
+  networking.firewall = rec {
+    allowedTCPPortRanges = [{
+      from = 1714;
+      to = 1764;
+    }];
+    allowedUDPPortRanges = allowedTCPPortRanges;
   };
 
 }

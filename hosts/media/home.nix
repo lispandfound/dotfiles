@@ -21,6 +21,7 @@
     xz
     unzip
     p7zip
+    kodi
 
     # utils
     ripgrep # recursively searches directories for a regex pattern
@@ -46,8 +47,6 @@
 
     keepassxc
     syncthing
-
-    emacs-pgtk
 
   ];
 
