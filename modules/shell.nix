@@ -43,11 +43,15 @@
       line_break.disabled = true;
       # General format configuration
       format =
-        "$character$python[](fg:#c678dd bg:blue)$directory[](fg:blue bg:yellow)$git_branch$git_status[](fg:yellow) ";
+        "$character$hostname$python[](fg:#c678dd bg:blue)$directory[](fg:blue bg:yellow)$git_branch$git_status[](fg:yellow) ";
       # Directory configuration
       directory = {
         format = "[  $path ]($style)";
         style = "fg:black bg:blue";
+      };
+      hostname = {
+        format = "[ $ssh_symbol$hostname ]($style)";
+        style = "fg:black bg:yellow";
       };
 
       # Git branch configuration
