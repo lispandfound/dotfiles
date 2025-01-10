@@ -43,7 +43,7 @@
       line_break.disabled = true;
       # General format configuration
       format =
-        "$character$hostname$python[](fg:#c678dd bg:blue)$directory[](fg:blue bg:yellow)$git_branch$git_status[](fg:yellow) ";
+        "$character$python[](fg:#c678dd bg:blue)$hostname$directory[](fg:blue bg:yellow)$git_branch$git_status[](fg:yellow) ";
       # Directory configuration
       directory = {
         format = "[  $path ]($style)";
@@ -51,7 +51,8 @@
       };
       hostname = {
         format = "[ $ssh_symbol$hostname ]($style)";
-        style = "fg:black bg:yellow";
+        ssh_symbol = "@";
+        style = "fg:black bg:cyan";
       };
 
       # Git branch configuration
@@ -83,8 +84,9 @@
       character = {
         format = "$symbol";
         success_symbol =
-          "[](fg:green)[󰌽 ](bg:green fg:black)[](fg:green bg:#c678dd)";
-        error_symbol = "[](fg:red)[󰌽 ](bg:red fg:black)[](fg:red bg:#c678dd)";
+          "[](fg:green)[󰌽 ](bg:green fg:black)[](fg:green bg:#c678dd )";
+        error_symbol =
+          "[](fg:red)[󰌽 ](bg:red fg:black)[](fg:red bg:#c678dd )";
       };
 
       # Python configuration
