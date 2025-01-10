@@ -52,7 +52,7 @@
       hostname = {
         format = "[ $ssh_symbol$hostname ]($style)";
         ssh_symbol = "@";
-        style = "fg:black bg:cyan";
+        style = "fg:black bg:blue";
       };
 
       # Git branch configuration
