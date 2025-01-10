@@ -61,7 +61,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -81,6 +81,7 @@
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   programs.fish.enable = true;
+
   users.users.jake = {
     isNormalUser = true;
     description = "Jake Faulkner";
@@ -154,14 +155,6 @@
     localNetworkGameTransfers.openFirewall =
       true; # Open ports in the firewall for Steam Local Network Game Transfers
   };
-  services.emacs.package = pkgs.emacs-unstable;
-  nixpkgs.overlays = [
-    (import (builtins.fetchTarball {
-      url =
-        "https://github.com/nix-community/emacs-overlay/archive/master.tar.gz";
-      sha256 = "1x21r6dk67xxcrhlqj3qz0980ij4g77h48q19yg62l2gbvl8xxky";
-    }))
-  ];
 
   networking.firewall = rec {
     allowedTCPPortRanges = [{
