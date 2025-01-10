@@ -7,6 +7,8 @@
 {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    ../../modules/avahi.nix
+    ../../modules/steam.nix
   ];
 
   # Bootloader.
@@ -76,16 +78,6 @@
     #media-session.enable = true;
   };
 
-  services.avahi = {
-    enable = true;
-    nssmdns = true;
-    openFirewall = true;
-    publish = {
-      enable = true;
-      userServices = true;
-      addresses = true;
-    };
-  };
   services.openssh = {
     enable = true;
     ports = [ 22 ];
@@ -160,15 +152,6 @@
     evdev:atkbd:*
       KEYBOARD_KEY_3a=esc
   '';
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall =
-      true; # Open ports in the firewall for Steam Remote Play
-    dedicatedServer.openFirewall =
-      true; # Open ports in the firewall for Source Dedicated Server
-    localNetworkGameTransfers.openFirewall =
-      true; # Open ports in the firewall for Steam Local Network Game Transfers
-  };
 
   services.transmission = {
     user = "jake";
