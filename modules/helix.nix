@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  home.packages = with pkgs; [ helix nixfmt ];
+  home.packages = with pkgs; [ helix nixfmt-classic ];
 
   programs.helix = {
     enable = true;
