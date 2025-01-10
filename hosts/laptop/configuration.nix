@@ -81,6 +81,16 @@
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   programs.fish.enable = true;
+  services.avahi = {
+    enable = true;
+    nssmdns = true;
+    openFirewall = true;
+    publish = {
+      enable = true;
+      userServices = true;
+      addresses = true;
+    };
+  };
 
   users.users.jake = {
     isNormalUser = true;
