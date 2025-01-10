@@ -1,25 +1,17 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ ../../modules/helix.nix ../../modules/shell.nix ../../modules/git.nix ];
+  imports = [
+    ../../modules/helix.nix
+    ../../modules/shell.nix
+    ../../modules/git.nix
+    ../../modules/kitty.nix
+  ];
   home.username = "jake";
   home.homeDirectory = "/home/jake";
 
   # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [
-    kitty
-
-    # archives
-
-    # utils
-
-    nerd-fonts.jetbrains-mono
-
-    keepassxc
-    syncthing
-
-  ];
+  home.packages = with pkgs; [ keepassxc syncthing ];
 
   programs.gnome-shell = {
     enable = true;
@@ -27,40 +19,6 @@
       { package = pkgs.gnomeExtensions.gsconnect; }
       { package = pkgs.gnomeExtensions.hide-minimized; }
     ];
-  };
-
-  programs.kitty = {
-    enable = true;
-    settings = {
-      allow_remote_control = true;
-      enabled_layouts = "splits";
-      wayland_titlebar_color = "#282c34";
-      font_family = "JetbrainsMono Nerd Font";
-      foreground = "#979eab";
-      background = "#282c34";
-
-      color0 = "#282c34";
-      color1 = "#e06c75";
-      color2 = "#98c379";
-      color3 = "#e5c07b";
-      color4 = "#61afef";
-      color5 = "#be5046";
-      color6 = "#56b6c2";
-      color7 = "#979eab";
-      color8 = "#393e48";
-      color9 = "#d19a66";
-      color10 = "#56b6c2";
-      color11 = "#e5c07b";
-      color12 = "#61afef";
-      color13 = "#be5046";
-      color14 = "#56b6c2";
-      color15 = "#abb2bf";
-
-      active_tab_foreground = "#282c34";
-      active_tab_background = "#979eab";
-      inactive_tab_foreground = "#abb2bf";
-      inactive_tab_background = "#282c34";
-    };
   };
 
   # This value determines the home Manager release that your

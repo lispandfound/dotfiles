@@ -1,5 +1,5 @@
 { config, pkgs, ... }: {
-  home.packages = [ gitu git delta ];
+  home.packages = with pkgs; [ gitu git delta ];
 
   programs.git = {
     enable = true;
