@@ -25,7 +25,17 @@
     extensions = [
       { package = pkgs.gnomeExtensions.gsconnect; }
       { package = pkgs.gnomeExtensions.hide-minimized; }
+      { package = pkgs.gnomeExtensions.dash-to-dock; }
+      {
+        package =
+          pkgs.gnomeExtensions.resolution-and-refresh-rate-in-quick-settings;
+      }
     ];
+  };
+
+  dconf.settings = {
+    "org/gnome/desktop/interface".scaling-factor = 2.0;
+    "org/gnome/desktop/a11y/applications".screen-keyboard-enabled = true;
   };
   # This value determines the home Manager release that your
   # configuration is compatible with. This helps avoid breakage

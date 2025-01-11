@@ -49,6 +49,10 @@
   # Enable the GNOME Desktop Environment.
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
+  services.displayManager = {
+    autoLogin.enable = true;
+    autoLogin.user = "jake";
+  };
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -121,6 +125,7 @@
       transmission_4-gtk
     ];
 
+  boot.kernelParams = [ "iwlwifi.power_save=0" "iwlmvm.power_scheme=1" ];
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
