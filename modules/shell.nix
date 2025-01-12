@@ -126,6 +126,15 @@
           deactivate
         end
       end
+      function fzf-man
+          if test -n "$argv[1]"
+              man $argv
+              return $status
+          else
+              man -k . | fzf --reverse --preview="echo {1,2} | sed 's/ (/./' | sed -E 's/\)\s*\$//' | xargs man" | awk '{print $1 "." $2}' | tr -d '()' | xargs -r man
+              return $status
+          end
+      end
     '';
     plugins = [{
       name = "fzf-fish";
