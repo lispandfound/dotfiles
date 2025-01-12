@@ -6,6 +6,7 @@
     ../../modules/shell.nix
     ../../modules/git.nix
     ../../modules/kitty.nix
+    ../../modules/python.nix
   ];
   home.username = "jake";
   home.homeDirectory = "/home/jake";

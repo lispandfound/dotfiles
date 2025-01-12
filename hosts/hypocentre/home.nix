@@ -2,8 +2,13 @@
 
 {
 
-  imports =
-    [ ../../modules/helix.nix ../../modules/shell.nix ../../modules/git.nix ];
+  imports = [
+    ../../modules/helix.nix
+    ../../modules/shell.nix
+    ../../modules/git.nix
+    ../../modules/python.nix
+  ];
+
   home.username = "jfa92";
   home.homeDirectory = "/home/jfa92";
 

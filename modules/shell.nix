@@ -26,6 +26,7 @@
     gnupg
     zoxide
     delta
+    devenv
   ];
 
   programs.fzf = {
