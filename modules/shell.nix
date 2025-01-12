@@ -27,7 +27,11 @@
     zoxide
     delta
     devenv
+    direnv
+    vault-tasks
   ];
+  home.file.".config/vault-tasks/config.toml".source =
+    "../config/vault-tasks/config.toml";
 
   programs.fzf = {
     enable = true;
@@ -137,10 +141,22 @@
           end
       end
     '';
-    plugins = [{
-      name = "fzf-fish";
-      src = pkgs.fishPlugins.fzf-fish.src;
-    }];
+    plugins = [
+      {
+        name = "fzf-fish";
+        src = pkgs.fishPlugins.fzf-fish.src;
+      }
+      {
+        name = "nix.fish";
+        src = pkgs.fetchFromGitHub {
+          owner = "kidonng";
+          repo = "nix.fish";
+          rev = "ad57d970841ae4a24521b5b1a68121cf385ba71e";
+          sha256 =
+            "13x3bfif906nszf4mgsqxfshnjcn6qm4qw1gv7nw89wi4cdp9i8q"; # You need to compute the SHA256 hash
+        };
+      }
+    ];
     shellAbbrs = {
       rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)";
       conf = "hx ~/.dotfiles";
@@ -151,4 +167,5 @@
     enable = true;
     options = [ "--cmd" "cd" ];
   };
+
 }

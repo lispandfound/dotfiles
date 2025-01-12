@@ -155,5 +155,8 @@
     }];
     allowedUDPPortRanges = allowedTCPPortRanges;
   };
+  nix.extraOptions = ''
+    trusted-users = root jake
+  '';
 
 }
