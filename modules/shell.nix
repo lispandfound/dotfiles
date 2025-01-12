@@ -31,7 +31,7 @@
     vault-tasks
   ];
   home.file.".config/vault-tasks/config.toml".source =
-    "../config/vault-tasks/config.toml";
+    ../config/vault-tasks/config.toml;
 
   programs.fzf = {
     enable = true;
@@ -160,6 +160,7 @@
     shellAbbrs = {
       rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)";
       conf = "hx ~/.dotfiles";
+      t = "vault-tasks -v ~/.tasks";
     };
   };
 
