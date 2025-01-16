@@ -43,8 +43,8 @@
 
         }
       ];
-      };
-      nixosConfigurations.work = nixpkgs.lib.nixosSystem {
+    };
+    nixosConfigurations.work = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
         ./hosts/work/configuration.nix
