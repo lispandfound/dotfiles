@@ -38,10 +38,23 @@
       };
     };
 
-    languages.language = [{
-      name = "nix";
-      auto-format = true;
-      formatter.command = "${pkgs.nixfmt-classic}/bin/nixfmt";
-    }];
+    languages.language = [
+      {
+        name = "nix";
+        auto-format = true;
+        formatter.command = "${pkgs.nixfmt-classic}/bin/nixfmt";
+      }
+      {
+        name = "markdown";
+        auto-format = true;
+        language-servers = [ "ltex" ];
+      }
+      {
+        name = "typst";
+        auto-format = true;
+        language-servers = [ "tinymist" "ltex" ];
+        formatter.command = "typstyle";
+      }
+    ];
   };
 }
