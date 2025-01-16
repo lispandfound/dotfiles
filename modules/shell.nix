@@ -108,6 +108,7 @@
     enable = true;
     interactiveShellInit = ''
       set -g fish_greeting ""
+      set -g EDITOR "hx"
       fzf_configure_bindings
       function fzf-man
           if test -n "$argv[1]"
