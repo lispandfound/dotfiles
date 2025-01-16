@@ -12,13 +12,14 @@
   home.homeDirectory = "/home/jake";
 
   # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [ keepassxc syncthing ];
+  home.packages = with pkgs; [ keepassxc syncthing safeeyes ];
 
   programs.gnome-shell = {
     enable = true;
     extensions = [
       { package = pkgs.gnomeExtensions.gsconnect; }
       { package = pkgs.gnomeExtensions.hide-minimized; }
+      { package = pkgs.gnomeExtensions.appindicator; }
     ];
   };
   dconf.settings = {
