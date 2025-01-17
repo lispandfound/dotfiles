@@ -138,4 +138,6 @@
         trusted-users = root jake				      
   '';
 
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
 }
