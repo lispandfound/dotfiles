@@ -47,12 +47,12 @@
       {
         name = "markdown";
         auto-format = true;
-        language-servers = [ "ltex" ];
+        language-servers = [ "ltex-ls-plus" ];
       }
       {
         name = "typst";
         auto-format = true;
-        language-servers = [ "tinymist" "ltex" ];
+        language-servers = [ "tinymist" "ltex-ls-plus" ];
         formatter.command = "typstyle";
       }
     ];
