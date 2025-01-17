@@ -1,5 +1,5 @@
 { config, pkgs, ... }: {
-  home.packages = with pkgs; [ gitu git delta ];
+  home.packages = with pkgs; [ gitu git delta meld wl-clipboard ];
 
   programs.git = {
     enable = true;
@@ -18,7 +18,10 @@
       pull = { rebase = false; };
       merge = {
         conflictstyle = "diff3";
-        tool = "vimdiff";
+        tool = "meld";
+      };
+      mergetool."meld" = {
+        cmd = ''meld "$LOCAL" "$MERGED" "$REMOTE" --output "$MERGED"'';
       };
     };
   };
