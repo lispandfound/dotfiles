@@ -2,6 +2,7 @@
 
 {
   home.packages = with pkgs; [
+    bat
     fish
     fzf
     starship
@@ -33,6 +34,14 @@
   ];
   home.file.".config/vault-tasks/config.toml".source =
     ../config/vault-tasks/config.toml;
+
+  programs.eza = {
+    icons = "auto";
+    enable = true;
+    enableFishIntegration = true;
+  };
+
+  programs.bat = { enable = true; };
 
   programs.fzf = {
     enable = true;
@@ -140,6 +149,8 @@
       rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)";
       conf = "hx ~/.dotfiles";
       t = "vault-tasks -v ~/.tasks";
+      cat = "bat";
+      less = "bat --paging=always";
     };
   };
 
