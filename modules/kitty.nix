@@ -32,5 +32,15 @@
       inactive_tab_foreground = "#abb2bf";
       inactive_tab_background = "#282c34";
     };
+    keybindings = {
+      "ctrl+left" = "neighboring_window left";
+      "shift+left" = "move_window right";
+      "ctrl+down" = "neighboring_window down";
+      "shift+down" = "move_window up";
+      "ctrl+right" = "neighboring_window right";
+      "shift+right" = "move_window left";
+      "ctrl+up" = "neighboring_window up";
+      "shift+up" = "move_window down";
+    };
   };
 }
