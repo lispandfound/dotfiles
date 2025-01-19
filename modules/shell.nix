@@ -2,35 +2,36 @@
 
 {
   home.packages = with pkgs; [
+    atool
     bat
-    fish
-    fzf
-    starship
-    # common utilities    
-    fd
-    zip
-    xz
-    unzip
-    p7zip
-    ripgrep # recursively searches directories for a regex pattern
-    jq # A lightweight and flexible command-line JSON processor
-    eza # A modern replacement for ‘ls’
-    fzf # A command-line fuzzy finder
-    yazi
-    file
-    which
-    tree
-    gnused
-    gnutar
-    gawk
-    zstd
-    gnupg
-    zoxide
     delta
     devenv
     direnv
-    vault-tasks
+    eza # A modern replacement for ‘ls’
+    fd
+    file
+    fish
+    fzf
+    fzf # A command-line fuzzy finder
+    gawk
     gh
+    gnupg
+    gnused
+    gnutar
+    jq # A lightweight and flexible command-line JSON processor
+    p7zip
+    ripgrep # recursively searches directories for a regex pattern
+    starship
+    tldr
+    tree
+    unzip
+    vault-tasks
+    which
+    xz
+    yazi
+    zip
+    zoxide
+    zstd
   ];
   home.file.".config/vault-tasks/config.toml".source =
     ../config/vault-tasks/config.toml;
@@ -151,6 +152,7 @@
       t = "vault-tasks -v ~/.tasks";
       cat = "bat";
       less = "bat --paging=always";
+      tree = "eza --tree";
     };
   };
 
