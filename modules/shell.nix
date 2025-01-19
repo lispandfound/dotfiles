@@ -62,11 +62,11 @@
         "$character$python[](fg:#c678dd bg:blue)$hostname$directory[](fg:blue bg:yellow)$git_branch$git_status[](fg:yellow) ";
       # Directory configuration
       directory = {
-        format = "[ $path ]($style)";
+        format = "[  $path ]($style)";
         style = "fg:black bg:blue";
       };
       hostname = {
-        format = "[ $ssh_symbol$hostname ]($style)";
+        format = "[ $ssh_symbol$hostname]($style)";
         ssh_symbol = "@";
         style = "fg:black bg:blue";
       };
