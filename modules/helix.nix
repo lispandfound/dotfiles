@@ -1,7 +1,11 @@
-{ config, pkgs, ... }:
+{ inputs, pkgs, ... }:
 
 {
-  home.packages = with pkgs; [ helix nixfmt-classic ];
+  home.packages = [
+    pkgs.helix
+    pkgs.nixfmt-classic
+    inputs.scls.defaultPackage.${pkgs.system}
+  ];
 
   programs.helix = {
     enable = true;
