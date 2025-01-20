@@ -15,19 +15,6 @@
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [ keepassxc syncthing safeeyes ];
 
-  programs.gnome-shell = {
-    enable = true;
-    extensions = [
-      { package = pkgs.gnomeExtensions.gsconnect; }
-      { package = pkgs.gnomeExtensions.hide-minimized; }
-      { package = pkgs.gnomeExtensions.appindicator; }
-    ];
-  };
-  dconf.settings = {
-    "org/gnome/desktop/input-sources".xkb-options = [ "caps:escape" ];
-    "org/gnome/desktop/interface".text-scaling-factor = 1.25;
-  };
-
   # This value determines the home Manager release that your
   # configuration is compatible with. This helps avoid breakage
   # when a new home Manager release introduces backwards
