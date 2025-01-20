@@ -25,7 +25,7 @@
     tldr
     tree
     unzip
-    vault-tasks
+    todo-txt-cli
     which
     xz
     yazi
@@ -149,7 +149,7 @@
     shellAbbrs = {
       rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)";
       conf = "hx ~/.dotfiles";
-      t = "vault-tasks -v ~/.tasks";
+      t = "todo.sh";
       cat = "bat";
       less = "bat --paging=always";
       tree = "eza --tree";
