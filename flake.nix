@@ -13,7 +13,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs: {
+  outputs = { self, nixpkgs, home-manager, scls, ... }@inputs: {
     nixosConfigurations.laptop = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
@@ -22,7 +22,7 @@
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-
+          home-manager.extraSpecialArgs = { inherit inputs; };
           # TODO replace ryan with your own username
           home-manager.users.jake = import ./hosts/laptop/home.nix;
 
@@ -39,6 +39,7 @@
           home-manager.useUserPackages = true;
 
           # TODO replace ryan with your own username
+          home-manager.extraSpecialArgs = { inherit inputs; };
           home-manager.users.jake = import ./hosts/media/home.nix;
 
         }
@@ -46,6 +47,7 @@
     };
     nixosConfigurations.work = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
+      specialArgs = { inherit inputs; };
       modules = [
         ./hosts/work/configuration.nix
         home-manager.nixosModules.home-manager
@@ -54,6 +56,7 @@
           home-manager.useUserPackages = true;
 
           # TODO replace ryan with your own username
+          home-manager.extraSpecialArgs = { inherit inputs; };
           home-manager.users.jake = import ./hosts/work/home.nix;
 
         }
