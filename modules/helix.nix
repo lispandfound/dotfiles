@@ -37,7 +37,13 @@
         V = "extend_to_line_end"; # Same behavior as normal mode V
       };
     };
+    languages.language-server = {
+      tinymist = {
+        command = "tinymist";
+        config = { exportPdf = "onType"; };
+      };
 
+    };
     languages.language = [
       {
         name = "nix";
