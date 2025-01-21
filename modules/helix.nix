@@ -6,6 +6,17 @@
     pkgs.nixfmt-classic
     inputs.scls.defaultPackage.${pkgs.system}
   ];
+  home.file.".config/helix/external-snippets.toml".text = ''
+    [[sources]] # list of sources to load
+    name = "friendly-snippets"  # optional name shown on snippet description
+    git = "https://github.com/rafamadriz/friendly-snippets.git" # git repo with snippets collections
+    [[sources.paths]] # list of paths to load on current source
+    scope = ["python"]  # optional scopes for current snippets
+    path = "snippets/python/python.json"  # where snippet file or dir located in repo
+    [[sources.paths]] # list of paths to load on current source
+    scope = ["git-commit"]  # optional scopes for current snippets
+    path = "snippets/gitcommit.json"  # where snippet file or dir located in repo
+  '';
 
   programs.helix = {
     enable = true;
@@ -49,6 +60,10 @@
         formatter.command = "${pkgs.nixfmt-classic}/bin/nixfmt";
       }
       {
+        name = "python";
+        language-servers = [ "scls" "pylsp" "ruff" ];
+      }
+      {
         name = "markdown";
         auto-format = true;
         language-servers = [ "ltex-ls-plus" ];
@@ -59,6 +74,24 @@
         language-servers = [ "tinymist" "ltex-ls-plus" ];
         formatter.command = "typstyle";
       }
+      {
+        name = "git-commit";
+        auto-format = true;
+        language-servers = [ "scls" ];
+      }
     ];
+    languages.language-server.scls = {
+      command = "simple-completion-language-server";
+      config = {
+        max_completion_items = 100;
+        feature_words = true;
+        feature_snippets = true;
+        snippets_first = true;
+        snippets_inline_by_word_tail = false;
+        feature_unicode_input = false;
+        feature_paths = false;
+        feature_citations = false;
+      };
+    };
   };
 }

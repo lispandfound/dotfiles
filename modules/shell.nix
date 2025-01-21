@@ -33,9 +33,6 @@
     zoxide
     zstd
   ];
-  home.file.".config/vault-tasks/config.toml".source =
-    ../config/vault-tasks/config.toml;
-
   programs.eza = {
     icons = "auto";
     enable = true;
