@@ -81,7 +81,15 @@
       }
       {
         name = "python";
-        language-servers = [ "scls" "pylsp" "ruff" ];
+        auto-format = true;
+        language-servers = [
+          "scls"
+          {
+            name = "pylsp";
+            except-features = [ "format" ];
+          }
+          "ruff"
+        ];
       }
       {
         name = "markdown";
