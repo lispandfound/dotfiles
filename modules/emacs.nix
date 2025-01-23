@@ -1,5 +1,5 @@
 { config, pkgs, ... }:
 
 {
-  home.packages = with pkgs; [ emacs-pgtk ];
+  home.packages = with pkgs; [ emacs30-pgtk ];
 }
