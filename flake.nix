@@ -11,6 +11,10 @@
       url = "github:estin/simple-completion-language-server";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    helix = {
+      url = "github:helix-editor/helix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, scls, ... }@inputs: {

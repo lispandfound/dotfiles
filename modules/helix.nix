@@ -2,7 +2,7 @@
 
 {
   home.packages = [
-    pkgs.helix
+    inputs.helix.packages."${pkgs.system}".helix
     pkgs.nixfmt-classic
     inputs.scls.defaultPackage.${pkgs.system}
   ];
@@ -20,6 +20,7 @@
 
   programs.helix = {
     enable = true;
+    package = inputs.helix.packages."${pkgs.system}".helix;
     defaultEditor = true;
     settings = {
       theme = "onedark"; # Set the theme
