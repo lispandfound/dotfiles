@@ -4,6 +4,7 @@
   home.packages = [
     inputs.helix.packages."${pkgs.system}".helix
     pkgs.nixfmt-classic
+    pkgs.helix-gpt
     inputs.scls.defaultPackage.${pkgs.system}
   ];
   home.file.".config/helix/external-snippets.toml".text = ''
@@ -54,6 +55,10 @@
       };
     };
     languages.language-server = {
+      gpt = {
+        command = "helix-gpt";
+        args = [ "--handler" "copilot" ];
+      };
       tinymist = {
         command = "tinymist";
         config = { exportPdf = "onType"; };
@@ -63,7 +68,7 @@
         command = "simple-completion-language-server";
         config = {
           max_completion_items = 100;
-          feature_words = true;
+          feature_words = false;
           feature_snippets = true;
           snippets_first = true;
           snippets_inline_by_word_tail = false;
@@ -85,6 +90,7 @@
         auto-format = true;
         language-servers = [
           "scls"
+          "gpt"
           {
             name = "pylsp";
             except-features = [ "format" ];
