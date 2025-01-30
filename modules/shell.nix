@@ -26,11 +26,13 @@
     tree
     unzip
     todo-txt-cli
+    watchexec
     which
     xz
     yazi
     zip
     zoxide
+    zenith
     zstd
   ];
   programs.eza = {
