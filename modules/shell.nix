@@ -19,6 +19,7 @@
     gnused
     gnutar
     jq # A lightweight and flexible command-line JSON processor
+    nil
     p7zip
     ripgrep # recursively searches directories for a regex pattern
     starship
@@ -29,12 +30,15 @@
     watchexec
     which
     xz
+    xan
     yazi
     zip
     zoxide
     zenith
     zstd
+    copilot-node-server
   ];
+
   programs.eza = {
     icons = "auto";
     enable = true;

@@ -15,6 +15,14 @@
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [ keepassxc syncthing zed-editor safeeyes ];
+  programs.gnome-shell = {
+    enable = true;
+    extensions = [{ package = pkgs.gnomeExtensions.appindicator; }];
+  };
+
+  dconf.settings = {
+    "org/gnome/desktop/input-sources".xkb-options = [ "caps:escape" ];
+  };
 
   # This value determines the home Manager release that your
   # configuration is compatible with. This helps avoid breakage
