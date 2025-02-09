@@ -22,6 +22,9 @@
     nil
     p7zip
     ripgrep # recursively searches directories for a regex pattern
+    rustc
+    gcc
+    cargo
     starship
     tldr
     tree
@@ -37,6 +40,7 @@
     zenith
     zstd
     copilot-node-server
+    nodejs
   ];
 
   programs.eza = {
