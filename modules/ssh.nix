@@ -40,6 +40,10 @@
         hostname = "login2.stampede3.tacc.utexas.edu";
         user = "jfaulkner5782";
       };
+      mantle = {
+        hostname = "mantle";
+        user = "jfa92";
+      };
     };
   };
 }
