@@ -184,6 +184,7 @@
        ;;(wanderlust +gmail)
 
        :app
+       ai
        ;;calendar
        ;;emms
        ;;everywhere        ; *leave* Emacs!? You must be joking
