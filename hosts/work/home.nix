@@ -14,7 +14,7 @@
   home.homeDirectory = "/home/jake";
 
   # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [ keepassxc syncthing zed-editor safeeyes ];
+  home.packages = with pkgs; [ keepassxc syncthing safeeyes ];
   programs.gnome-shell = {
     enable = true;
     extensions = [{ package = pkgs.gnomeExtensions.appindicator; }];
