@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: ci
-# key: ci
-# condition: t
-# --
-ci($1): $2

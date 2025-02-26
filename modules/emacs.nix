@@ -7,8 +7,8 @@
     hunspellDicts.en-au
     sqlite
   ];
-  home.file."${config.home.homeDirectory}/.config/doom" = {
-    source = ../config/doom;
-    target = "${config.home.homeDirectory}/.config/doom";
+  home.file."${config.home.homeDirectory}/.config/emacs" = {
+    source = ../config/emacs;
+    target = "${config.home.homeDirectory}/.config/emacs";
   };
 }
