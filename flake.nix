@@ -42,6 +42,7 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
 
+          home-manager.extraSpecialArgs = { inherit inputs; };
           # TODO replace ryan with your own username
           home-manager.users.jake = import ./hosts/desktop/home.nix;
 

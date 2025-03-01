@@ -2,7 +2,6 @@
 
 {
   imports = [
-    ../../modules/helix.nix
     ../../modules/shell.nix
     ../../modules/git.nix
     ../../modules/kitty.nix

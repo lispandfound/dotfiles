@@ -7,6 +7,7 @@
 {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    ../../modules/nvidia.nix
   ];
 
   # Bootloader.
@@ -163,11 +164,11 @@
     allowedUDPPortRanges = allowedTCPPortRanges;
   };
 
-   # Enable automatic login for the user.
-   services.xserver.displayManager.autoLogin.enable = true;
-   services.xserver.displayManager.autoLogin.user = "jake";
-   # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
-   systemd.services."getty@tty1".enable = false;
-   systemd.services."autovt@tty1".enable = false;
+  # Enable automatic login for the user.
+  services.xserver.displayManager.autoLogin.enable = true;
+  services.xserver.displayManager.autoLogin.user = "jake";
+  # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
+  systemd.services."getty@tty1".enable = false;
+  systemd.services."autovt@tty1".enable = false;
 
 }
