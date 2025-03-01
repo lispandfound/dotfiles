@@ -1,7 +1,8 @@
-{ inputs, config, pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   imports = [
+    ../../modules/emacs.nix
     ../../modules/helix.nix
     ../../modules/shell.nix
     ../../modules/git.nix
@@ -13,22 +14,14 @@
   home.homeDirectory = "/home/jake";
 
   # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [ keepassxc syncthing safeeyes zoom-us ];
-
-  # programs.gnome-shell = {
-  #   enable = true;
-  #   extensions = [
-  #     { package = pkgs.gnomeExtensions.gsconnect; }
-  #     { package = pkgs.gnomeExtensions.hide-minimized; }
-  #     { package = pkgs.gnomeExtensions.appindicator; }
-  #   ];
-  # };
-
-  services.kdeconnect.enable = true;
+  home.packages = with pkgs; [ keepassxc syncthing zed-editor safeeyes ];
+  programs.gnome-shell = {
+    enable = true;
+    extensions = [{ package = pkgs.gnomeExtensions.appindicator; }];
+  };
 
   dconf.settings = {
     "org/gnome/desktop/input-sources".xkb-options = [ "caps:escape" ];
-    "org/gnome/desktop/interface".text-scaling-factor = 1.25;
   };
 
   # This value determines the home Manager release that your

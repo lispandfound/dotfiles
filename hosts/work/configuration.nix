@@ -7,15 +7,15 @@
 {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../modules/avahi.nix
-    ../../modules/steam.nix
+    ../../modules/nvidia.nix
+    ../../modules/containers.nix
   ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "laptop"; # Define your hostname.
+  networking.hostName = "work"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -29,7 +29,7 @@
   time.timeZone = "Pacific/Auckland";
 
   # Select internationalisation properties.
-  i18n.defaultLocale = "en_NZ.UTF-8";
+  i18n.defaultLocale = "en_GB.UTF-8";
 
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "en_NZ.UTF-8";
@@ -42,16 +42,13 @@
     LC_TELEPHONE = "en_NZ.UTF-8";
     LC_TIME = "en_NZ.UTF-8";
   };
-
+  programs.fish.enable = true;
   # Enable the X11 windowing system.
   services.xserver.enable = true;
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  # services.xserver.displayManager.gdm.enable = true;
-  # services.xserver.desktopManager.gnome.enable = true;
-
+  services.displayManager.sddm.enable = true;
+  services.desktopManager.plasma6.enable = true;
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
@@ -84,8 +81,6 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  programs.fish.enable = true;
-
   users.users.jake = {
     isNormalUser = true;
     description = "Jake Faulkner";
@@ -93,19 +88,13 @@
     packages = with pkgs;
       [
         #  thunderbird
-        steam
       ];
     shell = pkgs.fish;
+
   };
 
   # Install firefox.
   programs.firefox.enable = true;
-  nix.optimise.automatic = true;
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 30d";
-  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -136,7 +125,6 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -145,20 +133,11 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.11"; # Did you read the comment?
-  services.udev.extraHwdb = ''
-    evdev:atkbd:*
-      KEYBOARD_KEY_3a=esc
+  nix.extraOptions = ''
+    					      
+        trusted-users = root jake				      
   '';
 
-  networking.firewall = rec {
-    allowedTCPPortRanges = [{
-      from = 1714;
-      to = 1764;
-    }];
-    allowedUDPPortRanges = allowedTCPPortRanges;
-  };
-  nix.extraOptions = ''
-    trusted-users = root jake
-  '';
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
 }

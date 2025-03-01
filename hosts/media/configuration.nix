@@ -15,7 +15,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "laptop"; # Define your hostname.
+  networking.hostName = "media"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -45,12 +45,14 @@
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  # services.xserver.displayManager.gdm.enable = true;
-  # services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
+  services.displayManager = {
+    autoLogin.enable = true;
+    autoLogin.user = "jake";
+  };
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -80,12 +82,22 @@
     #media-session.enable = true;
   };
 
+  services.openssh = {
+    enable = true;
+    ports = [ 22 ];
+    settings = {
+      PasswordAuthentication = true;
+      AllowUsers = [ "jake" ];
+      UseDns = true;
+      PermitRootLogin = "yes";
+    };
+  };
+
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   programs.fish.enable = true;
-
   users.users.jake = {
     isNormalUser = true;
     description = "Jake Faulkner";
@@ -100,12 +112,6 @@
 
   # Install firefox.
   programs.firefox.enable = true;
-  nix.optimise.automatic = true;
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 30d";
-  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -116,8 +122,10 @@
     [
       #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
       #  wget
+      transmission_4-gtk
     ];
 
+  boot.kernelParams = [ "iwlwifi.power_save=0" "iwlmvm.power_scheme=1" ];
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -132,7 +140,6 @@
   # services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -145,11 +152,22 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.11"; # Did you read the comment?
+
   services.udev.extraHwdb = ''
     evdev:atkbd:*
       KEYBOARD_KEY_3a=esc
   '';
 
+  services.transmission = {
+    user = "jake";
+    enable = true; # Enable transmission daemon
+    openRPCPort = true; # Open firewall for RPC
+    settings = { # Override default settings
+      download-dir = "${config.services.transmission.home}/Downloads";
+      rpc-bind-address = "0.0.0.0"; # Bind to own IP
+      rpc-whitelist-enabled = false;
+    };
+  };
   networking.firewall = rec {
     allowedTCPPortRanges = [{
       from = 1714;
@@ -157,8 +175,5 @@
     }];
     allowedUDPPortRanges = allowedTCPPortRanges;
   };
-  nix.extraOptions = ''
-    trusted-users = root jake
-  '';
 
 }

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: test
+# key: test
+# condition: t
+# --
+test($1): $2

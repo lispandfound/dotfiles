@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: feat
+# key: feat
+# condition: t
+# --
+feat($1): $2
