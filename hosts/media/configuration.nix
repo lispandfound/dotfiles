@@ -166,6 +166,8 @@
       download-dir = "${config.services.transmission.home}/Downloads";
       rpc-bind-address = "0.0.0.0"; # Bind to own IP
       rpc-whitelist-enabled = false;
+      rpc-host-whitelist-enabled = false;
+      rpc-host-whitelist = [ "media.local" ];
     };
   };
   networking.firewall = rec {
@@ -173,6 +175,8 @@
       from = 1714;
       to = 1764;
     }];
+    allowedTCPPorts = [ 8080 ];
+    allowedUDPPorts = allowedTCPPorts;
     allowedUDPPortRanges = allowedTCPPortRanges;
   };
 
