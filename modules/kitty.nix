@@ -5,6 +5,7 @@
     settings = {
       allow_remote_control = true;
       enabled_layouts = "splits";
+      shell = "fish";
       wayland_titlebar_color = "#282c34";
       font_family = "JetbrainsMono Nerd Font";
       foreground = "#979eab";
@@ -41,6 +42,11 @@
       "shift+right" = "move_window left";
       "ctrl+up" = "neighboring_window up";
       "shift+up" = "move_window down";
+      "ctrl+y" = "launch --bias 30 --cwd current yazi";
+      "ctrl+p" =
+        "launch --location before --bias 20 --cwd current --title '*repl*' direnv exec . bpython";
+      "ctrl+0" = ''
+        launch --bias 30 fish -c "todo.sh ls | bat -p --paging=always --language=todo.txt"'';
     };
   };
 }

@@ -2,38 +2,47 @@
 
 {
   home.packages = with pkgs; [
+    atool
+    aider-chat
     bat
-    fish
-    fzf
-    starship
-    # common utilities    
-    fd
-    zip
-    xz
-    unzip
-    p7zip
-    ripgrep # recursively searches directories for a regex pattern
-    jq # A lightweight and flexible command-line JSON processor
-    eza # A modern replacement for ‘ls’
-    fzf # A command-line fuzzy finder
-    yazi
-    file
-    which
-    tree
-    gnused
-    gnutar
-    gawk
-    zstd
-    gnupg
-    zoxide
     delta
     devenv
     direnv
-    vault-tasks
+    eza # A modern replacement for ‘ls’
+    fd
+    file
+    fish
+    fzf
+    fzf # A command-line fuzzy finder
+    gawk
     gh
+    gnupg
+    gnused
+    gnutar
+    jq # A lightweight and flexible command-line JSON processor
+    nil
+    p7zip
+    ripgrep # recursively searches directories for a regex pattern
+    rustc
+    gcc
+    cargo
+    starship
+    tldr
+    tree
+    unzip
+    todo-txt-cli
+    watchexec
+    which
+    xz
+    xan
+    yazi
+    zip
+    zoxide
+    zenith
+    zstd
+    copilot-node-server
+    nodejs
   ];
-  home.file.".config/vault-tasks/config.toml".source =
-    ../config/vault-tasks/config.toml;
 
   programs.eza = {
     icons = "auto";
@@ -61,11 +70,11 @@
         "$character$python[](fg:#c678dd bg:blue)$hostname$directory[](fg:blue bg:yellow)$git_branch$git_status[](fg:yellow) ";
       # Directory configuration
       directory = {
-        format = "[ $path ]($style)";
+        format = "[  $path ]($style)";
         style = "fg:black bg:blue";
       };
       hostname = {
-        format = "[ $ssh_symbol$hostname ]($style)";
+        format = "[ $ssh_symbol$hostname]($style)";
         ssh_symbol = "@";
         style = "fg:black bg:blue";
       };
@@ -128,6 +137,14 @@
               return $status
           end
       end
+      function y
+        	set tmp (mktemp -t "yazi-cwd.XXXXXX")
+        	yazi $argv --cwd-file="$tmp"
+        	if set cwd (command cat -- "$tmp"); and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
+        		builtin cd -- "$cwd"
+        	end
+        	rm -f -- "$tmp"
+      end
     '';
     plugins = [
       {
@@ -148,9 +165,10 @@
     shellAbbrs = {
       rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)";
       conf = "hx ~/.dotfiles";
-      t = "vault-tasks -v ~/.tasks";
+      t = "todo.sh";
       cat = "bat";
       less = "bat --paging=always";
+      tree = "eza --tree";
     };
   };
 
