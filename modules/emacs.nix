@@ -2,13 +2,11 @@
 
 {
   home.packages = with pkgs; [
-    emacs30-pgtk
+    enchant
+    emacsPackages.jinx
+    emacs-pgtk
     hunspell
     hunspellDicts.en-au
     sqlite
   ];
-  home.file."${config.home.homeDirectory}/.config/emacs" = {
-    source = ../config/emacs;
-    target = "${config.home.homeDirectory}/.config/emacs";
-  };
 }
