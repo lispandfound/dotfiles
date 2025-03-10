@@ -3,6 +3,7 @@
 {
   imports = [
     ../../modules/helix.nix
+    ../../modules/emacs.nix
     ../../modules/shell.nix
     ../../modules/git.nix
     ../../modules/kitty.nix
