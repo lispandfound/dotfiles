@@ -3,6 +3,7 @@
 {
   home.packages = with pkgs; [
     atool
+    aider-chat
     bat
     delta
     devenv

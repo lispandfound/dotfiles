@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: chore
-# key: chore
-# condition: t
-# --
-chore($1): $2
