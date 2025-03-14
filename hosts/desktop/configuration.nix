@@ -29,7 +29,7 @@
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_NZ.UTF-8";
-
+  nix.settings.trusted-users = [ "root" "jake" ];
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "en_NZ.UTF-8";
     LC_IDENTIFICATION = "en_NZ.UTF-8";
@@ -131,7 +131,7 @@
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.enable = false;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # This value determines the NixOS release from which the default
@@ -156,13 +156,13 @@
       true; # Open ports in the firewall for Steam Local Network Game Transfers
   };
 
-  networking.firewall = rec {
-    allowedTCPPortRanges = [{
-      from = 1714;
-      to = 1764;
-    }];
-    allowedUDPPortRanges = allowedTCPPortRanges;
-  };
+  #networking.firewall = rec {
+  #  allowedTCPPortRanges = [{
+  #    from = 1714;
+  #    to = 1764;
+  #  }];
+  #  allowedUDPPortRanges = allowedTCPPortRanges;
+  #};
 
   # Enable automatic login for the user.
   services.xserver.displayManager.autoLogin.enable = true;

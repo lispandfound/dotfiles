@@ -7,6 +7,8 @@
     ../../modules/kitty.nix
     ../../modules/python.nix
     ../../modules/ssh.nix
+    ../../modules/helix.nix
+    ../../modules/minecraft.nix
   ];
   home.username = "jake";
   home.homeDirectory = "/home/jake";
