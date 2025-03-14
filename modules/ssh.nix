@@ -42,7 +42,7 @@
       };
       mantle = {
         hostname = "mantle";
-        user = "jfa92";
+        user = "jake";
       };
     };
   };

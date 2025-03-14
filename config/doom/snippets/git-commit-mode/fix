@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: fix
-# key: fix
-# condition: t
-# --
-fix($1): $2
