@@ -30,6 +30,23 @@
         }
       ];
     };
+    nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./hosts/desktop/configuration.nix
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+
+          home-manager.extraSpecialArgs = { inherit inputs; };
+          # TODO replace ryan with your own username
+          home-manager.users.jake = import ./hosts/desktop/home.nix;
+
+        }
+      ];
+    };
+
     nixosConfigurations.media = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
