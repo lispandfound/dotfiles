@@ -17,6 +17,7 @@
     kodi
     keepassxc
     syncthing
+    stremio
 
   ];
 

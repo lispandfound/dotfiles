@@ -14,6 +14,7 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  nix.settings.trusted-users = [ "root" "jake" ];
 
   networking.hostName = "media"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -47,12 +48,11 @@
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
+  programs.dconf.enable = true;
+  services.xserver.displayManager.autoLogin.enable = true;
+  services.xserver.displayManager.autoLogin.user = "jake";
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
-  services.displayManager = {
-    autoLogin.enable = true;
-    autoLogin.user = "jake";
-  };
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -98,10 +98,16 @@
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   programs.fish.enable = true;
+  users.groups.media = { };
+
+  users.users.kodi = {
+    isNormalUser = true;
+    extraGroups = [ "media" ]; # Add user kodi to media group
+  };
   users.users.jake = {
     isNormalUser = true;
     description = "Jake Faulkner";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "media" ];
     packages = with pkgs;
       [
         #  thunderbird
@@ -171,12 +177,20 @@
     };
   };
   networking.firewall = rec {
-    allowedTCPPortRanges = [{
-      from = 1714;
-      to = 1764;
-    }];
-    allowedTCPPorts = [ 8080 ];
-    allowedUDPPorts = allowedTCPPorts;
+    allowedTCPPortRanges = [
+      {
+        from = 1714;
+        to = 1764;
+      }
+      {
+        from = 8080;
+        to = 8080;
+      }
+      {
+        from = 3000;
+        to = 3000;
+      }
+    ];
     allowedUDPPortRanges = allowedTCPPortRanges;
   };
 

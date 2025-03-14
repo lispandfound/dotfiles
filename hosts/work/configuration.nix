@@ -95,6 +95,7 @@
 
   # Install firefox.
   programs.firefox.enable = true;
+  nix.settings.trusted-users = [ "root" "jake" ];
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
