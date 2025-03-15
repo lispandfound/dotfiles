@@ -9,6 +9,7 @@
     ./hardware-configuration.nix
     ../../modules/avahi.nix
     ../../modules/steam.nix
+    ../../modules/dufs.nix
   ];
 
   # Bootloader.
