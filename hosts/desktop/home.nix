@@ -9,6 +9,7 @@
     ../../modules/ssh.nix
     ../../modules/helix.nix
     ../../modules/minecraft.nix
+    ../../modules/sync.nix
   ];
   home.username = "jake";
   home.homeDirectory = "/home/jake";
