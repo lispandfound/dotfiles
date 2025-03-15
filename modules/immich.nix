@@ -6,7 +6,7 @@
   users.users.immich = {
     isSystemUser = true;
     group = "immich";
-    uid = 5001;
+    uid = 5005;
   };
   users.groups.immich = { };
 
@@ -29,14 +29,14 @@
       users.users.immich = {
         isSystemUser = true;
         group = "immich";
-        uid = 5001;
+        uid = 5005;
       };
       users.groups.immich = { };
 
       # Use systemd service script to read the password file and run immich
       services.immich = {
         enable = true;
-        port = 5001;
+        port = 5005;
         openFirewall = true;
         host = "0.0.0.0";
       };
