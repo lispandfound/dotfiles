@@ -13,6 +13,7 @@
     ../../modules/immich.nix
     ../../modules/flood.nix
     ../../modules/tailscale.nix
+    ../../modules/kodi.nix
   ];
 
   # Bootloader.
@@ -104,10 +105,6 @@
   programs.fish.enable = true;
   users.groups.media = { };
 
-  users.users.kodi = {
-    isNormalUser = true;
-    extraGroups = [ "media" ]; # Add user kodi to media group
-  };
   users.users.jake = {
     isNormalUser = true;
     description = "Jake Faulkner";
