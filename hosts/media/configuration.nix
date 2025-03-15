@@ -11,6 +11,7 @@
     ../../modules/steam.nix
     ../../modules/dufs.nix
     ../../modules/immich.nix
+    ../../modules/flood.nix
     ../../modules/tailscale.nix
   ];
 
