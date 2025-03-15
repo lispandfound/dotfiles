@@ -10,7 +10,6 @@
   };
   users.groups.dufs = { };
 
-  networking.firewall.allowedTCPPorts = [ 5000 ];
   containers.dufsContainer = {
     autoStart = true;
     ephemeral = true; # Reset on restart to minimize attack persistence

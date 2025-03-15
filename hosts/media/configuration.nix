@@ -192,6 +192,10 @@
         from = 3000;
         to = 3000;
       }
+      {
+        from = 5000;
+        to = 5010;
+      }
     ];
     allowedUDPPortRanges = allowedTCPPortRanges;
   };
