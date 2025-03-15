@@ -1,6 +1,4 @@
-{ config, pkgs, lib, ... }:
-
-{
+{ config, pkgs, lib, ... }: {
   # Ensure /var/lib/dufs is created and persists on the host system
   systemd.tmpfiles.rules = [ "d /var/lib/dufs 0750 dufs dufs -" ];
 
