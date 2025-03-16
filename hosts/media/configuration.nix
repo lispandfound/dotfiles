@@ -10,6 +10,8 @@
     ../../modules/avahi.nix
     ../../modules/steam.nix
     ../../modules/dufs.nix
+    ../../modules/immich.nix
+    ../../modules/flood.nix
     ../../modules/tailscale.nix
   ];
 
@@ -191,6 +193,10 @@
       {
         from = 3000;
         to = 3000;
+      }
+      {
+        from = 5000;
+        to = 5010;
       }
     ];
     allowedUDPPortRanges = allowedTCPPortRanges;
