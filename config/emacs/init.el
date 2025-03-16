@@ -518,7 +518,10 @@
 (use-package eglot
   :custom
   (eglot-report-progress nil)
+  :hook (nix-ts-mode . eglot-ensure)
   :config
+  (add-to-list 'eglot-server-programs '(nix-ts-mode . ("nil")))
+
   (defun my-filter-eglot-diagnostics (diags)
     "Drop Pyright 'variable not accessed' notes from DIAGS."
     (list (seq-remove (lambda (d)
@@ -1053,10 +1056,13 @@ If the new path's directories does not exist, create them."
 
 (use-package copilot
   :ensure (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+  :custom (copilot-server-executable (executable-find "copilot-node-server"))
   :hook (prog-mode)
-  :config
-  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
+  :bind (:map copilot-completion-map
+              ("C-n" . 'copilot-accept-completion)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)
+              ("M-n" . 'copilot-next-completion)
+              ("M-p" . 'copilot-previous-completion)))
 
 (use-package copilot-chat
   :ensure (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
@@ -1079,3 +1085,7 @@ If the new path's directories does not exist, create them."
 (setq initial-major-mode 'text-mode)
 
 (use-package gitignore-templates)
+(use-package nix-ts-mode
+  :mode "\\.nix\\'"
+
+  )

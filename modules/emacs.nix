@@ -8,5 +8,6 @@
     hunspell
     hunspellDicts.en-au
     sqlite
+    stow # to symlink emacs directory without having it read-only
   ];
 }
