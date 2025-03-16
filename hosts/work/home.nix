@@ -21,7 +21,7 @@
   };
 
   dconf.settings = {
-    "org/gnome/desktop/input-sources".xkb-options = [ "caps:escape" ];
+    "org/gnome/desktop/input-sources".xkb-options = [ "caps:ctrl_modifier" ];
   };
 
   # This value determines the home Manager release that your

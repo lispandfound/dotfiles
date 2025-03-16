@@ -4,6 +4,7 @@
   imports = [
     ../../modules/shell.nix
     ../../modules/git.nix
+    ../../modules/emacs.nix
     ../../modules/kitty.nix
     ../../modules/python.nix
     ../../modules/ssh.nix
@@ -14,7 +15,7 @@
   home.homeDirectory = "/home/jake";
 
   # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [ keepassxc syncthing safeeyes zoom-us ];
+  home.packages = with pkgs; [ keepassxc syncthing safeeyes zoom-us spotify ];
 
   # programs.gnome-shell = {
   #   enable = true;
