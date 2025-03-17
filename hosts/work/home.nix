@@ -20,9 +20,7 @@
     extensions = [{ package = pkgs.gnomeExtensions.appindicator; }];
   };
 
-  dconf.settings = {
-    "org/gnome/desktop/input-sources".xkb-options = [ "caps:ctrl_modifier" ];
-  };
+
 
   # This value determines the home Manager release that your
   # configuration is compatible with. This helps avoid breakage

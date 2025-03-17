@@ -29,7 +29,6 @@
   services.kdeconnect.enable = true;
 
   dconf.settings = {
-    "org/gnome/desktop/input-sources".xkb-options = [ "caps:escape" ];
     "org/gnome/desktop/interface".text-scaling-factor = 1.25;
   };
 
