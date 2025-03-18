@@ -1,6 +1,15 @@
 { config, pkgs, lib, ... }: {
-  # Ensure /var/lib/dufs is created and persists on the host system
 
+  services.xserver = {
+    enable = true;
+    desktopManager.kodi = {
+      enable = true; # package = pkgs.kodi;
+      package = pkgs.kodi-gbm;
+    };
+
+  };
+
+  services.xserver.displayManager.lightdm.greeter.enable = false;
   environment.systemPackages = with pkgs; [ kodi-gbm ];
 
 }

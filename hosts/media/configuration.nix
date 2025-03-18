@@ -56,8 +56,6 @@
   programs.dconf.enable = true;
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "jake";
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -108,7 +106,7 @@
   users.users.jake = {
     isNormalUser = true;
     description = "Jake Faulkner";
-    extraGroups = [ "networkmanager" "wheel" "media" ];
+    extraGroups = [ "networkmanager" "wheel" "media" "flood" ];
     packages = with pkgs;
       [
         #  thunderbird
