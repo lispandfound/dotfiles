@@ -9,6 +9,8 @@
     ./hardware-configuration.nix
     ../../modules/nvidia.nix
     ../../modules/containers.nix
+    ../../modules/tailscale.nix
+    ../../modules/sync.nix
   ];
 
   # Bootloader.
