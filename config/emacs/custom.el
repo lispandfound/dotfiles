@@ -13,11 +13,11 @@
  '(display-time-format "%H:%M")
  '(org-capture-templates
    '(("l" "Logged completed task" entry
-      (file+headline "~/org/todo.org" "Tasks")
+      (file+headline org-agenda-capture-file "Tasks")
       "* DONE %?\12 %U\12 %a\12 %i")
-     ("n" "Note" entry (file+headline "~/org/todo.org" "Notes")
+     ("n" "Note" entry (file+headline org-default-notes-file "Notes")
       "* %?\12 %U\12 %a\12 %i")
-     ("t" "Todo" entry (file+headline "~/org/todo.org" "Tasks")
+     ("t" "Todo" entry (file+headline org-agenda-capture-file "Tasks")
       "* TODO %?\12 %U\12 %a\12 %i")))
  '(package-install-upgrade-built-in t)
  '(package-selected-packages
