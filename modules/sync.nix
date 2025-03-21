@@ -6,20 +6,28 @@
     group = "davfs2";
   };
   users.groups.davfs2 = { };
+  environment.etc."davfs2/davfs2.conf".text = ''
+    use_locks 0
+    dav_group davfs2
+  '';
+
+  systemd.mounts = [{
+    where = "/mnt/dufs";
+    what = "https://media.tail7ee4b1.ts.net:5000";
+    options = "uid=1000,file_mode=0664,dir_mode=2775";
+    type = "davfs";
+  }];
 
   # Mount unit for WebDAV (delayed until needed)
-  systemd.services.mount-dufs = {
-    description = "WebDAV Mount for dufs";
-    wants = [ "tailscaled.service" ]; # Ensures Tailscale is up
-    after = [ "tailscaled.service" ]; # Ensures it starts after Tailscale
-    wantedBy = [ "graphical.target" ]; # Ensures it's available after boot
-
-    serviceConfig = {
-      Type = "oneshot"; # Runs once at startup
-      RemainAfterExit = true; # Keeps the mount persistent
-      ExecStart =
-        "${pkgs.mount}/bin/mount -t davfs -o uid=1000,file_mode=0664,dir_mode=2775 https://media.tail7ee4b1.ts.net:5000 /mnt/dufs";
-      ExecStop = "${pkgs.umount}/bin/umount /mnt/dufs";
-    };
-  };
+  systemd.automounts = [{
+    description = "WebDAV Mount for dufs...";
+    requires = [ "tailscaled.service" ];
+    after = [
+      "tailscaled.service"
+      "sys-subsystem-net-devices-tailscale0.device"
+    ]; # Ensures Tailscale is up
+    wantedBy = [ "multi-user.target" ]; # Ensures it's available after boot
+    where = "/mnt/dufs";
+    enable = true;
+  }];
 }

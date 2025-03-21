@@ -44,6 +44,10 @@
         hostname = "mantle";
         user = "jake";
       };
+      lightsail = {
+        hostname = "3.105.18.205";
+        user = "bitnami";
+      };
     };
   };
 }
