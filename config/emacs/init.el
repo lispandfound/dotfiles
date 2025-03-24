@@ -1060,10 +1060,12 @@ If the new path's directories does not exist, create them."
   :custom (copilot-server-executable (executable-find "copilot-node-server"))
   :hook (prog-mode)
   :bind (:map copilot-completion-map
-              ("C-n" . 'copilot-accept-completion)
-              ("C-<tab>" . 'copilot-accept-completion-by-word)
-              ("M-n" . 'copilot-next-completion)
-              ("M-p" . 'copilot-previous-completion)))
+              ("M-y" . copilot-accept-completion-by-line)
+              ("M-Y" . copilot-accept-completion)
+              ("M-J" . copilot-next-completion)
+              ("M-K" . copilot-previous-completion)
+              ("M->" . copilot-next-completion)
+              ("M-<" . copilot-previous-completion)))
 
 (use-package copilot-chat
   :ensure (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
