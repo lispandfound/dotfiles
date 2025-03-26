@@ -55,6 +55,7 @@
 (use-package mood-line
   :demand t
   :config
+  (require 'mood-line-segment-vc)
   (mood-line-mode)
   :custom (mood-line-glyph-alist mood-line-glyphs-unicode))
 
@@ -671,10 +672,6 @@ point reaches the beginning or end of the buffer, stop there."
   :config
   (add-to-list 'consult-dir-sources 'consult-dir--source-eshell t)
   (add-to-list 'consult-dir-sources 'consult-dir--source-zoxide t))
-
-
-
-
 
 (use-package elm-mode)
 
