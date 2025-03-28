@@ -17,7 +17,10 @@
   home.packages = with pkgs; [ keepassxc syncthing safeeyes ];
   programs.gnome-shell = {
     enable = true;
-    extensions = [{ package = pkgs.gnomeExtensions.appindicator; }];
+    extensions = [
+      { package = pkgs.gnomeExtensions.appindicator; }
+      { package = pkgs.gnomeExtensions.tailscale-qs; }
+    ];
   };
 
   # This value determines the home Manager release that your
