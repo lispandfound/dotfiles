@@ -11,6 +11,15 @@
  '(display-line-numbers t)
  '(display-time-default-load-average nil)
  '(display-time-format "%H:%M")
+ '(mood-line-glyph-alist
+   '((:checker-info . 8505) (:checker-issues . 9873)
+     (:checker-good . 10004) (:checker-checking . 58726)
+     (:checker-errored . 10006) (:checker-interrupted . 9208)
+     (:vc-added . 43) (:vc-needs-merge . 10231)
+     (:vc-needs-update . 8595) (:vc-conflict . 10006)
+     (:vc-good . 10004) (:buffer-narrowed . 9660)
+     (:buffer-modified . 9679) (:buffer-read-only . 9632)
+     (:frame-client . 8645) (:count-separator . 10005)))
  '(org-capture-templates
    '(("l" "Logged completed task" entry
       (file+headline org-agenda-capture-file "Tasks")

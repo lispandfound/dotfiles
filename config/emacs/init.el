@@ -48,6 +48,8 @@
 (use-package transient
   :demand t)
 
+
+
 (use-package doom-themes
   :demand t
   :config (load-theme 'doom-one t))
@@ -56,8 +58,7 @@
   :demand t
   :config
   (require 'mood-line-segment-vc)
-  (mood-line-mode)
-  :custom (mood-line-glyph-alist mood-line-glyphs-unicode))
+  (mood-line-mode))
 
 (display-time-mode)
 (keyboard-translate ?\C-t ?\C-x)
@@ -914,6 +915,11 @@ If the new path's directories does not exist, create them."
     (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu))
     (casual-avy-tmenu)))
 
+(use-package casual-make
+  :ensure nil
+  :bind (:map makefile-mode-map ("C-o" . casual-make-tmenu))
+  :after (make-mode))
+
 (use-package casual-isearch
   :ensure nil
   :bind (:map isearch-mode-map ("C-o" . casual-isearch-tmenu)))
@@ -963,7 +969,7 @@ If the new path's directories does not exist, create them."
 
 (use-package casual-agenda
   :ensure nil
-  :after org
+  :after org-agenda  ;; Ensure org-agenda is loaded first
   :bind (:map
          org-agenda-mode-map
          ("C-o" . casual-agenda-tmenu)
@@ -972,7 +978,9 @@ If the new path's directories does not exist, create them."
 
 (use-package casual-editkit
   :ensure nil
-  :bind (("C-c C-h" . casual-editkit-main-tmenu)))
+  :bind (("C-c C-h" . casual-editkit-main-tmenu))
+  :hook (rectangle-mark-mode . (lambda ()
+                                 (define-key rectangle-mark-mode-map (kbd "C-o") #'casual-editkit-rectangle-tmenu))))
 
 
 (use-package popper
