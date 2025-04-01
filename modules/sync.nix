@@ -26,7 +26,7 @@
       "tailscaled.service"
       "sys-subsystem-net-devices-tailscale0.device"
     ]; # Ensures Tailscale is up
-    wantedBy = [ "multi-user.target" ]; # Ensures it's available after boot
+    wantedBy = [ "remote-fs.target" ]; # Ensures it's available after boot
     where = "/mnt/dufs";
     enable = true;
   }];
