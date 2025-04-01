@@ -9,11 +9,11 @@
     ./hardware-configuration.nix
     ../../modules/avahi.nix
     ../../modules/steam.nix
-    ../../modules/dufs.nix
     ../../modules/immich.nix
     ../../modules/transmission.nix
     ../../modules/tailscale.nix
     ../../modules/kodi.nix
+    ../../modules/syncthing-server.nix
   ];
 
   # Bootloader.
