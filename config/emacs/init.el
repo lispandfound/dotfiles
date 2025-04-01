@@ -48,6 +48,8 @@
 (use-package transient
   :demand t)
 
+
+
 (use-package doom-themes
   :demand t
   :config (load-theme 'doom-one t))
@@ -55,8 +57,8 @@
 (use-package mood-line
   :demand t
   :config
-  (mood-line-mode)
-  :custom (mood-line-glyph-alist mood-line-glyphs-unicode))
+  (require 'mood-line-segment-vc)
+  (mood-line-mode))
 
 (display-time-mode)
 (keyboard-translate ?\C-t ?\C-x)
@@ -518,7 +520,10 @@
 (use-package eglot
   :custom
   (eglot-report-progress nil)
+  :hook (nix-ts-mode . eglot-ensure)
   :config
+  (add-to-list 'eglot-server-programs '(nix-ts-mode . ("nil")))
+
   (defun my-filter-eglot-diagnostics (diags)
     "Drop Pyright 'variable not accessed' notes from DIAGS."
     (list (seq-remove (lambda (d)
@@ -669,10 +674,6 @@ point reaches the beginning or end of the buffer, stop there."
   (add-to-list 'consult-dir-sources 'consult-dir--source-eshell t)
   (add-to-list 'consult-dir-sources 'consult-dir--source-zoxide t))
 
-
-
-
-
 (use-package elm-mode)
 
 (use-package wgrep)
@@ -682,11 +683,12 @@ point reaches the beginning or end of the buffer, stop there."
   :bind (("C-c a" . 'org-agenda-transient)
          ("C-c x" . 'org-capture-transient))
   :custom
-  (org-agenda-files '("~/org/todo.org"))
-  (org-default-notes-file "~/org/todo.org")
-  (org-directory "~/org")
+  (org-agenda-files '("/mnt/dufs/org/todo.org"))
+  (org-default-notes-file "/mnt/dufs/org/notes.org")
+  (org-directory "/mnt/dufs/org")
   (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
   :init
+  (setq org-agenda-capture-file "/mnt/dufs/org/todo.org")
   (defun org-setup-transient-interface ()
     (transient-define-prefix org-agenda-transient ()
       "Replace the org-agenda buffer by a transient."
@@ -913,6 +915,11 @@ If the new path's directories does not exist, create them."
     (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu))
     (casual-avy-tmenu)))
 
+(use-package casual-make
+  :ensure nil
+  :bind (:map makefile-mode-map ("C-o" . casual-make-tmenu))
+  :after (make-mode))
+
 (use-package casual-isearch
   :ensure nil
   :bind (:map isearch-mode-map ("C-o" . casual-isearch-tmenu)))
@@ -962,7 +969,7 @@ If the new path's directories does not exist, create them."
 
 (use-package casual-agenda
   :ensure nil
-  :after org
+  :after org-agenda  ;; Ensure org-agenda is loaded first
   :bind (:map
          org-agenda-mode-map
          ("C-o" . casual-agenda-tmenu)
@@ -971,7 +978,9 @@ If the new path's directories does not exist, create them."
 
 (use-package casual-editkit
   :ensure nil
-  :bind (("C-c C-h" . casual-editkit-main-tmenu)))
+  :bind (("C-c C-h" . casual-editkit-main-tmenu))
+  :hook (rectangle-mark-mode . (lambda ()
+                                 (define-key rectangle-mark-mode-map (kbd "C-o") #'casual-editkit-rectangle-tmenu))))
 
 
 (use-package popper
@@ -1053,10 +1062,15 @@ If the new path's directories does not exist, create them."
 
 (use-package copilot
   :ensure (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+  :custom (copilot-server-executable (executable-find "copilot-node-server"))
   :hook (prog-mode)
-  :config
-  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
+  :bind (:map copilot-completion-map
+              ("M-y" . copilot-accept-completion-by-line)
+              ("M-Y" . copilot-accept-completion)
+              ("M-J" . copilot-next-completion)
+              ("M-K" . copilot-previous-completion)
+              ("M->" . copilot-next-completion)
+              ("M-<" . copilot-previous-completion)))
 
 (use-package copilot-chat
   :ensure (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
@@ -1079,3 +1093,7 @@ If the new path's directories does not exist, create them."
 (setq initial-major-mode 'text-mode)
 
 (use-package gitignore-templates)
+(use-package nix-ts-mode
+  :mode "\\.nix\\'"
+
+  )
