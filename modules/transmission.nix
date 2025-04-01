@@ -7,7 +7,7 @@
   users.users.transmission = {
     isSystemUser = true;
     group = "transmission";
-    uid = 5006;
+    uid = 70;
   };
   users.groups.transmission = { };
 
@@ -25,18 +25,9 @@
 
     config = { config, pkgs, lib, ... }: {
       system.stateVersion = "24.11";
-      environment.systemPackages = with pkgs; [
-        transmission
-        transmission_4
-        findutils
-      ];
+      environment.systemPackages = with pkgs; [ transmission_4 findutils ];
 
       # Ensure transmission user exists inside the container
-      users.users.transmission = {
-        isNormalUser = true;
-        group = "transmission";
-        uid = 5006;
-      };
 
       systemd.services.transmission-clean = {
         description = "Clean up old downloads in transmission";
@@ -67,11 +58,11 @@
         package = pkgs.transmission_4;
         openRPCPort = true; # Open firewall for RPC
         settings = {
-          download-dir = "/var/lib/transmission/download";
           rpc-bind-address = "0.0.0.0"; # Bind to own IP
           rpc-whitelist =
             "127.0.0.1"; # Whitelist your remote machine (10.0.0.1 in this example)
-          rpc-port = 5006;
+          rpc-whitelist-enabled = false;
+          rpc-host-whitelist-enabled = false;
         };
         user = "transmission";
         group = "transmission";
@@ -90,6 +81,10 @@
           {
             from = 5006;
             to = 5006;
+          }
+          {
+            from = 9091;
+            to = 9091;
           }
           {
             from = 6881;

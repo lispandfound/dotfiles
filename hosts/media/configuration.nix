@@ -11,7 +11,7 @@
     ../../modules/steam.nix
     ../../modules/dufs.nix
     ../../modules/immich.nix
-    ../../modules/flood.nix
+    ../../modules/transmission.nix
     ../../modules/tailscale.nix
     ../../modules/kodi.nix
   ];
@@ -106,7 +106,7 @@
   users.users.jake = {
     isNormalUser = true;
     description = "Jake Faulkner";
-    extraGroups = [ "networkmanager" "wheel" "media" "flood" ];
+    extraGroups = [ "networkmanager" "wheel" "media" "transmission" ];
     packages = with pkgs;
       [
         #  thunderbird
@@ -163,18 +163,6 @@
       KEYBOARD_KEY_3a=esc
   '';
 
-  services.transmission = {
-    user = "jake";
-    enable = true; # Enable transmission daemon
-    openRPCPort = true; # Open firewall for RPC
-    settings = { # Override default settings
-      download-dir = "${config.services.transmission.home}/Downloads";
-      rpc-bind-address = "0.0.0.0"; # Bind to own IP
-      rpc-whitelist-enabled = false;
-      rpc-host-whitelist-enabled = false;
-      rpc-host-whitelist = [ "media.local" ];
-    };
-  };
   networking.firewall = rec {
     allowedTCPPortRanges = [
       {
