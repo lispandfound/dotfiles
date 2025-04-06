@@ -388,7 +388,7 @@
   :config
   (add-hook 'python-ts-mode-hook (lambda ()
                                    (setq-local transpose-sexps-function #'treesit-transpose-sexps
-                                               devdocs-current-docs '("pandas~2" "numpy~2.0" "python~3.13"))))
+                                               devdocs-current-docs '("pandas~2" "numpy~2.0" "python~3.13" "matplotlib"))))
   (require 's)
   (require 'dash)
   (defun python-get-treesit-def ()
