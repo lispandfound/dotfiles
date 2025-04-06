@@ -1097,3 +1097,9 @@ If the new path's directories does not exist, create them."
   :mode "\\.nix\\'"
 
   )
+(use-package org-download
+  :after org
+  :bind
+  (:map org-mode-map
+        (("s-Y" . org-download-screenshot)
+         ("s-y" . org-download-yank))))
