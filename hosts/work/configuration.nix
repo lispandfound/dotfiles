@@ -10,6 +10,7 @@
     ../../modules/nvidia.nix
     ../../modules/containers.nix
     ../../modules/tailscale.nix
+    ../../modules/sync-system.nix
   ];
 
   # Bootloader.
@@ -85,7 +86,7 @@
   users.users.jake = {
     isNormalUser = true;
     description = "Jake Faulkner";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "davfs2" ];
     packages = with pkgs;
       [
         #  thunderbird

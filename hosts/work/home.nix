@@ -9,6 +9,7 @@
     ../../modules/kitty.nix
     ../../modules/python.nix
     ../../modules/ssh.nix
+    ../../modules/sync.nix
   ];
   home.username = "jake";
   home.homeDirectory = "/home/jake";
