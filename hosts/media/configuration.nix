@@ -13,7 +13,8 @@
     ../../modules/transmission.nix
     ../../modules/tailscale.nix
     ../../modules/kodi.nix
-    ../../modules/syncthing-server.nix
+    ../../modules/dufs.nix
+    ../../modules/org-server.nix
   ];
 
   # Bootloader.

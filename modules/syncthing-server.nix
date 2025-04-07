@@ -14,6 +14,7 @@
     settings = {
       guiAddress =
         "0.0.0.0:8384"; # Change to localhost if remote access isn't needed
+      gui = { insecureSkipHostcheck = true; };
     };
   };
 
