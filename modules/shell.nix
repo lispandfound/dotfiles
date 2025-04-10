@@ -10,6 +10,7 @@
     delta
     devenv
     direnv
+    dtach
     eza # A modern replacement for ‘ls’
     fd
     file
