@@ -384,10 +384,17 @@
               (:repeat-map python-indent-shift-right-repeat-map
                            (">" . python-indent-shift-right)
                            ("<" . python-indent-shift-left)))
-
+  :init
+  (setq major-mode-remap-alist
+        '((python-mode . python-ts-mode)))
   :config
+
+
+  (add-hook 'python-ts-mode-hook #'eglot-ensure)
   (add-hook 'python-ts-mode-hook (lambda ()
                                    (setq-local transpose-sexps-function #'treesit-transpose-sexps
+                                               python-shell-interpreter "ipython"
+                                               python-shell-interpreter-args "--simple-prompt --classic"
                                                devdocs-current-docs '("pandas~2" "numpy~2.0" "python~3.13" "matplotlib"))))
   (require 's)
   (require 'dash)
@@ -495,11 +502,10 @@
             (insert (read-from-minibuffer (s-concat "Description for exception " exception ": ")))
             (call-interactively #'python-indent-shift-right))
           (newline-and-indent))))))
-(setq major-mode-remap-alist
-      '((python-mode . python-ts-mode)))
 
-(add-hook 'python-ts-mode-hook #'eglot-ensure)
-
+(use-package comint-mime
+  :hook ((shell-mode . comint-mime-setup)
+         (inferior-python-mode . comint-mime-setup)))
 
 (global-set-key [remap newline] #'newline-and-indent)
 
@@ -856,10 +862,11 @@ If the new path's directories does not exist, create them."
   :hook (gfm-mode))
 
 (use-package cylc-mode
-  :ensure nil
-  :commands (cylc-mode)
-  :load-path "lisp/")
-
+  :ensure (cylc-mode
+           :host github
+           :repo "cylc/cylc-flow"
+           :files ("cylc/flow/etc/syntax/cylc-mode.el"))
+  :mode ("suite.*\\.rc\\'" "\\.cylc\\'"))
 
 
 (use-package grip-mode
