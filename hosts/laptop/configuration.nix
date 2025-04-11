@@ -10,7 +10,6 @@
     ../../modules/avahi.nix
     ../../modules/steam.nix
     ../../modules/tailscale.nix
-    ../../modules/sync.nix
   ];
 
   # Bootloader.
