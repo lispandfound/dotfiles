@@ -7,8 +7,15 @@
     group = "davfs2";
   };
   security.wrappers = {
-    mount.davfs = {
+    "mount.davfs" = {
       source = "${pkgs.davfs2}/bin/mount.davfs";
+      owner = "root";
+      group = "root";
+      permissions = "u+rx,g+rx,o+rx";
+      setuid = true;
+    };
+    "umount.davfs" = {
+      source = "${pkgs.davfs2}/bin/umount.davfs";
       owner = "root";
       group = "root";
       permissions = "u+rx,g+rx,o+rx";

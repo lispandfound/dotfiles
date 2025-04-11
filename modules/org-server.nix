@@ -3,42 +3,33 @@
 let
   containerName = "media-server";
   orgGid = 5555;
+  caddyUid = 5556;
 in {
+  environment.systemPackages = with pkgs; [ python3 ];
+  users.groups.org = {
+    gid = 5555; # Or let NixOS assign it
+  };
 
-  systemd.tmpfiles.rules = [ "d /var/lib/dufs 0750 dufs dufs -" ];
+  users.users.org = {
+    isSystemUser = true;
+    group = "org";
+    home = "/var/lib/org";
+    createHome = true;
+  };
+  systemd.services.org-static-server = {
+    description = "Static file server for /var/lib/org using Python";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
 
-  users.groups.org = { gid = orgGid; };
-
-  containers.${containerName} = {
-    autoStart = true;
-    ephemeral = false;
-    users.groups.org = { gid = orgGid; };
-    users.users.caddy = {
-      isSystemUser = true;
-      group = "caddy";
-      extraGroups = [ "org" ];
-    };
-    bindMounts."/var/lib/org" = {
-      hostPath = "/var/lib/org";
-      isReadOnly = true;
-    };
-
-    config = { config, pkgs, ... }: {
-      networking.firewall.allowedTCPPorts = [ 80 ];
-
-      services.caddy = {
-        enable = true;
-        package = pkgs.caddy;
-
-        virtualHosts."media.tail7ee4b1.ts.net" = {
-          extraConfig = ''
-            root * /var/lib/org
-            file_server
-            tls internal
-          '';
-        };
-      };
+    serviceConfig = {
+      ExecStart =
+        "${pkgs.python3}/bin/python3 -m http.server 5007 --directory /var/lib/org";
+      WorkingDirectory = "/var/lib/org";
+      User = "org";
+      Group = "org";
+      Restart = "on-failure";
     };
   };
+  networking.firewall.allowedTCPPorts = [ 5007 ];
 }
 

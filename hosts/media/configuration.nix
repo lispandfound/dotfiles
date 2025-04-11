@@ -107,13 +107,13 @@
   users.users.jake = {
     isNormalUser = true;
     description = "Jake Faulkner";
-    extraGroups = [ "networkmanager" "wheel" "media" "transmission" ];
+    extraGroups = [ "networkmanager" "wheel" "media" "transmission" "org" ];
     packages = with pkgs;
       [
         #  thunderbird
         steam
       ];
-    shell = pkgs.fish;
+    shell = pkgs.bash;
   };
 
   # Install firefox.
