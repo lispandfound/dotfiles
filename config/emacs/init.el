@@ -37,6 +37,7 @@
     (require 'elpaca)
     (elpaca-generate-autoloads "elpaca" repo)
     (load "./elpaca-autoloads")))
+
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
@@ -49,10 +50,7 @@
   :demand t)
 
 
-
-(use-package doom-themes
-  :demand t
-  :config (load-theme 'doom-one t))
+(load-theme 'modus-operandi t)
 
 (use-package mood-line
   :demand t
@@ -1110,3 +1108,34 @@ If the new path's directories does not exist, create them."
   (:map org-mode-map
         (("s-Y" . org-download-screenshot)
          ("s-y" . org-download-yank))))
+
+(use-package eldoc-box
+  :hook (eglot-managed-mode . eldoc-box-hover-at-point-mode))
+
+
+(defun ddg-search (query)
+  "Search DuckDuckGo for QUERY."
+  (interactive "sDuckDuckGo Search: ")
+  (browse-url (concat "https://duckduckgo.com/?q=" (url-hexify-string query)))))
+
+(defun ddg-search-at-point ()
+  "Search DuckDuckGo for the word at point."
+  (interactive)
+  (let ((word (thing-at-point 'symbol)))
+    (if word
+        (ddg-search word)
+      (message "No word at point."))))
+
+
+(defun github-org-search (query)
+  "Search the UCGMSim GitHub organization for QUERY."
+  (interactive "sGitHub Search: ")
+  (browse-url (concat "https://github.com/search?type=code&q=org%3Aucgmsim%20" (url-hexify-string query))))
+
+(defun github-org-search-at-point ()
+  "Search the UCGMSim GitHub organization for the word at point."
+  (interactive)
+  (let ((word (thing-at-point 'symbol)))
+    (if word
+        (github-org-search word)
+      (message "No word at point."))))
