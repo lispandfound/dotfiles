@@ -358,10 +358,6 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-
-
-
-
 (use-package magit
   :bind ("C-c g" . magit-status)
   :init (with-eval-after-load 'project
@@ -373,9 +369,7 @@
 (use-package browse-at-remote
   :bind ("C-c C-o" . browse-at-remote))
 
-
 (use-package pyvenv)
-
 
 (use-package python
   :ensure nil
@@ -539,10 +533,10 @@
                       (car diags))))
 
   (advice-add 'eglot--report-to-flymake :filter-args #'my-filter-eglot-diagnostics))
+
 (use-package flymake-ruff
   :ensure t
   :hook (eglot-managed-mode . flymake-ruff-load))
-
 
 (use-package project
   :ensure nil
@@ -586,21 +580,19 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key [remap move-beginning-of-line]
                 'smarter-move-beginning-of-line)
 
-
 (setq dired-dwim-target t
       dired-auto-revert-buffer t
       dired-listing-switches "-alFh"
-      isearch-lazy-count t)
-
-(setq tramp-use-ssh-controlmaster-options nil)
+      isearch-lazy-count t
+      tramp-use-ssh-controlmaster-options nil
+      vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)
+      use-short-answers t)
 
 (use-package yaml-mode)
 
 (use-package csv-mode
   :hook (csv-mode . csv-align-mode))
 
-(setq vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
-(setq use-short-answers t)
 
 (use-package haskell-mode
   :bind (:map haskell-mode-map
