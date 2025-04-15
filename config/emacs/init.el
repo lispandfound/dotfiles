@@ -687,12 +687,12 @@ point reaches the beginning or end of the buffer, stop there."
   :bind (("C-c a" . 'org-agenda-transient)
          ("C-c x" . 'org-capture-transient))
   :custom
-  (org-agenda-files '("/mnt/dufs/org/todo.org"))
-  (org-default-notes-file "/mnt/dufs/org/notes.org")
-  (org-directory "/mnt/dufs/org")
+  (org-agenda-files '("~/org/todo.org"))
+  (org-default-notes-file "~/org/notes.org")
+  (org-directory "~/org")
   (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
   :init
-  (setq org-agenda-capture-file "/mnt/dufs/org/todo.org")
+  (setq org-agenda-capture-file "~/org/todo.org")
   (defun org-setup-transient-interface ()
     (transient-define-prefix org-agenda-transient ()
       "Replace the org-agenda buffer by a transient."
