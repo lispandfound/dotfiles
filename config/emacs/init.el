@@ -720,6 +720,8 @@ point reaches the beginning or end of the buffer, stop there."
         ("H" "Habits tracker"
          (lambda () (interactive) (org-agenda nil "H")))]])
 
+    (add-hook 'auto-save-hook 'org-save-all-org-buffers)
+
     (transient-define-prefix org-capture-transient ()
       "Org Capture Templates"
       ["Capture"
