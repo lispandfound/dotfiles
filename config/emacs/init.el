@@ -49,8 +49,10 @@
 (use-package transient
   :demand t)
 
-
-(load-theme 'modus-operandi t)
+(use-package modus-themes
+  :demand t
+  :config
+  (load-theme 'modus-operandi t))
 
 (use-package mood-line
   :demand t
