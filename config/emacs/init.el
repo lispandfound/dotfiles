@@ -720,7 +720,7 @@ point reaches the beginning or end of the buffer, stop there."
         ("H" "Habits tracker"
          (lambda () (interactive) (org-agenda nil "H")))]])
 
-    (add-hook 'auto-save-hook 'org-save-all-org-buffers)
+
 
     (transient-define-prefix org-capture-transient ()
       "Org Capture Templates"
@@ -729,7 +729,10 @@ point reaches the beginning or end of the buffer, stop there."
        ("n" "Note" (lambda () (interactive) (org-capture nil "n")))
        ("t" "Todo" (lambda () (interactive) (org-capture nil "t")))]))
   (add-hook 'emacs-startup-hook #'org-setup-transient-interface))
-
+(add-hook 'org-agenda-mode-hook
+          (lambda ()
+            (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
+            (auto-save-mode)))
 
 (use-package org-menu
   :ensure (:host github :repo "sheijk/org-menu")
