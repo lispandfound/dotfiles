@@ -521,6 +521,8 @@
   (eglot-report-progress nil)
   :hook (nix-ts-mode . eglot-ensure)
   :config
+  (setq-default eglot-workspace-configuration
+                '(:ruff (:enabled t :formatEnabled :json-false :extendSelect "I")))
   (add-to-list 'eglot-server-programs '(nix-ts-mode . ("nil")))
 
   (defun my-filter-eglot-diagnostics (diags)
