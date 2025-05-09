@@ -6,7 +6,7 @@
       "kernel.unprivileged_userns_clone" = 1; # for apptainer
     };
   };
-  virtualisation.docker.rootless = {
+  virtualisation.docker = {
     enable = true;
     setSocketVariable = true;
   };

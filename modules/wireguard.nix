@@ -1,5 +1,5 @@
 { config, pkgs, ... }: {
-  environment.systemPackages = with pkgs; [ wireguard wireguard-tools ];
+  environment.systemPackages = with pkgs; [ wireguard-tools ];
   networking.wg-quick.interfaces.wg0 = {
     # This is the client, so it doesn't listen on a port unless it also acts as a server for other peers.
     # ListenPort = 51820; # Usually not needed for the client side initiating the connection
