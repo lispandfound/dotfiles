@@ -10,6 +10,7 @@
     ../../modules/avahi.nix
     ../../modules/steam.nix
     ../../modules/containers.nix
+    ../../modules/wireguard.nix
   ];
 
   # Bootloader.
@@ -50,6 +51,7 @@
 
   # Enable the GNOME Desktop Environment.
   programs.dconf.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "jake";
 
