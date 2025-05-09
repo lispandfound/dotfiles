@@ -12,13 +12,10 @@
   home.homeDirectory = "/home/jake";
 
   # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [
+  home.packages = with pkgs;
+    [
 
-    keepassxc
-    syncthing
-    stremio
-
-  ];
+    ];
 
   programs.gnome-shell = {
     enable = true;
