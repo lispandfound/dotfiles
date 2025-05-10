@@ -10,6 +10,7 @@
     ../../modules/ssh.nix
     ../../modules/helix.nix
     ../../modules/minecraft.nix
+    ../../modules/calibre.nix
   ];
   home.username = "jake";
   home.homeDirectory = "/home/jake";
