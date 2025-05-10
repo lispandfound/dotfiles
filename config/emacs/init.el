@@ -37,6 +37,7 @@
     (require 'elpaca)
     (elpaca-generate-autoloads "elpaca" repo)
     (load "./elpaca-autoloads")))
+
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
@@ -48,11 +49,10 @@
 (use-package transient
   :demand t)
 
-
-
-(use-package doom-themes
+(use-package modus-themes
   :demand t
-  :config (load-theme 'doom-one t))
+  :config
+  (load-theme 'modus-operandi t))
 
 (use-package mood-line
   :demand t
@@ -358,10 +358,6 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-
-
-
-
 (use-package magit
   :bind ("C-c g" . magit-status)
   :init (with-eval-after-load 'project
@@ -373,9 +369,7 @@
 (use-package browse-at-remote
   :bind ("C-c C-o" . browse-at-remote))
 
-
 (use-package pyvenv)
-
 
 (use-package python
   :ensure nil
@@ -384,11 +378,18 @@
               (:repeat-map python-indent-shift-right-repeat-map
                            (">" . python-indent-shift-right)
                            ("<" . python-indent-shift-left)))
-
+  :init
+  (setq major-mode-remap-alist
+        '((python-mode . python-ts-mode)))
   :config
+
+
+  (add-hook 'python-ts-mode-hook #'eglot-ensure)
   (add-hook 'python-ts-mode-hook (lambda ()
                                    (setq-local transpose-sexps-function #'treesit-transpose-sexps
-                                               devdocs-current-docs '("pandas~2" "numpy~2.0" "python~3.13"))))
+                                               python-shell-interpreter "ipython"
+                                               python-shell-interpreter-args "--simple-prompt --classic"
+                                               devdocs-current-docs '("pandas~2" "numpy~2.0" "python~3.13" "matplotlib"))))
   (require 's)
   (require 'dash)
   (defun python-get-treesit-def ()
@@ -495,11 +496,10 @@
             (insert (read-from-minibuffer (s-concat "Description for exception " exception ": ")))
             (call-interactively #'python-indent-shift-right))
           (newline-and-indent))))))
-(setq major-mode-remap-alist
-      '((python-mode . python-ts-mode)))
 
-(add-hook 'python-ts-mode-hook #'eglot-ensure)
-
+(use-package comint-mime
+  :hook ((shell-mode . comint-mime-setup)
+         (inferior-python-mode . comint-mime-setup)))
 
 (global-set-key [remap newline] #'newline-and-indent)
 
@@ -533,10 +533,10 @@
                       (car diags))))
 
   (advice-add 'eglot--report-to-flymake :filter-args #'my-filter-eglot-diagnostics))
+
 (use-package flymake-ruff
   :ensure t
   :hook (eglot-managed-mode . flymake-ruff-load))
-
 
 (use-package project
   :ensure nil
@@ -580,21 +580,19 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key [remap move-beginning-of-line]
                 'smarter-move-beginning-of-line)
 
-
 (setq dired-dwim-target t
       dired-auto-revert-buffer t
       dired-listing-switches "-alFh"
-      isearch-lazy-count t)
-
-(setq tramp-use-ssh-controlmaster-options nil)
+      isearch-lazy-count t
+      tramp-use-ssh-controlmaster-options nil
+      vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)
+      use-short-answers t)
 
 (use-package yaml-mode)
 
 (use-package csv-mode
   :hook (csv-mode . csv-align-mode))
 
-(setq vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
-(setq use-short-answers t)
 
 (use-package haskell-mode
   :bind (:map haskell-mode-map
@@ -683,12 +681,12 @@ point reaches the beginning or end of the buffer, stop there."
   :bind (("C-c a" . 'org-agenda-transient)
          ("C-c x" . 'org-capture-transient))
   :custom
-  (org-agenda-files '("/mnt/dufs/org/todo.org"))
-  (org-default-notes-file "/mnt/dufs/org/notes.org")
-  (org-directory "/mnt/dufs/org")
+  (org-agenda-files '("~/org/todo.org"))
+  (org-default-notes-file "~/org/notes.org")
+  (org-directory "~/org")
   (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
   :init
-  (setq org-agenda-capture-file "/mnt/dufs/org/todo.org")
+  (setq org-agenda-capture-file "~/org/todo.org")
   (defun org-setup-transient-interface ()
     (transient-define-prefix org-agenda-transient ()
       "Replace the org-agenda buffer by a transient."
@@ -722,6 +720,8 @@ point reaches the beginning or end of the buffer, stop there."
         ("H" "Habits tracker"
          (lambda () (interactive) (org-agenda nil "H")))]])
 
+
+
     (transient-define-prefix org-capture-transient ()
       "Org Capture Templates"
       ["Capture"
@@ -729,7 +729,10 @@ point reaches the beginning or end of the buffer, stop there."
        ("n" "Note" (lambda () (interactive) (org-capture nil "n")))
        ("t" "Todo" (lambda () (interactive) (org-capture nil "t")))]))
   (add-hook 'emacs-startup-hook #'org-setup-transient-interface))
-
+(add-hook 'org-agenda-mode-hook
+          (lambda ()
+            (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
+            (auto-save-mode)))
 
 (use-package org-menu
   :ensure (:host github :repo "sheijk/org-menu")
@@ -856,10 +859,11 @@ If the new path's directories does not exist, create them."
   :hook (gfm-mode))
 
 (use-package cylc-mode
-  :ensure nil
-  :commands (cylc-mode)
-  :load-path "lisp/")
-
+  :ensure (cylc-mode
+           :host github
+           :repo "cylc/cylc-flow"
+           :files ("cylc/flow/etc/syntax/cylc-mode.el"))
+  :mode ("suite.*\\.rc\\'" "\\.cylc\\'"))
 
 
 (use-package grip-mode
@@ -1097,3 +1101,23 @@ If the new path's directories does not exist, create them."
   :mode "\\.nix\\'"
 
   )
+(use-package org-download
+  :after org
+  :bind
+  (:map org-mode-map
+        (("s-Y" . org-download-screenshot)
+         ("s-y" . org-download-yank))))
+
+(use-package eldoc-box
+  :hook (eglot-managed-mode . eldoc-box-hover-at-point-mode))
+
+(use-package lookup
+  :ensure nil
+  :bind (("C-c l" . lookup/query))
+  :load-path "lisp/"
+  :init
+  ;; Embark integration
+  (with-eval-after-load 'embark
+    (define-key embark-symbol-map (kbd "l") #'lookup/query))
+  :config
+  (add-hook 'kill-emacs-hook #'lookup/save-query-history))
