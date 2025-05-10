@@ -15,6 +15,11 @@
         user = "jfa92";
         proxyJump = "lander2";
       };
+      vps = {
+        hostname = "139.99.195.31";
+        user = "jake";
+        port = 56303;
+      };
 
       maui = {
         hostname = "login.maui.nesi.org.nz";
