@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  environment.systemPackages = with pkgs; [ calibre ];
+  home.packages = with pkgs; [ calibre ];
 
   # Optional: Enable Calibre's content server if desired.
   # services.calibre-server = {
@@ -13,13 +13,6 @@
   # Optional: Configure Calibre's library location (if you don't want the default).
   # environment.variables.CALIBRE_CONFIG_DIRECTORY = "/path/to/calibre/config";
   # environment.variables.CALIBRE_LIBRARY_PATH = "/path/to/calibre/library";
-  hardware.udev.extraRules = ''
-    # Example for a Kindle device:
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="1949", MODE="0666"
-
-    # Udev rule for Kobo devices:
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="2237", MODE="0666"
-  '';
   # Optional: Add udev rules for ebook readers.
   # hardware.udev.extraRules = ''
   #   # Example for a Kindle device:
