@@ -346,6 +346,7 @@
     (add-to-list 'eshell-visual-commands "watch"))
   :config
   (bind-key "E" #'eshell embark-file-map)
+
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -516,7 +517,9 @@
 
 (setq-default abbrev-mode t)
 
+
 (use-package eglot
+  :ensure nil
   :custom
   (eglot-report-progress nil)
   :hook (nix-ts-mode . eglot-ensure)
@@ -1067,7 +1070,8 @@ If the new path's directories does not exist, create them."
 
 (use-package copilot
   :ensure (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
-  :custom (copilot-server-executable (executable-find "copilot-node-server"))
+  :custom (copilot-server-executable (executable-find "copilot-node-server")
+                                     copilot-idle-delay nil)
   :hook (prog-mode)
   :bind (:map copilot-completion-map
               ("M-y" . copilot-accept-completion-by-line)
@@ -1077,19 +1081,24 @@ If the new path's directories does not exist, create them."
               ("M->" . copilot-next-completion)
               ("M-<" . copilot-previous-completion)))
 
+
 (use-package copilot-chat
-  :ensure (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
-  :bind (:map global-map
-              ("C-c C-y" . copilot-chat-yank)
-              ("C-c M-y" . copilot-chat-yank-pop)
-              ("C-c C-M-y" . (lambda () (interactive) (copilot-chat-yank-pop -1))))
-  :after (request org markdown-mode))
+  :bind (("C-c C-y" . copilot-chat-yank)
+         ("C-c M-y" . copilot-chat-yank-pop)
+         ("C-c C-M-y" . (lambda () (interactive) (copilot-chat-yank-pop -1)))
+         ("C-c t" . copilot-chat))
+  :custom ((copilot-chat-model "claude-3.7-sonnet")
+           (copilot-chat-backend 'request)))
 
 (use-package jinx
   :ensure nil
   :hook (emacs-startup . global-jinx-mode)
   :bind (([remap ispell-word] . jinx-correct)
-         ("C-M-$" . jinx-languages)))
+         ("C-M-$" . jinx-languages))
+  :config
+  (with-eval-after-load 'embark
+    (dolist (map '(embark-symbol-map embark-identifier-map))
+      (bind-key "$" #'jinx-correct-word map))))
 
 (use-package flymake
   :ensure nil
