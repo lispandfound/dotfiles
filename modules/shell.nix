@@ -5,6 +5,7 @@
     aider-chat
     atool
     bat
+    bottom
     cargo
     copilot-node-server
     delta
