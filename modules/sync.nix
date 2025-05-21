@@ -1,33 +1,22 @@
 { config, pkgs, lib, ... }: {
-  environment.systemPackages = with pkgs; [ davfs2 mount umount ];
+  # Define the user mount unit
+  systemd.user.services.mount-dufs = {
+    Unit = {
+      Description = "Mount WebDAV at /mnt/dufs after pinging server";
+      After = [
+        "network-online.target"
+        "tailscaled.service"
+        "sys-subsystem-net-devices-tailscale0.device"
+      ];
+    };
+    Install = { WantedBy = [ "default.target" ]; };
 
-  users.users.davfs2 = {
-    isSystemUser = true;
-    group = "davfs2";
+    # Ensure the unit will run the mount when logging in
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.mount}/bin/mount /mnt/dufs";
+      RemainAfterExit = "true";
+    };
+
   };
-  users.groups.davfs2 = { };
-  environment.etc."davfs2/davfs2.conf".text = ''
-    use_locks 0
-    dav_group davfs2
-  '';
-
-  systemd.mounts = [{
-    where = "/mnt/dufs";
-    what = "https://media.tail7ee4b1.ts.net:5000";
-    options = "uid=1000,file_mode=0664,dir_mode=2775";
-    type = "davfs";
-  }];
-
-  # Mount unit for WebDAV (delayed until needed)
-  systemd.automounts = [{
-    description = "WebDAV Mount for dufs...";
-    requires = [ "tailscaled.service" ];
-    after = [
-      "tailscaled.service"
-      "sys-subsystem-net-devices-tailscale0.device"
-    ]; # Ensures Tailscale is up
-    wantedBy = [ "remote-fs.target" ]; # Ensures it's available after boot
-    where = "/mnt/dufs";
-    enable = true;
-  }];
 }

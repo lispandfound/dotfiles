@@ -9,15 +9,17 @@
     ../../modules/kitty.nix
     ../../modules/python.nix
     ../../modules/ssh.nix
+    ../../modules/sync.nix
   ];
   home.username = "jake";
   home.homeDirectory = "/home/jake";
 
   # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [ keepassxc safeeyes ];
+  home.packages = with pkgs; [ spotify keepassxc slack safeeyes celluloid ];
   programs.gnome-shell = {
     enable = true;
     extensions = [
+      { package = pkgs.gnomeExtensions.gsconnect; }
       { package = pkgs.gnomeExtensions.appindicator; }
       { package = pkgs.gnomeExtensions.tailscale-qs; }
     ];

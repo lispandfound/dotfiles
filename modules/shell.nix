@@ -2,12 +2,16 @@
 
 {
   home.packages = with pkgs; [
-    atool
     aider-chat
+    atool
     bat
+    bottom
+    cargo
+    copilot-node-server
     delta
     devenv
     direnv
+    dtach
     eza # A modern replacement for ‘ls’
     fd
     file
@@ -15,33 +19,32 @@
     fzf
     fzf # A command-line fuzzy finder
     gawk
+    gcc
     gh
     gnupg
     gnused
     gnutar
     jq # A lightweight and flexible command-line JSON processor
     nil
+    nodejs
     p7zip
+    pandoc
     ripgrep # recursively searches directories for a regex pattern
     rustc
-    gcc
-    cargo
     starship
     tldr
+    todo-txt-cli
     tree
     unzip
-    todo-txt-cli
     watchexec
     which
-    xz
     xan
+    xz
     yazi
+    zenith
     zip
     zoxide
-    zenith
     zstd
-    copilot-node-server
-    nodejs
   ];
 
   programs.eza = {

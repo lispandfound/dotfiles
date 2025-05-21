@@ -8,10 +8,18 @@
   };
   security.wrappers = {
     "mount.davfs" = {
-      setuid = true;
+      source = "${pkgs.davfs2}/bin/mount.davfs";
       owner = "root";
       group = "root";
-      source = "${pkgs.davfs2}/bin/mount.davfs";
+      permissions = "u+rx,g+rx,o+rx";
+      setuid = true;
+    };
+    "umount.davfs" = {
+      source = "${pkgs.davfs2}/bin/umount.davfs";
+      owner = "root";
+      group = "root";
+      permissions = "u+rx,g+rx,o+rx";
+      setuid = true;
     };
   };
   fileSystems."/mnt/dufs" = {
