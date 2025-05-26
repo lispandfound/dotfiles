@@ -15,7 +15,14 @@
   home.homeDirectory = "/home/jake";
 
   # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [ spotify keepassxc slack safeeyes celluloid ];
+  home.packages = with pkgs; [
+    spotify
+    keepassxc
+    slack
+    safeeyes
+    celluloid
+    thunderbird
+  ];
   programs.gnome-shell = {
     enable = true;
     extensions = [
