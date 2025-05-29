@@ -9,6 +9,7 @@
     ./hardware-configuration.nix
     ../../modules/nvidia.nix
     ../../modules/containers.nix
+    ../../modules/intel-alderlake.nix
   ];
 
   # Bootloader.
