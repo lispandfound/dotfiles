@@ -16,7 +16,7 @@
   home.homeDirectory = "/home/jake";
 
   # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [ keepassxc safeeyes zoom-us spotify ];
+  home.packages = with pkgs; [ keepassxc safeeyes zoom-us spotify discord ];
 
   programs.gnome-shell = {
     enable = true;
