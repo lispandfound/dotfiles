@@ -5,8 +5,7 @@
     enchant
     emacsPackages.jinx
     emacs-pgtk
-    hunspell
-    hunspellDicts.en-au
+    (hunspellWithDicts ([ hunspellDicts.en_AU-large ]))
     sqlite
     stow # to symlink emacs directory without having it read-only
   ];

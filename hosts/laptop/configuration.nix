@@ -10,7 +10,6 @@
     ../../modules/avahi.nix
     ../../modules/steam.nix
     ../../modules/tailscale.nix
-    ../../modules/sync.nix
   ];
 
   # Bootloader.
@@ -142,10 +141,6 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.11"; # Did you read the comment?
-  services.udev.extraHwdb = ''
-    evdev:atkbd:*
-      KEYBOARD_KEY_3a=esc
-  '';
 
   networking.firewall = rec {
     allowedTCPPortRanges = [

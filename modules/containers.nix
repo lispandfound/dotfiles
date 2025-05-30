@@ -6,10 +6,7 @@
       "kernel.unprivileged_userns_clone" = 1; # for apptainer
     };
   };
-  virtualisation.docker = {
-    enable = true;
-    setSocketVariable = true;
-  };
+  virtualisation.docker = { enable = true; };
   programs.singularity = {
     enable = true;
     package = pkgs.apptainer;

@@ -21,6 +21,7 @@ in {
     description = "MapBin service user";
     home = "/var/lib/mapbin";
     createHome = true;
+    extraGroups = [ "docker" ];
   };
 
   # Create a matching group
@@ -58,7 +59,7 @@ in {
         ${pkgs.docker}/bin/docker run \
           --rm \
           --name mapbin-container \
-          -p 127.0.0.1:3000:3000 \
+          -p 3000:3000 \
           -v ${mapDataPath}:/mapbin/map \
           ${mapbinImage}
       '';
@@ -74,5 +75,4 @@ in {
   networking.firewall.interfaces."wg0".allowedTCPPorts = [ 3000 ];
 
   # Ensure the system user is part of the docker group
-  users.users.${serviceUser}.extraGroups = [ "docker" ];
 }

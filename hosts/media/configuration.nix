@@ -11,6 +11,7 @@
     ../../modules/steam.nix
     ../../modules/containers.nix
     ../../modules/wireguard.nix
+    ../../modules/mapbin.nix
   ];
 
   # Bootloader.
@@ -51,7 +52,8 @@
 
   # Enable the GNOME Desktop Environment.
   programs.dconf.enable = true;
-  services.xserver.displayManager.gdm.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.desktopManager.plasma6.enable = true;
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "jake";
 

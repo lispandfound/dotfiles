@@ -10,20 +10,19 @@
     serverAliveCountMax = 2;
     controlPath = "~/.ssh/sockets/ssh_mux_%h_%p_%r";
     matchBlocks = {
-      mahuika = {
-        hostname = "login.mahuika.nesi.org.nz";
+      nesi = {
+        hostname = "login.hpc.nesi.org.nz";
         user = "jfa92";
-        proxyJump = "lander2";
+        proxyJump = "nesilander";
+      };
+      vps = {
+        hostname = "139.99.195.31";
+        user = "jake";
+        port = 56303;
       };
 
-      maui = {
-        hostname = "login.maui.nesi.org.nz";
-        user = "jfa92";
-        proxyJump = "lander2";
-      };
-
-      lander2 = {
-        hostname = "lander02.nesi.org.nz";
+      nesilander = {
+        hostname = "lander.hpc.nesi.org.nz";
         user = "jfa92";
       };
 

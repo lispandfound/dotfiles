@@ -10,6 +10,7 @@
     ../../modules/ssh.nix
     ../../modules/helix.nix
     ../../modules/minecraft.nix
+    ../../modules/calibre.nix
   ];
   home.username = "jake";
   home.homeDirectory = "/home/jake";
@@ -17,20 +18,16 @@
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [ keepassxc safeeyes zoom-us spotify ];
 
-  # programs.gnome-shell = {
-  #   enable = true;
-  #   extensions = [
-  #     { package = pkgs.gnomeExtensions.gsconnect; }
-  #     { package = pkgs.gnomeExtensions.hide-minimized; }
-  #     { package = pkgs.gnomeExtensions.appindicator; }
-  #   ];
-  # };
+  programs.gnome-shell = {
+    enable = true;
+    extensions = [
+      { package = pkgs.gnomeExtensions.gsconnect; }
+      { package = pkgs.gnomeExtensions.hide-minimized; }
+      { package = pkgs.gnomeExtensions.appindicator; }
+    ];
+  };
 
   services.kdeconnect.enable = true;
-
-  dconf.settings = {
-    "org/gnome/desktop/interface".text-scaling-factor = 1.25;
-  };
 
   # This value determines the home Manager release that your
   # configuration is compatible with. This helps avoid breakage
@@ -45,5 +42,4 @@
   # Let home Manager install and manage itself.
   programs.home-manager.enable = true;
 
-  services.syncthing = { enable = true; };
 }
