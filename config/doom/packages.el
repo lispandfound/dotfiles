@@ -50,5 +50,7 @@
 (package! pet)
 (package! igist)
 (package! cylc-mode :recipe (:host github
-                     :repo "cylc/cylc-flow"
-                     :files ("cylc/flow/etc/syntax/cylc-mode.el")))
+                             :repo "cylc/cylc-flow"
+                             :files ("cylc/flow/etc/syntax/cylc-mode.el")))
+(package! slurm-mode)
+(package! ox-slack)

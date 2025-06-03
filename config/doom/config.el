@@ -44,7 +44,7 @@
                  :underline nil
                  :slant 'normal
                  :weight 'regular
-                 :height 140
+                 :size 14.0
                  :width 'normal
                  :foundry "JB"
                  :family "JetBrainsMono Nerd Font"))
@@ -60,7 +60,11 @@
 (keyboard-translate ?\C-t ?\C-x)
 (keyboard-translate ?\C-x ?\C-t)
 (global-unset-key (kbd "C-t"))          ; unbind the transpose-char key because it annoys me
+(map! "C-t C-s" #'save-buffer) ; Occasionally C-x is C-t
+(setq tramp-use-connection-share nil)
 
+(use-package! slurm-script-mode)
+(use-package! slurm-mode)
 
 (map!
  "C-." #'embark-act
@@ -112,7 +116,7 @@
 (use-package! cylc-mode
   :mode ("suite.*\\.rc\\'" "\\.cylc\\'"))
 
-
+(use-package! ox-slack :after (org))
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
