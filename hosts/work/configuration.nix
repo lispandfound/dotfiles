@@ -7,10 +7,8 @@
 {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../modules/nvidia.nix
     ../../modules/containers.nix
-    ../../modules/tailscale.nix
-    ../../modules/sync-system.nix
+    ../../modules/nvidia.nix
   ];
 
   # Bootloader.
