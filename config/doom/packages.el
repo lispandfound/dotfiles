@@ -54,3 +54,5 @@
                              :files ("cylc/flow/etc/syntax/cylc-mode.el")))
 (package! slurm-mode)
 (package! ox-slack)
+(package! cmake-mode)
+(package! magit-lfs)
