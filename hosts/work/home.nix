@@ -18,6 +18,7 @@
   home.packages = with pkgs; [
     spotify
     keepassxc
+    kdotool
     slack
     safeeyes
     celluloid
