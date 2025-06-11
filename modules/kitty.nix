@@ -5,7 +5,7 @@
     settings = {
       allow_remote_control = true;
       enabled_layouts = "splits";
-      shell = "fish";
+      shell = "zsh";
       font_family = "JetbrainsMono Nerd Font";
       font_size = 14.0;
       background = "#fafafa";
