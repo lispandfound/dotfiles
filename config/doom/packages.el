@@ -56,3 +56,5 @@
 (package! ox-slack)
 (package! cmake-mode)
 (package! magit-lfs)
+(package! dwim-shell-command)
+(package! detached)
