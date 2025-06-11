@@ -42,7 +42,7 @@
     LC_TELEPHONE = "en_NZ.UTF-8";
     LC_TIME = "en_NZ.UTF-8";
   };
-  programs.fish.enable = true;
+  programs.zsh.enable = true;
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
@@ -89,7 +89,7 @@
       [
         #  thunderbird
       ];
-    shell = pkgs.fish;
+    shell = pkgs.zsh;
 
   };
 
