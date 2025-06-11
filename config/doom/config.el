@@ -57,8 +57,13 @@
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 
+
 (keyboard-translate ?\C-t ?\C-x)
 (keyboard-translate ?\C-x ?\C-t)
+(add-hook 'server-after-make-frame-hook
+          (lambda ()
+            (keyboard-translate ?\C-t ?\C-x)
+            (keyboard-translate ?\C-x ?\C-t)))
 (global-unset-key (kbd "C-t"))          ; unbind the transpose-char key because it annoys me
 (map! "C-t C-s" #'save-buffer) ; Occasionally C-x is C-t
 (setq tramp-use-connection-share nil)
