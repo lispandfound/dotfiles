@@ -54,7 +54,10 @@
     enableZshIntegration = true;
   };
 
-  programs.bat = { enable = true; };
+  programs.bat = {
+    enable = true;
+
+  };
 
   programs.fzf = {
     enable = true;
@@ -65,6 +68,10 @@
     enable = true;
     options = [ "--cmd" "cd" ];
   };
+  programs.direnv = {
+    enable = true;
+    enableZshIntegration = true;
+  };
 
   programs.zsh = {
     enable = true;
@@ -72,7 +79,12 @@
       # Load grml config first
       source ${pkgs.grml-zsh-config}/etc/zsh/zshrc
     '';
-    shellAliases = { ssh = "kitten ssh"; };
+    shellAliases = {
+      ssh = "kitten ssh";
+      rebuild = ''sudo nixos-rebuild switch --flake "$HOME/.dotfiles#work"'';
+      cat = "bat";
+      less = "bat --paging=always";
+    };
   };
 
 }
