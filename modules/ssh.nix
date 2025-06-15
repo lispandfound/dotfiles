@@ -26,6 +26,13 @@
         user = "jfa92";
       };
 
+      rch = {
+        hostname = "rch-login.canterbury.ac.nz";
+        user = "jfa92";
+        identityFile = "~/.ssh/id_rch";
+        identitiesOnly = true;
+      };
+
       hyp = {
         hostname = "hypocentre";
         user = "jfa92";

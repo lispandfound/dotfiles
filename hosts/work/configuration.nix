@@ -7,10 +7,8 @@
 {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../modules/nvidia.nix
     ../../modules/containers.nix
-    ../../modules/tailscale.nix
-    ../../modules/sync-system.nix
+    ../../modules/nvidia.nix
   ];
 
   # Bootloader.
@@ -44,13 +42,13 @@
     LC_TELEPHONE = "en_NZ.UTF-8";
     LC_TIME = "en_NZ.UTF-8";
   };
-  programs.fish.enable = true;
+  programs.zsh.enable = true;
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.desktopManager.plasma6.enable = true;
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
@@ -91,7 +89,7 @@
       [
         #  thunderbird
       ];
-    shell = pkgs.fish;
+    shell = pkgs.zsh;
 
   };
 

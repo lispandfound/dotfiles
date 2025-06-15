@@ -44,7 +44,7 @@
                  :underline nil
                  :slant 'normal
                  :weight 'regular
-                 :height 140
+                 :size 14.0
                  :width 'normal
                  :foundry "JB"
                  :family "JetBrainsMono Nerd Font"))
@@ -57,10 +57,19 @@
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 
+
 (keyboard-translate ?\C-t ?\C-x)
 (keyboard-translate ?\C-x ?\C-t)
+(add-hook 'server-after-make-frame-hook
+          (lambda ()
+            (keyboard-translate ?\C-t ?\C-x)
+            (keyboard-translate ?\C-x ?\C-t)))
 (global-unset-key (kbd "C-t"))          ; unbind the transpose-char key because it annoys me
+(map! "C-t C-s" #'save-buffer) ; Occasionally C-x is C-t
+(setq tramp-use-connection-share nil)
 
+(use-package! slurm-script-mode)
+(use-package! slurm-mode)
 
 (map!
  "C-." #'embark-act
@@ -112,6 +121,32 @@
 (use-package! cylc-mode
   :mode ("suite.*\\.rc\\'" "\\.cylc\\'"))
 
+(use-package! ox-slack :after (org))
+(use-package! cmake-mode)
+(use-package! magit-lfs
+  :after (magit))
+(use-package! dwim-shell-command
+  :ensure t
+  :bind (([remap shell-command] . dwim-shell-command)
+         :map dired-mode-map
+         ([remap dired-do-async-shell-command] . dwim-shell-command)
+         ([remap dired-do-shell-command] . dwim-shell-command)
+         ([remap dired-smart-shell-command] . dwim-shell-command)))
+
+(use-package! dwim-shell-commands :after dwim-shell-command)
+
+(use-package! detached
+  :init
+  (detached-init)
+  :bind (;; Replace `async-shell-command' with `detached-shell-command'
+         ([remap async-shell-command] . detached-shell-command)
+         ;; Replace `compile' with `detached-compile'
+         ([remap compile] . detached-compile)
+         ([remap recompile] . detached-compile-recompile)
+         ;; Replace built in completion of sessions with `consult'
+         ([remap detached-open-session] . detached-consult-session))
+  :custom ((detached-show-output-on-attach t)
+           (detached-terminal-data-command system-type)))
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
