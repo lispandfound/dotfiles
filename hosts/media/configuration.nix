@@ -9,10 +9,9 @@
     ./hardware-configuration.nix
     ../../modules/avahi.nix
     ../../modules/steam.nix
-    ../../modules/dufs.nix
-    ../../modules/immich.nix
-    ../../modules/flood.nix
-    ../../modules/tailscale.nix
+    ../../modules/containers.nix
+    ../../modules/wireguard.nix
+    ../../modules/mapbin.nix
   ];
 
   # Bootloader.
@@ -53,10 +52,10 @@
 
   # Enable the GNOME Desktop Environment.
   programs.dconf.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.desktopManager.plasma6.enable = true;
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "jake";
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -104,20 +103,16 @@
   programs.fish.enable = true;
   users.groups.media = { };
 
-  users.users.kodi = {
-    isNormalUser = true;
-    extraGroups = [ "media" ]; # Add user kodi to media group
-  };
   users.users.jake = {
     isNormalUser = true;
     description = "Jake Faulkner";
-    extraGroups = [ "networkmanager" "wheel" "media" ];
+    extraGroups = [ "networkmanager" "wheel" "media" "transmission" "org" ];
     packages = with pkgs;
       [
         #  thunderbird
         steam
       ];
-    shell = pkgs.fish;
+    shell = pkgs.bash;
   };
 
   # Install firefox.
@@ -168,18 +163,6 @@
       KEYBOARD_KEY_3a=esc
   '';
 
-  services.transmission = {
-    user = "jake";
-    enable = true; # Enable transmission daemon
-    openRPCPort = true; # Open firewall for RPC
-    settings = { # Override default settings
-      download-dir = "${config.services.transmission.home}/Downloads";
-      rpc-bind-address = "0.0.0.0"; # Bind to own IP
-      rpc-whitelist-enabled = false;
-      rpc-host-whitelist-enabled = false;
-      rpc-host-whitelist = [ "media.local" ];
-    };
-  };
   networking.firewall = rec {
     allowedTCPPortRanges = [
       {

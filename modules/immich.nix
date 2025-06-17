@@ -12,7 +12,6 @@
 
   containers.immichContainer = {
     autoStart = true;
-    ephemeral = true; # Reset on restart to minimize attack persistence
 
     bindMounts = {
       "/var/lib/immich" = {

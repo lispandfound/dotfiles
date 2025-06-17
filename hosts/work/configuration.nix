@@ -7,10 +7,8 @@
 {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../modules/nvidia.nix
     ../../modules/containers.nix
-    ../../modules/tailscale.nix
-    ../../modules/sync-system.nix
+    ../../modules/nvidia.nix
   ];
 
   # Bootloader.
@@ -44,7 +42,7 @@
     LC_TELEPHONE = "en_NZ.UTF-8";
     LC_TIME = "en_NZ.UTF-8";
   };
-  programs.fish.enable = true;
+  programs.zsh.enable = true;
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
@@ -91,7 +89,7 @@
       [
         #  thunderbird
       ];
-    shell = pkgs.fish;
+    shell = pkgs.zsh;
 
   };
 
