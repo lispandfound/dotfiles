@@ -9,6 +9,8 @@
     ./hardware-configuration.nix
     ../../modules/nvidia.nix
     ../../modules/containers.nix
+    ../../modules/intel-alderlake.nix
+    ../../modules/avahi.nix
   ];
 
   # Bootloader.
@@ -47,8 +49,19 @@
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.sddm.enable = true;
+  services.desktopManager.plasma6.enable = true;
+
+  services.openssh = {
+    enable = true;
+    ports = [ 22 ];
+    settings = {
+      PasswordAuthentication = true;
+      AllowUsers = [ "jake" ];
+      UseDns = true;
+      PermitRootLogin = "yes";
+    };
+  };
 
   # Configure keymap in X11
   services.xserver.xkb = {

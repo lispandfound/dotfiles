@@ -23,7 +23,7 @@
     enable = true;
     defaultEditor = true;
     settings = {
-      theme = "ayu_light"; # Set the theme
+      theme = "onedark"; # Set the theme
       editor = {
         jump-label-alphabet =
           "aoeuidhtnsfygpcrlqjkbxmwvz"; # Set jump label alphabet
