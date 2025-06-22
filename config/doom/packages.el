@@ -58,3 +58,7 @@
 (package! magit-lfs)
 (package! dwim-shell-command)
 (package! detached)
+(package! ghub
+	:pin "97a07691efad6fc16bc000a35be80d4f8dae251a" ; 4.3.2
+	;; ghub requires Emacs 29.1+
+	:disable (version< emacs-version "29.1")) ;; HACK: until https://github.com/doomemacs/doomemacs/pull/8422 merges
