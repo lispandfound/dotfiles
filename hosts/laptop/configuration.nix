@@ -8,8 +8,6 @@
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../../modules/avahi.nix
-    ../../modules/steam.nix
-    ../../modules/tailscale.nix
   ];
 
   # Bootloader.
@@ -48,6 +46,7 @@
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
+  boot.plymouth.enable = false;
 
   # Enable the GNOME Desktop Environment.
   # services.xserver.displayManager.gdm.enable = true;
@@ -85,7 +84,7 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  programs.fish.enable = true;
+  programs.zsh.enable = true;
 
   users.users.jake = {
     isNormalUser = true;
@@ -96,7 +95,7 @@
         #  thunderbird
         steam
       ];
-    shell = pkgs.fish;
+    shell = pkgs.zsh;
   };
 
   # Install firefox.

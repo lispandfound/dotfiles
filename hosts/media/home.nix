@@ -2,6 +2,7 @@
 
 {
   imports = [
+    ../../modules/emacs.nix
     ../../modules/helix.nix
     ../../modules/shell.nix
     ../../modules/git.nix
@@ -12,14 +13,10 @@
   home.homeDirectory = "/home/jake";
 
   # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [
+  home.packages = with pkgs;
+    [
 
-    kodi
-    keepassxc
-    syncthing
-    stremio
-
-  ];
+    ];
 
   programs.gnome-shell = {
     enable = true;
