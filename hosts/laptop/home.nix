@@ -14,7 +14,14 @@
   home.homeDirectory = "/home/jake";
 
   # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [ keepassxc syncthing kdotool safeeyes zoom-us ];
+  home.packages = with pkgs; [
+    keepassxc
+    syncthing
+    kdotool
+    safeeyes
+    slack
+    zoom-us
+  ];
 
   # programs.gnome-shell = {
   #   enable = true;
