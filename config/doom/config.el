@@ -165,6 +165,10 @@
                   (menu-bar-lines . t))))
 (when (modulep! :tools lookup)
   (add-to-list '+lookup-provider-url-alist '("Hoogle" "https://hoogle.mangoiv.com/?q=%s")))
+(defalias 'upcase-variable
+  (kmacro "C-= = C-x C-u"))
+(map! :leader "c u" 'upcase-variable)
+
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
