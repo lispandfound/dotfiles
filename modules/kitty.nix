@@ -7,6 +7,7 @@
       enabled_layouts = "splits";
       shell = "zsh";
       font_family = "JetbrainsMono Nerd Font";
+      font_size = 14.0;
       background = "#ffffff";
       foreground = "#262626";
       cursor = "#6fd2fc";
