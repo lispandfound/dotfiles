@@ -163,6 +163,8 @@
                   (height . 25)
                   (minibuffer . t)
                   (menu-bar-lines . t))))
+(when (modulep! :tools lookup)
+  (add-to-list '+lookup-provider-url-alist '("Hoogle" "https://hoogle.mangoiv.com/?q=%s")))
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
