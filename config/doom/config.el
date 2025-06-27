@@ -44,7 +44,7 @@
                  :underline nil
                  :slant 'normal
                  :weight 'regular
-                 :height 140
+                 :size 14.0
                  :width 'normal
                  :foundry "JB"
                  :family "JetBrainsMono Nerd Font"))
