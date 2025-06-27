@@ -58,3 +58,4 @@
 (package! magit-lfs)
 (package! dwim-shell-command)
 (package! detached)
+(package! edit-server)

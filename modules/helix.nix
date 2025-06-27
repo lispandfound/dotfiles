@@ -23,7 +23,7 @@
     enable = true;
     defaultEditor = true;
     settings = {
-      theme = "onedark"; # Set the theme
+      theme = "github_light"; # Set the theme
       editor = {
         jump-label-alphabet =
           "aoeuidhtnsfygpcrlqjkbxmwvz"; # Set jump label alphabet

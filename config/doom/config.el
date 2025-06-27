@@ -44,7 +44,7 @@
                  :underline nil
                  :slant 'normal
                  :weight 'regular
-                 :height 140
+                 :size 14.0
                  :width 'normal
                  :foundry "JB"
                  :family "JetBrainsMono Nerd Font"))
@@ -142,7 +142,56 @@
          ;; Replace built in completion of sessions with `consult'
          ([remap detached-open-session] . detached-consult-session))
   :custom ((detached-show-output-on-attach t)
+           (detached-notification-function (lambda (t) nil))
            (detached-terminal-data-command system-type)))
+
+
+
+
+(use-package! edit-server
+  :ensure t
+  :commands edit-server-start
+  :init (if after-init-time
+            (edit-server-start)
+          (add-hook 'after-init-hook
+                    #'(lambda() (edit-server-start))))
+  :config (setq edit-server-new-frame-alist
+                '((name . "Edit with Emacs FRAME")
+                  (top . 200)
+                  (left . 200)
+                  (width . 80)
+                  (height . 25)
+                  (minibuffer . t)
+                  (menu-bar-lines . t))))
+(when (modulep! :tools lookup)
+  (add-to-list '+lookup-provider-url-alist '("Hoogle" "https://hoogle.mangoiv.com/?q=%s")))
+;; TRAMP speedup
+(setq remote-file-name-inhibit-locks t
+      tramp-use-scp-direct-remote-copying t
+      remote-file-name-inhibit-auto-save-visited t
+      tramp-copy-size-limit (* 1024 1024)
+      tramp-verbose 2)
+
+(connection-local-set-profile-variables
+ 'remote-direct-async-process
+ '((tramp-direct-async-process . t)))
+
+
+(connection-local-set-profile-variables
+ '(:application tramp :protocol "scp")
+ 'remote-direct-async-process)
+
+(setq magit-tramp-pipe-stty-settings 'pty)
+
+(after! (tramp compile)
+  (remove-hook 'compilation-mode-hook #'tramp-compile-disable-ssh-controlmaster-options))
+
+(defalias 'upcase-variable
+  (kmacro "C-= = C-x C-u"))
+(map! :leader "c u" 'upcase-variable)
+
+
+
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.

@@ -81,8 +81,10 @@
     '';
     shellAliases = {
       ssh = "kitten ssh";
-      rebuild = ''sudo nixos-rebuild switch --flake "$HOME/.dotfiles#work"'';
+      rebuild =
+        ''sudo nixos-rebuild switch --flake "$HOME/.dotfiles#$(hostname)"'';
       cat = "bat";
+      conf = "hx ~/.dotfiles";
       less = "bat --paging=always";
     };
   };
