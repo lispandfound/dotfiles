@@ -1,12 +1,9 @@
 ;;; casual/config.el -*- lexical-binding: t; -*-
 
 
-;; (use-package! casual-suite
-;;   :defer t)
-
-(use-package! casual-calc  
-   :bind (:map calc-mode-map ("C-o" . casual-calc-tmenu))
-   :after (calc))
+(use-package! casual-calc
+  :bind (:map calc-mode-map ("C-o" . casual-calc-tmenu))
+  :after (calc))
 
 (use-package! casual-info
   :bind (:map Info-mode-map ("C-o" . casual-info-tmenu))
@@ -36,7 +33,6 @@
 (use-package! casual-isearch
   :bind (:map isearch-mode-map ("C-o" . casual-isearch-tmenu)))
 
-
 (use-package! casual-ibuffer
   :bind (:map
          ibuffer-mode-map
@@ -52,9 +48,10 @@
          ("$" . ibuffer-toggle-filter-group))  ; optional
   :after (ibuffer))
 
+(use-package! casual-image
+  :bind (:map image-mode-map ("C-o" . casual-image-tmenu)))
 
 (use-package! casual-bookmarks
-  :ensure nil
   :bind (:map bookmark-bmenu-mode-map
               ("C-o" . casual-bookmarks-tmenu)
               ("S" . casual-bookmarks-sortby-tmenu)
