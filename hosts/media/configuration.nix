@@ -100,7 +100,7 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  programs.fish.enable = true;
+  programs.zsh.enable = true;
   users.groups.media = { };
 
   users.users.jake = {
@@ -112,7 +112,7 @@
         #  thunderbird
         steam
       ];
-    shell = pkgs.bash;
+    shell = pkgs.zsh;
   };
 
   # Install firefox.
