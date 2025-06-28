@@ -14,9 +14,6 @@
   dconf.settings = {
     "org/gnome/desktop/input-sources".xkb-options = [ "caps:ctrl_modifier" ];
   };
-  services.emacs = {
-    enable = true;
-    package = pkgs.emacs-pgtk;
-  };
+  services.emacs = { package = pkgs.emacs-pgtk; };
 
 }

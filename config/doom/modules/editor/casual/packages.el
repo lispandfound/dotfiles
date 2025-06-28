@@ -1,1 +1,2 @@
-(package! casual-suite)
+(package! casual)
+(package! casual-avy)
