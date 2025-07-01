@@ -1,5 +1,13 @@
 { config, pkgs, ... }: {
-  home.packages = with pkgs; [ gitu git delta meld wl-clipboard jujutsu ];
+  home.packages = with pkgs; [
+    gitu
+    git
+    git-lfs
+    delta
+    meld
+    wl-clipboard
+    jujutsu
+  ];
 
   programs.git = {
     enable = true;

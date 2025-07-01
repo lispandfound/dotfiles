@@ -2,18 +2,21 @@
 
 {
   home.packages = with pkgs; [
-    enchant
+    (enchant.override {
+      withAspell = false;
+      withHspell = false;
+    })
+    nuspell
     emacsPackages.jinx
     emacs-pgtk
-    (hunspellWithDicts ([ hunspellDicts.en_AU-large ]))
+    hunspellDicts.en_AU-large
     sqlite
-    stow # to symlink emacs directory without having it read-only
-    kdotool
-    dotool
+    stow
   ];
+
   dconf.settings = {
     "org/gnome/desktop/input-sources".xkb-options = [ "caps:ctrl_modifier" ];
   };
-  services.emacs = { package = pkgs.emacs-pgtk; };
 
+  services.emacs = { package = pkgs.emacs-pgtk; };
 }
