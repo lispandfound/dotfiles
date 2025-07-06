@@ -525,6 +525,7 @@ point reaches the beginning or end of the buffer, stop there."
 (add-to-list 'display-buffer-alist '("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom))))
 
 (use-package exec-path-from-shell
+  :demand t
   :config
   (exec-path-from-shell-initialize))
 
@@ -947,30 +948,7 @@ If the new path's directories does not exist, create them."
 (use-package jenkinsfile-mode)
 
 
-(use-package copilot
-  :ensure (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
-  :custom (copilot-server-executable (executable-find "copilot-node-server")
-                                     copilot-idle-delay nil)
-  :hook (prog-mode)
-  :bind (:map copilot-completion-map
-              ("M-y" . copilot-accept-completion-by-line)
-              ("M-Y" . copilot-accept-completion)
-              ("M-J" . copilot-next-completion)
-              ("M-K" . copilot-previous-completion)
-              ("M->" . copilot-next-completion)
-              ("M-<" . copilot-previous-completion)))
-
-
-(use-package copilot-chat
-  :bind (("C-c C-y" . copilot-chat-yank)
-         ("C-c M-y" . copilot-chat-yank-pop)
-         ("C-c C-M-y" . (lambda () (interactive) (copilot-chat-yank-pop -1)))
-         ("C-c t" . copilot-chat))
-  :custom ((copilot-chat-model "claude-4-sonnet")
-           (copilot-chat-backend 'request)))
-
 (use-package jinx
-  :ensure nil
   :custom (jinx-languages "en_AU")
   :hook (emacs-startup . global-jinx-mode)
   :bind (([remap ispell-word] . jinx-correct)
@@ -1135,3 +1113,20 @@ If the new path's directories does not exist, create them."
 (with-eval-after-load 'tramp
   (with-eval-after-load 'compile
     (remove-hook 'compilation-mode-hook #'tramp-compile-disable-ssh-controlmaster-options)))
+(use-package rust-mode
+  :ensure t
+  :mode ("\\.rs\\'" . rust-mode)
+  :hook (rust-mode . (lambda ()
+                       ;; Sensible indentation for Rust
+                       (setq indent-tabs-mode nil)
+                       (setq tab-width 4)
+                       ;; Enable electric indent mode (usually on by default)
+                       (electric-indent-mode 1)
+                       ;; Prettify symbols (optional, but nice for things like -> to →)
+                       (prettify-symbols-mode)
+                       ;; Format on save with rustfmt (requires rustfmt to be installed)
+                       (setq rust-format-on-save t)
+                       )))
+
+
+(use-package flymake-collection)

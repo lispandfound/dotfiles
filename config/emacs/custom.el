@@ -5,7 +5,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(casual-lib-use-unicode t)
- '(compile-command "just ")
  '(consult-narrow-key "<")
  '(dired-compress-file-default-suffix ".xz")
  '(display-line-numbers t)
@@ -77,6 +76,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#ffffff" :foreground "#000000" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 140 :width normal :foundry "JB" :family "JetBrainsMono Nerd Font"))))
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#ffffff" :foreground "#000000" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 110 :width normal :foundry "JB" :family "JetBrainsMono Nerd Font"))))
  '(mode-line ((t (:box (:line-width (2 . 6) :style flat-button)))))
  '(mode-line-inactive ((t (:box (:line-width (2 . 6) :style flat-button))))))
