@@ -624,6 +624,7 @@ point reaches the beginning or end of the buffer, stop there."
 (add-to-list 'display-buffer-alist '("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom))))
 
 (use-package exec-path-from-shell
+  :demand t
   :config
   (exec-path-from-shell-initialize))
 
