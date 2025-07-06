@@ -1047,30 +1047,7 @@ If the new path's directories does not exist, create them."
 (use-package jenkinsfile-mode)
 
 
-(use-package copilot
-  :ensure (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
-  :custom (copilot-server-executable (executable-find "copilot-node-server")
-                                     copilot-idle-delay nil)
-  :hook (prog-mode)
-  :bind (:map copilot-completion-map
-              ("M-y" . copilot-accept-completion-by-line)
-              ("M-Y" . copilot-accept-completion)
-              ("M-J" . copilot-next-completion)
-              ("M-K" . copilot-previous-completion)
-              ("M->" . copilot-next-completion)
-              ("M-<" . copilot-previous-completion)))
-
-
-(use-package copilot-chat
-  :bind (("C-c C-y" . copilot-chat-yank)
-         ("C-c M-y" . copilot-chat-yank-pop)
-         ("C-c C-M-y" . (lambda () (interactive) (copilot-chat-yank-pop -1)))
-         ("C-c t" . copilot-chat))
-  :custom ((copilot-chat-model "claude-4-sonnet")
-           (copilot-chat-backend 'request)))
-
 (use-package jinx
-  :ensure nil
   :custom (jinx-languages "en_AU")
   :hook (emacs-startup . global-jinx-mode)
   :bind (([remap ispell-word] . jinx-correct)
