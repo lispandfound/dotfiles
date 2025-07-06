@@ -380,14 +380,14 @@
 (use-package treesit-auto
   :custom
   (treesit-auto-install 'prompt)
+
   :hook (after-init . global-treesit-auto-mode)
   :config
-  (treesit-auto-add-to-auto-mode-aoalist 'all))
+  (treesit-auto-add-to-auto-mode-alist 'all))
 
 (use-package python
   :ensure nil
   :bind (:map python-ts-mode-map
-              ("M-n" . insert-numpydoc)
               (:repeat-map python-indent-shift-right-repeat-map
                            (">" . python-indent-shift-right)
                            ("<" . python-indent-shift-left)))
