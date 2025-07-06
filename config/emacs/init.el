@@ -400,115 +400,16 @@
   (add-hook 'python-ts-mode-hook #'eglot-ensure)
   (add-hook 'python-ts-mode-hook (lambda ()
                                    (setq-local transpose-sexps-function #'treesit-transpose-sexps
-                                               python-shell-interpreter "ipython"
                                                python-shell-interpreter-args "--simple-prompt --classic"
-                                               devdocs-current-docs '("pandas~2" "numpy~2.0" "python~3.13" "matplotlib"))))
-  (require 's)
-  (require 'dash)
-  (defun python-get-treesit-def ()
-    (treesit-parent-until (treesit-node-at (point)) (lambda (node) (or (s-equals? (treesit-node-type node) "function_definition")
-                                                                       (s-equals? (treesit-node-type node) "class_definition")))))
+                                               devdocs-current-docs '("pandas~2" "numpy~2.0" "python~3.13" "matplotlib")))))
 
-  (defun python-parameters (node)
-    (if-let ((parameters (treesit-node-child-by-field-name node "parameters")))
-        (-map (lambda (node) (cons (python-parameter-name node) (python-parameter-type node)))
-              (-filter #'python-parameter-name (treesit-node-children  parameters t)))))
 
-  (defun python-function-is-method-p (node)
-    (if-let ((grandparent (treesit-node-parent (treesit-node-parent node))))
-        (s-equals? (treesit-node-type grandparent) "class_definition")))
-
-  (defun python-parameter-name (node)
-    (if-let ((parameter-name (treesit-node-text (treesit-search-subtree node "identifier"))))
-        (substring-no-properties parameter-name)))
-  (defun python-annotated-type-extraction (node)
-    (alist-get 't (treesit-query-capture node '(((type (generic_type (identifier ) @gener (type_parameter (type (identifier) @t) _)))
-                                                 (:match "Annotated" @gener))))))
-
-  (defun python-parameter-type (node)
-    (if-let ((parameter-type (treesit-node-text (treesit-node-child-by-field-name node "type"))))
-        (let ((unannotated-type (python-annotated-type-extraction (treesit-node-child-by-field-name node "type"))))
-          (s-replace-regexp "[[:space:]\n]+" " " (substring-no-properties (if unannotated-type (treesit-node-text unannotated-type) parameter-type))))))
-
-  (defun python-return-type (node)
-    (if-let ((return (treesit-node-text (treesit-node-child-by-field-name node "return_type"))))
-        (s-replace-regexp "[[:space:]\n]+" " " (substring-no-properties return))))
-
-  (defun python-extract-docstring (node)
-    (alist-get 'c (treesit-query-capture (python-get-treesit-def) '((function_definition) body: (block :anchor (expression_statement (string) @c))))))
-
-  (defun python-raises (node)
-    (-map (lambda (node) (treesit-node-text (cdr node))) (treesit-query-capture node '((raise_statement (call function: (_) @e))))))
-
-  (defun insert-numpydoc ()
-    (interactive)
-    (save-excursion
-      (let* ((function-definition (python-get-treesit-def))
-             (parameters (-filter (lambda (param) (or (not (python-function-is-method-p function-definition))
-                                                      (and
-                                                       (not (s-equals? (car param) "self"))
-                                                       (not (s-equals? (car param) "cls")))))
-                                  (python-parameters function-definition)))
-             (return (python-return-type function-definition))
-             (raises (python-raises function-definition))
-             (existing-doc (python-extract-docstring function-definition)))
-        (when (and existing-doc (yes-or-no-p "Overwrite Existing Docstring "))
-          (delete-region  (treesit-node-start existing-doc) (treesit-node-end existing-doc)))
-        (goto-char (treesit-node-start (treesit-node-child-by-field-name function-definition "body")))
-        (insert "\"\"\"")
-        (newline-and-indent)
-        (insert "\"\"\"")
-        (newline-and-indent)
-        (previous-line 2)
-        (end-of-line)
-        (let ((description (s-trim (read-from-minibuffer "Short Description: "))))
-          (insert description)
-          (unless (s-equals? (substring description -1) ".")
-            (insert ".")))
-        (newline-and-indent 2)
-        (insert (read-from-minibuffer "Long Description: "))
-        (fill-paragraph)
-        (when parameters
-          (newline-and-indent 2)
-          (insert "Parameters")
-          (newline-and-indent)
-          (insert "----------")
-          (newline-and-indent)
-          (dolist (parameter parameters)
-            (let ((name (car parameter))
-                  (type (cdr parameter)))
-              (insert name)
-              (when type
-                (insert " : ")
-                (insert type)
-                )
-              (newline-and-indent)
-              (insert (read-from-minibuffer (s-concat "Description for " name ": ")))
-
-              (call-interactively #'python-indent-shift-right))
-            (newline-and-indent)))
-        (when (and return (not (s-equals? return "None")))
-          (newline-and-indent 2)
-          (insert "Returns")
-          (newline-and-indent)
-          (insert "-------")
-          (newline-and-indent)
-          (insert return)
-          (newline-and-indent)
-          (insert (read-from-minibuffer "Description of return value: "))
-          (call-interactively #'python-indent-shift-right))
-        (when raises
-          (newline-and-indent 2)
-          (insert "Raises")
-          (newline-and-indent)
-          (insert "------")
-          (newline-and-indent)
-          (dolist (exception raises)
-            (insert exception)
-            (newline-and-indent)
-            (insert (read-from-minibuffer (s-concat "Description for exception " exception ": ")))
-            (call-interactively #'python-indent-shift-right))
-          (newline-and-indent))))))
+(use-package python-numpydoc
+  :ensure nil
+  :after (python)
+  :load-path "lisp/"
+  :bind (:map python-ts-mode-map
+              ("M-n" . python-numpydoc-insert)))
 
 (use-package comint-mime
   :hook ((shell-mode . comint-mime-setup)
@@ -1206,9 +1107,13 @@ If the new path's directories does not exist, create them."
   (add-hook 'python-base-mode-hook 'pet-mode -10)
   (add-hook 'python-mode-hook
             (lambda ()
-              (setq-local python-shell-interpreter (pet-executable-find "python")
+              (setq-local python-shell-interpreter (pet-executable-find "ipython")
                           python-shell-virtualenv-root (pet-virtualenv-root))))
   (add-hook 'python-mode-hook 'pet-flycheck-setup))
+
+(use-package deadgrep
+  :bind (("<f5>" . #'deadgrep)
+         ("C-x p g" . #'deadgrep)))
 
 (setq remote-file-name-inhibit-locks t
       tramp-use-scp-direct-remote-copying t
