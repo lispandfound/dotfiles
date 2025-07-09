@@ -1132,3 +1132,19 @@ If the new path's directories does not exist, create them."
 (use-package flymake-collection)
 (put 'narrow-to-region 'disabled nil)
 (setq bookmark-save-flag 1)
+
+
+(use-package edit-server
+  :commands edit-server-start
+  :init (if after-init-time
+            (edit-server-start)
+          (add-hook 'after-init-hook
+                    #'(lambda() (edit-server-start))))
+  :config (setq edit-server-new-frame-alist
+                '((name . "Edit with Emacs FRAME")
+                  (top . 200)
+                  (left . 200)
+                  (width . 80)
+                  (height . 25)
+                  (minibuffer . t)
+                  (menu-bar-lines . t))))
