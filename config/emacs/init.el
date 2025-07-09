@@ -380,9 +380,9 @@
 (use-package treesit-auto
   :custom
   (treesit-auto-install 'prompt)
-
-  :hook (after-init . global-treesit-auto-mode)
+  :demand t
   :config
+  (global-treesit-auto-mode)
   (treesit-auto-add-to-auto-mode-alist 'all))
 
 (use-package python
@@ -402,6 +402,8 @@
                                    (setq-local transpose-sexps-function #'treesit-transpose-sexps
                                                python-shell-interpreter-args "--simple-prompt --classic"
                                                devdocs-current-docs '("pandas~2" "numpy~2.0" "python~3.13" "matplotlib")))))
+
+(use-package cython-mode)
 
 
 (use-package python-numpydoc
@@ -1088,6 +1090,8 @@ If the new path's directories does not exist, create them."
               (setq-local python-shell-interpreter (pet-executable-find "ipython")
                           python-shell-virtualenv-root (pet-virtualenv-root))))
   (add-hook 'python-mode-hook 'pet-flycheck-setup))
+
+
 
 (use-package deadgrep
   :bind (("<f5>" . #'deadgrep)
