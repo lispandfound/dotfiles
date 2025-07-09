@@ -1131,3 +1131,4 @@ If the new path's directories does not exist, create them."
 
 (use-package flymake-collection)
 (put 'narrow-to-region 'disabled nil)
+(setq bookmark-save-flag 1)
