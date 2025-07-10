@@ -1225,3 +1225,4 @@ If the new path's directories does not exist, create them."
 
 
 (use-package flymake-collection)
+(put 'downcase-region 'disabled nil)
