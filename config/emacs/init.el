@@ -397,7 +397,6 @@
   :config
 
 
-  (add-hook 'python-ts-mode-hook #'eglot-ensure)
   (add-hook 'python-ts-mode-hook (lambda ()
                                    (setq-local transpose-sexps-function #'treesit-transpose-sexps
                                                python-shell-interpreter-args "--simple-prompt --classic"
@@ -440,10 +439,7 @@
   (eglot-report-progress nil)
   :hook (nix-ts-mode . eglot-ensure)
   :config
-  (setq-default eglot-workspace-configuration
-                '(:ruff (:enabled t :formatEnabled :json-false :extendSelect "I")
-                        :basedpyright (:typeCheckingMode "standard"))
-                )
+  (setq-default eglot-workspace-configuration '(:basedpyright (:typeCheckingMode "standard")))
   (add-to-list 'eglot-server-programs '(nix-ts-mode . ("nil")))
 
   (defun my-filter-eglot-diagnostics (diags)
@@ -1083,13 +1079,20 @@ If the new path's directories does not exist, create them."
 (use-package cmake-mode)
 
 (use-package pet
-  :config
+  :init
   (add-hook 'python-base-mode-hook 'pet-mode -10)
-  (add-hook 'python-mode-hook
+  (add-hook 'python-base-mode-hook
             (lambda ()
-              (setq-local python-shell-interpreter (pet-executable-find "ipython")
-                          python-shell-virtualenv-root (pet-virtualenv-root))))
-  (add-hook 'python-mode-hook 'pet-flycheck-setup))
+              (setq-local python-shell-interpreter (or (pet-executable-find "ipython") (pet-executable-find "python"))
+                          python-shell-virtualenv-root (pet-virtualenv-root)
+                          eglot-server-programs `(((python-base-mode python-mode python-ts-mode) ,(pet-executable-find "basedpyright-langserver") "--stdio")))
+              (setq-local apheleia-formatters `((ruff ,(pet-executable-find "ruff") "format" "--silent"
+                                                      (apheleia-formatters-fill-column "--line-length")
+                                                      "--stdin-filename" filepath "-")
+                                                (ruff-isort ,(pet-executable-find "ruff") "check" "-n" "--select" "I" "--fix" "--fix-only"
+                                                            "--stdin-filename" filepath "-")))
+
+              (eglot-ensure))))
 
 
 
