@@ -1,0 +1,50 @@
+cmake-mode
+
+(min "cmake_minimum_required(VERSION " p ")")
+(project "project(" p " VERSION " p " LANGUAGES CXX)")
+(add_executable "add_executable(" p " " p ")")
+(add_library "add_library(" p " " p ")")
+(target_sources "target_sources(" p " PRIVATE" n> p ")")
+(target_include "target_include_directories(" p " PRIVATE" n> p ")")
+(target_compile "target_compile_options(" p " PRIVATE" n> p ")")
+(target_link "target_link_libraries(" p " PRIVATE" n> p ")")
+(find_package "find_package(" p " REQUIRED)")
+(include_directories "include_directories(" p ")")
+(link_directories "link_directories(" p ")")
+(install_target "install(TARGETS " p " DESTINATION " p ")")
+(configure_file "configure_file(" p " " p " @ONLY)")
+(set "set(" p " " p ")")
+(option "option(" p " \"" p "\" " p ")")
+(if "if(" p ")" n> p n> "endif()")
+(ifelse "if(" p ")" n> p n> "else()" n> q n> "endif()")
+(function "function(" p ")" n> p n> "endfunction()")
+(macro "macro(" p ")" n> p n> "endmacro()")
+(foreach "foreach(" p " IN LISTS " p ")" n> p n> "endforeach()")
+(message "message(" p ")")
+(message-status "message(STATUS \"" p "\")")
+(message-warning "message(WARNING \"" p "\")")
+(message-fatal "message(FATAL_ERROR \"" p "\")")
+(add_subdirectory "add_subdirectory(" p ")")
+(enable_testing "enable_testing()")
+(add_test "add_test(NAME " p " COMMAND " p ")")
+
+
+text-mode
+
+(box "┌─" (make-string (length str) ?─) "─┐" n
+     "│ " (s str)                       " │" n
+     "└─" (make-string (length str) ?─) "─┘" n)
+(abox "+-" (make-string (length str) ?-) "-+" n
+      "| " (s str)                       " |" n
+      "+-" (make-string (length str) ?-) "-+" n)
+
+fundamental-mode ;; Available everywhere
+
+(today (format-time-string "%Y-%m-%d"))
+
+prog-mode
+
+(fixme (if (derived-mode-p 'emacs-lisp-mode) ";; " comment-start) "FIXME ")
+(todo (if (derived-mode-p 'emacs-lisp-mode) ";; " comment-start) "TODO ")
+(bug (if (derived-mode-p 'emacs-lisp-mode) ";; " comment-start) "BUG ")
+(hack (if (derived-mode-p 'emacs-lisp-mode) ";; " comment-start) "HACK ")
