@@ -380,14 +380,14 @@
 (use-package treesit-auto
   :custom
   (treesit-auto-install 'prompt)
-  :hook (after-init . global-treesit-auto-mode)
+  :demand t
   :config
-  (treesit-auto-add-to-auto-mode-aoalist 'all))
+  (global-treesit-auto-mode)
+  (treesit-auto-add-to-auto-mode-alist 'all))
 
 (use-package python
   :ensure nil
   :bind (:map python-ts-mode-map
-              ("M-n" . insert-numpydoc)
               (:repeat-map python-indent-shift-right-repeat-map
                            (">" . python-indent-shift-right)
                            ("<" . python-indent-shift-left)))
@@ -397,118 +397,20 @@
   :config
 
 
-  (add-hook 'python-ts-mode-hook #'eglot-ensure)
   (add-hook 'python-ts-mode-hook (lambda ()
                                    (setq-local transpose-sexps-function #'treesit-transpose-sexps
-                                               python-shell-interpreter "ipython"
                                                python-shell-interpreter-args "--simple-prompt --classic"
-                                               devdocs-current-docs '("pandas~2" "numpy~2.0" "python~3.13" "matplotlib"))))
-  (require 's)
-  (require 'dash)
-  (defun python-get-treesit-def ()
-    (treesit-parent-until (treesit-node-at (point)) (lambda (node) (or (s-equals? (treesit-node-type node) "function_definition")
-                                                                       (s-equals? (treesit-node-type node) "class_definition")))))
+                                               devdocs-current-docs '("pandas~2" "numpy~2.0" "python~3.13" "matplotlib")))))
 
-  (defun python-parameters (node)
-    (if-let ((parameters (treesit-node-child-by-field-name node "parameters")))
-        (-map (lambda (node) (cons (python-parameter-name node) (python-parameter-type node)))
-              (-filter #'python-parameter-name (treesit-node-children  parameters t)))))
+(use-package cython-mode)
 
-  (defun python-function-is-method-p (node)
-    (if-let ((grandparent (treesit-node-parent (treesit-node-parent node))))
-        (s-equals? (treesit-node-type grandparent) "class_definition")))
 
-  (defun python-parameter-name (node)
-    (if-let ((parameter-name (treesit-node-text (treesit-search-subtree node "identifier"))))
-        (substring-no-properties parameter-name)))
-  (defun python-annotated-type-extraction (node)
-    (alist-get 't (treesit-query-capture node '(((type (generic_type (identifier ) @gener (type_parameter (type (identifier) @t) _)))
-                                                 (:match "Annotated" @gener))))))
-
-  (defun python-parameter-type (node)
-    (if-let ((parameter-type (treesit-node-text (treesit-node-child-by-field-name node "type"))))
-        (let ((unannotated-type (python-annotated-type-extraction (treesit-node-child-by-field-name node "type"))))
-          (s-replace-regexp "[[:space:]\n]+" " " (substring-no-properties (if unannotated-type (treesit-node-text unannotated-type) parameter-type))))))
-
-  (defun python-return-type (node)
-    (if-let ((return (treesit-node-text (treesit-node-child-by-field-name node "return_type"))))
-        (s-replace-regexp "[[:space:]\n]+" " " (substring-no-properties return))))
-
-  (defun python-extract-docstring (node)
-    (alist-get 'c (treesit-query-capture (python-get-treesit-def) '((function_definition) body: (block :anchor (expression_statement (string) @c))))))
-
-  (defun python-raises (node)
-    (-map (lambda (node) (treesit-node-text (cdr node))) (treesit-query-capture node '((raise_statement (call function: (_) @e))))))
-
-  (defun insert-numpydoc ()
-    (interactive)
-    (save-excursion
-      (let* ((function-definition (python-get-treesit-def))
-             (parameters (-filter (lambda (param) (or (not (python-function-is-method-p function-definition))
-                                                      (and
-                                                       (not (s-equals? (car param) "self"))
-                                                       (not (s-equals? (car param) "cls")))))
-                                  (python-parameters function-definition)))
-             (return (python-return-type function-definition))
-             (raises (python-raises function-definition))
-             (existing-doc (python-extract-docstring function-definition)))
-        (when (and existing-doc (yes-or-no-p "Overwrite Existing Docstring "))
-          (delete-region  (treesit-node-start existing-doc) (treesit-node-end existing-doc)))
-        (goto-char (treesit-node-start (treesit-node-child-by-field-name function-definition "body")))
-        (insert "\"\"\"")
-        (newline-and-indent)
-        (insert "\"\"\"")
-        (newline-and-indent)
-        (previous-line 2)
-        (end-of-line)
-        (let ((description (s-trim (read-from-minibuffer "Short Description: "))))
-          (insert description)
-          (unless (s-equals? (substring description -1) ".")
-            (insert ".")))
-        (newline-and-indent 2)
-        (insert (read-from-minibuffer "Long Description: "))
-        (fill-paragraph)
-        (when parameters
-          (newline-and-indent 2)
-          (insert "Parameters")
-          (newline-and-indent)
-          (insert "----------")
-          (newline-and-indent)
-          (dolist (parameter parameters)
-            (let ((name (car parameter))
-                  (type (cdr parameter)))
-              (insert name)
-              (when type
-                (insert " : ")
-                (insert type)
-                )
-              (newline-and-indent)
-              (insert (read-from-minibuffer (s-concat "Description for " name ": ")))
-
-              (call-interactively #'python-indent-shift-right))
-            (newline-and-indent)))
-        (when (and return (not (s-equals? return "None")))
-          (newline-and-indent 2)
-          (insert "Returns")
-          (newline-and-indent)
-          (insert "-------")
-          (newline-and-indent)
-          (insert return)
-          (newline-and-indent)
-          (insert (read-from-minibuffer "Description of return value: "))
-          (call-interactively #'python-indent-shift-right))
-        (when raises
-          (newline-and-indent 2)
-          (insert "Raises")
-          (newline-and-indent)
-          (insert "------")
-          (newline-and-indent)
-          (dolist (exception raises)
-            (insert exception)
-            (newline-and-indent)
-            (insert (read-from-minibuffer (s-concat "Description for exception " exception ": ")))
-            (call-interactively #'python-indent-shift-right))
-          (newline-and-indent))))))
+(use-package python-numpydoc
+  :ensure nil
+  :after (python)
+  :load-path "lisp/"
+  :bind (:map python-ts-mode-map
+              ("M-n" . python-numpydoc-insert)))
 
 (use-package comint-mime
   :hook ((shell-mode . comint-mime-setup)
@@ -516,14 +418,41 @@
 
 (global-set-key [remap newline] #'newline-and-indent)
 
-(use-package skempo
-  :demand t
-  :ensure (:host github :repo "xFA25E/skempo")
-  :config
-  (global-set-key (kbd "C-c C-n") #'tempo-forward-mark)
-  (global-set-key (kbd "C-c C-p") #'tempo-backward-mark)
-  (load (concat user-emacs-directory "skempo/python.el"))
-  (load (concat user-emacs-directory "skempo/markdown.el")))
+;; Configure Tempel
+(use-package tempel
+  ;; Require trigger prefix before template name when completing.
+  ;; :custom
+  ;; (tempel-trigger-prefix "<")
+
+  :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+         ("M-*" . tempel-insert))
+
+  :init
+
+  ;; Setup completion at point
+  (defun tempel-setup-capf ()
+    ;; Add the Tempel Capf to `completion-at-point-functions'.
+    ;; `tempel-expand' only triggers on exact matches. Alternatively use
+    ;; `tempel-complete' if you want to see all matches, but then you
+    ;; should also configure `tempel-trigger-prefix', such that Tempel
+    ;; does not trigger too often when you don't expect it. NOTE: We add
+    ;; `tempel-expand' *before* the main programming mode Capf, such
+    ;; that it will be tried first.
+    (setq-local completion-at-point-functions
+                (cons #'tempel-expand
+                      completion-at-point-functions)))
+
+  (add-hook 'conf-mode-hook 'tempel-setup-capf)
+  (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'text-mode-hook 'tempel-setup-capf)
+
+  ;; Optionally make the Tempel templates available to Abbrev,
+  ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+  ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+  ;; (global-tempel-abbrev-mode)
+  )
+
+(use-package tempel-collection)
 
 (use-package ws-butler
   :hook (prog-mode markdown-mode org-mode))
@@ -537,10 +466,7 @@
   (eglot-report-progress nil)
   :hook (nix-ts-mode . eglot-ensure)
   :config
-  (setq-default eglot-workspace-configuration
-                '(:ruff (:enabled t :formatEnabled :json-false :extendSelect "I")
-                        :basedpyright (:typeCheckingMode "standard"))
-                )
+  (setq-default eglot-workspace-configuration '(:basedpyright (:typeCheckingMode "standard")))
   (add-to-list 'eglot-server-programs '(nix-ts-mode . ("nil")))
 
   (defun my-filter-eglot-diagnostics (diags)
@@ -1180,13 +1106,26 @@ If the new path's directories does not exist, create them."
 (use-package cmake-mode)
 
 (use-package pet
-  :config
+  :init
   (add-hook 'python-base-mode-hook 'pet-mode -10)
-  (add-hook 'python-mode-hook
+  (add-hook 'python-base-mode-hook
             (lambda ()
-              (setq-local python-shell-interpreter (pet-executable-find "python")
-                          python-shell-virtualenv-root (pet-virtualenv-root))))
-  (add-hook 'python-mode-hook 'pet-flycheck-setup))
+              (setq-local python-shell-interpreter (or (pet-executable-find "ipython") (pet-executable-find "python"))
+                          python-shell-virtualenv-root (pet-virtualenv-root)
+                          eglot-server-programs `(((python-base-mode python-mode python-ts-mode) ,(pet-executable-find "basedpyright-langserver") "--stdio")))
+              (setq-local apheleia-formatters `((ruff ,(pet-executable-find "ruff") "format" "--silent"
+                                                      (apheleia-formatters-fill-column "--line-length")
+                                                      "--stdin-filename" filepath "-")
+                                                (ruff-isort ,(pet-executable-find "ruff") "check" "-n" "--select" "I" "--fix" "--fix-only"
+                                                            "--stdin-filename" filepath "-")))
+
+              (eglot-ensure))))
+
+
+
+(use-package deadgrep
+  :bind (("<f5>" . #'deadgrep)
+         ("C-x p g" . #'deadgrep)))
 
 (setq remote-file-name-inhibit-locks t
       tramp-use-scp-direct-remote-copying t
@@ -1226,3 +1165,21 @@ If the new path's directories does not exist, create them."
 
 (use-package flymake-collection)
 (put 'downcase-region 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+(setq bookmark-save-flag 1)
+
+
+(use-package edit-server
+  :commands edit-server-start
+  :init (if after-init-time
+            (edit-server-start)
+          (add-hook 'after-init-hook
+                    #'(lambda() (edit-server-start))))
+  :config (setq edit-server-new-frame-alist
+                '((name . "Edit with Emacs FRAME")
+                  (top . 200)
+                  (left . 200)
+                  (width . 80)
+                  (height . 25)
+                  (minibuffer . t)
+                  (menu-bar-lines . t))))

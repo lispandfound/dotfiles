@@ -45,7 +45,7 @@
  '(popper-reference-buffers
    '("\\*tldr\\*" "Output\\*$" "\\*Async Shell Command\\*"
      compilation-mode help-mode eshell-mode "\\*Messages\\*$"
-     devdocs-mode "\\*Detached Shell Command\\*"))
+     devdocs-mode inferior-python-mode deadgrep-mode))
  '(popper-window-height 20)
  '(proced-auto-update-flag 'visible)
  '(proced-auto-update-interval 1)
