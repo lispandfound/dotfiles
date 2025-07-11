@@ -1,4 +1,4 @@
-=# Initialize zoxide
+# Initialize zoxide
 eval "$(zoxide init zsh --cmd cd)"
 
 # Initialize fzf
