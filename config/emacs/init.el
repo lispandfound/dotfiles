@@ -1113,21 +1113,24 @@ If the new path's directories does not exist, create them."
 
 (use-package pet
   :init
+  (defun pet/initialise-environment ()
+    (interactive)
+    (setq-local python-shell-interpreter (or (pet-executable-find "ipython") (pet-executable-find "python"))
+                python-shell-virtualenv-root (pet-virtualenv-root)
+                eglot-server-programs `(((python-base-mode python-mode python-ts-mode) ,(pet-executable-find "basedpyright-langserver") "--stdio")))
+    (setq-local apheleia-formatters `((ruff ,(pet-executable-find "ruff") "format" "--silent"
+                                            (apheleia-formatters-fill-column "--line-length")
+                                            "--stdin-filename" filepath "-")
+                                      (ruff-isort ,(pet-executable-find "ruff") "check" "-n" "--select" "I" "--fix" "--fix-only"
+                                                  "--stdin-filename" filepath "-")))
+    (eglot-ensure))
   (add-hook 'python-base-mode-hook 'pet-mode -10)
-  (add-hook 'python-base-mode-hook
-            (lambda ()
-              (setq-local python-shell-interpreter (or (pet-executable-find "ipython") (pet-executable-find "python"))
-                          python-shell-virtualenv-root (pet-virtualenv-root)
-                          eglot-server-programs `(((python-base-mode python-mode python-ts-mode) ,(pet-executable-find "basedpyright-langserver") "--stdio")))
-              (setq-local apheleia-formatters `((ruff ,(pet-executable-find "ruff") "format" "--silent"
-                                                      (apheleia-formatters-fill-column "--line-length")
-                                                      "--stdin-filename" filepath "-")
-                                                (ruff-isort ,(pet-executable-find "ruff") "check" "-n" "--select" "I" "--fix" "--fix-only"
-                                                            "--stdin-filename" filepath "-")))
+  (add-hook 'python-base-mode-hook #'pet/initialise-environment))
 
-              (eglot-ensure))))
-
-
+(use-package eglot-booster
+  :after eglot
+  :ensure (:host github :repo "jdtsmith/eglot-booster")
+  :config	(eglot-booster-mode))
 
 (use-package deadgrep
   :bind (("<f5>" . #'deadgrep)
