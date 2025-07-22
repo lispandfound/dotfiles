@@ -466,6 +466,11 @@
   :custom
   (eglot-report-progress nil)
   :hook (nix-ts-mode . eglot-ensure)
+  :bind (("C-c c r" . eglot-rename)
+         ("C-c c e" . eglot)
+         ("C-c c i" . eglot-code-action-organize-imports)
+         ("C-c c a" . eglot-code-actions)
+         ("C-c c q" . eglot-code-quickfix))
   :config
   (setq-default eglot-workspace-configuration '(:basedpyright (:typeCheckingMode "standard")))
   (add-to-list 'eglot-server-programs '(nix-ts-mode . ("nil")))
@@ -480,7 +485,10 @@
 
   (advice-add 'eglot--report-to-flymake :filter-args #'my-filter-eglot-diagnostics))
 
-
+(use-package eglot-booster
+  :ensure (:host github :repo "jdtsmith/eglot-booster")
+  :after eglot
+  :config	(eglot-booster-mode))
 (use-package flymake-ruff
   :ensure t
   :hook (eglot-managed-mode . flymake-ruff-load))
@@ -667,8 +675,6 @@ point reaches the beginning or end of the buffer, stop there."
          (lambda () (interactive) (org-agenda nil "A")))
         ("H" "Habits tracker"
          (lambda () (interactive) (org-agenda nil "H")))]])
-
-
 
     (transient-define-prefix org-capture-transient ()
       "Org Capture Templates"
@@ -1155,6 +1161,7 @@ If the new path's directories does not exist, create them."
 
 
 (use-package flymake-collection)
+(put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 (setq bookmark-save-flag 1)
 
