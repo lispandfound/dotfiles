@@ -160,6 +160,7 @@
   (ido-mode -1))
 
 (add-hook 'after-init-hook #'electric-pair-mode)
+(add-hook 'after-init-hook #'electric-indent-mode)
 
 (use-package corfu
   ;; Optional customizations
