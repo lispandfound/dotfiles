@@ -1127,11 +1127,6 @@ If the new path's directories does not exist, create them."
   (add-hook 'python-base-mode-hook 'pet-mode -10)
   (add-hook 'python-base-mode-hook #'pet/initialise-environment))
 
-(use-package eglot-booster
-  :after eglot
-  :ensure (:host github :repo "jdtsmith/eglot-booster")
-  :config	(eglot-booster-mode))
-
 (use-package deadgrep
   :bind (("<f5>" . #'deadgrep)
          ("C-x p g" . #'deadgrep)))
