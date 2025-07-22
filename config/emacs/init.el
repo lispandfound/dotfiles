@@ -1146,23 +1146,12 @@ If the new path's directories does not exist, create them."
 
 (setq magit-tramp-pipe-stty-settings 'pty)
 
+
 (with-eval-after-load 'tramp
   (with-eval-after-load 'compile
     (remove-hook 'compilation-mode-hook #'tramp-compile-disable-ssh-controlmaster-options)))
-(use-package rust-mode
-  :ensure t
-  :mode ("\\.rs\\'" . rust-mode)
-  :hook (rust-mode . (lambda ()
-                       ;; Sensible indentation for Rust
-                       (setq indent-tabs-mode nil)
-                       (setq tab-width 4)
-                       ;; Enable electric indent mode (usually on by default)
-                       (electric-indent-mode 1)
-                       ;; Prettify symbols (optional, but nice for things like -> to →)
-                       (prettify-symbols-mode)
-                       ;; Format on save with rustfmt (requires rustfmt to be installed)
-                       (setq rust-format-on-save t)
-                       )))
+
+(use-package rust-mode)
 
 
 (use-package flymake-collection)
