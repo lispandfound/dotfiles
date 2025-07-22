@@ -1002,8 +1002,6 @@ If the new path's directories does not exist, create them."
         (("s-Y" . org-download-screenshot)
          ("s-y" . org-download-yank))))
 
-(use-package eldoc-box
-  :hook (eglot-managed-mode . eldoc-box-hover-at-point-mode))
 
 (use-package lookup
   :ensure nil
