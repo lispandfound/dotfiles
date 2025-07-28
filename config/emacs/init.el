@@ -114,7 +114,21 @@
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
          ("M-r" . consult-history))                ;; orig. previous-matching-history-element
-
+  :custom (consult-imenu-config
+           '((emacs-lisp-mode :toplevel "Functions" :types
+                              ((102 "Functions" font-lock-function-name-face)
+                               (109 "Macros" font-lock-function-name-face)
+                               (112 "Packages" font-lock-constant-face)
+                               (116 "Types" font-lock-type-face)
+                               (118 "Variables" font-lock-variable-name-face)))
+             (python-ts-mode
+              :types
+              ((?f "Function" font-lock-function-name-face)
+               (?m "Method" font-lock-function-name-face)
+               (?c "Class" font-lock-property-use-face)
+               (?M "Module" font-lock-builtin-face)
+               (?F "Field" font-lock-regexp-face)
+               (?v "Variable" font-lock-constant-face)))))
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
   :hook (completion-list-mode . consult-preview-at-point-mode)
