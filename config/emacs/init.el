@@ -482,7 +482,10 @@
   :ensure nil
   :custom
   (eglot-report-progress nil)
-  :hook (nix-ts-mode . eglot-ensure)
+  :hook ((nix-ts-mode . eglot-ensure)
+         (python-ts-mode . eglot-ensure)
+         (haskell-mode . eglot-ensure)
+         (rust-mode . eglot-ensure))
   :bind (("C-c c r" . eglot-rename)
          ("C-c c e" . eglot)
          ("C-c c i" . eglot-code-action-organize-imports)
@@ -570,7 +573,7 @@ point reaches the beginning or end of the buffer, stop there."
   :bind (:map haskell-mode-map
               (("C-c C-c" . haskell-compile)))
   :init
-  (add-hook 'haskell-mode-hook #'eglot-ensure)
+
   (add-to-list 'display-buffer-alist '("\\*haskell-compilation\\*.*" (display-buffer-in-side-window (side . bottom)))))
 
 (add-to-list 'display-buffer-alist '("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom))))
@@ -1139,7 +1142,6 @@ If the new path's directories does not exist, create them."
                                             "--stdin-filename" filepath "-")
                                       (ruff-isort ,(pet-executable-find "ruff") "check" "-n" "--select" "I" "--fix" "--fix-only"
                                                   "--stdin-filename" filepath "-")))
-    (eglot-ensure))
   (add-hook 'python-base-mode-hook 'pet-mode -10)
   (add-hook 'python-base-mode-hook #'pet/initialise-environment))
 
