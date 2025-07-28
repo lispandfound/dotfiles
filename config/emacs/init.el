@@ -469,7 +469,8 @@
   ;; (global-tempel-abbrev-mode)
   )
 
-(use-package tempel-collection)
+(use-package tempel-collection
+  :after tempel)
 
 (use-package ws-butler
   :hook (prog-mode markdown-mode org-mode))
