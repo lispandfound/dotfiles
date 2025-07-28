@@ -493,6 +493,27 @@
          ("C-c c a" . eglot-code-actions)
          ("C-c c q" . eglot-code-quickfix))
   :config
+  (defun group-by-breadcrumb-kind (breadcrumb-list)
+    "Group all values in BREADCRUMB-LIST by their breadcrumb-kind property.
+Returns an alist where keys are breadcrumb-kind strings and values are lists
+of corresponding breadcrumb entries."
+    (let ((groups '()))
+      (dolist (item breadcrumb-list)
+        (let* ((breadcrumb-obj (car item))
+               (name (substring-no-properties breadcrumb-obj))
+               (position (car (get-text-property 0 'breadcrumb-region breadcrumb-obj)))
+               (kind (get-text-property 0 'breadcrumb-kind breadcrumb-obj))
+               (simple-item (cons name (set-marker (make-marker) position))))
+          (when kind
+            (let ((existing-group (assoc kind groups)))
+              (if existing-group
+                  (setcdr existing-group (cons simple-item (cdr existing-group)))
+                (push (list kind simple-item) groups))))))
+      ;; Reverse the order of items in each group to maintain original order
+      (mapcar (lambda (group)
+                (cons (car group) (reverse (cdr group))))
+              (reverse groups))))
+  (advice-add 'eglot-imenu :filter-return #'group-by-breadcrumb-kind)
   (setq-default eglot-workspace-configuration '(:basedpyright (:typeCheckingMode "standard")))
   (add-to-list 'eglot-server-programs '(nix-ts-mode . ("nil")))
 
