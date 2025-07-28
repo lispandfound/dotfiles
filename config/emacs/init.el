@@ -411,6 +411,7 @@
   :init
   (setq major-mode-remap-alist
         '((python-mode . python-ts-mode)))
+
   :config
 
 
@@ -459,9 +460,9 @@
                 (cons #'tempel-expand
                       completion-at-point-functions)))
 
-  (add-hook 'conf-mode-hook 'tempel-setup-capf)
-  (add-hook 'prog-mode-hook 'tempel-setup-capf)
-  (add-hook 'text-mode-hook 'tempel-setup-capf)
+  (add-hook 'conf-mode-hook 'tempel-setup-capf t)
+  (add-hook 'prog-mode-hook 'tempel-setup-capf t)
+  (add-hook 'text-mode-hook 'tempel-setup-capf t)
 
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
