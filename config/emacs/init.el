@@ -1186,14 +1186,12 @@ If the new path's directories does not exist, create them."
                                             (apheleia-formatters-fill-column "--line-length")
                                             "--stdin-filename" filepath "-")
                                       (ruff-isort ,(pet-executable-find "ruff") "check" "-n" "--select" "I" "--fix" "--fix-only"
-                                                  "--stdin-filename" filepath "-")))
-  (add-hook 'python-base-mode-hook 'pet-mode -10)
-  (add-hook 'python-base-mode-hook #'pet/initialise-environment))
+                                                  "--stdin-filename" filepath "-"))))
+  (add-hook 'python-base-mode-hook 'pet-mode -90)
+  (add-hook 'pet-mode-hook #'pet/initialise-environment))
 
-(use-package eglot-booster
-  :after eglot
-  :ensure (:host github :repo "jdtsmith/eglot-booster")
-  :config	(eglot-booster-mode))
+
+
 
 (use-package deadgrep
   :bind (("<f5>" . #'deadgrep)
