@@ -826,10 +826,7 @@ If the new path's directories does not exist, create them."
   :bind ("C-h D" . devdocs-lookup))
 
 
-(use-package avy
-  :bind (("C-'" . avy-goto-word-0)
-         ("C-c C-j" . avy-resume))
-  :custom (avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
+
 
 (use-package ascii-art-to-unicode)
 
@@ -1069,7 +1066,7 @@ If the new path's directories does not exist, create them."
 ;;; casual/config.el -*- lexical-binding: t; -*-
 
 (use-package casual)
-(use-package casual-avy)
+
 
 (use-package casual-calc
   :ensure nil
@@ -1086,19 +1083,42 @@ If the new path's directories does not exist, create them."
   :bind (:map dired-mode-map ("C-o" . casual-dired-tmenu))
   :after (dired transient))
 
-(use-package casual-avy
-  :ensure nil
-  :bind ("M-g" . my/custom-avy-tmenu)
-  :init
-  (defun my/custom-avy-tmenu ()
-    (interactive)
-    (require 'casual-avy)
-    (transient-append-suffix 'casual-avy-tmenu "M-n"  '("E" "Error" consult-compile-error :transient nil))
-    (transient-append-suffix 'casual-avy-tmenu "E"  '("f" "Flymake Error" consult-flymake))
-    (transient-append-suffix 'casual-avy-tmenu "p"  '("o" "Outline Item" consult-outline))
-    (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu))
-    (transient-append-suffix 'casual-avy-tmenu "i"  '("j" "Resume last jump" avy-resume))
-    (casual-avy-tmenu)))
+(use-package avy
+  :bind (
+         ;; From "Goto Thing" section
+         ("M-g c" . avy-goto-char-timer) ; Character
+         ;; Note: casual-avy-avy-goto-char-2, casual-avy-avy-goto-word-1,
+         ;; casual-avy-avy-goto-symbol-1, casual-avy-avy-goto-whitespace-end,
+         ;; and casual-avy-avy-goto-line are wrappers for avy functions
+         ;; that handle --above/--below. To bind directly, use the base avy func.
+         ("M-g 2" . avy-goto-char-2)      ; 2 Characters
+         ("M-g w" . avy-goto-word-1)      ; Word
+         ("M-g s" . avy-goto-symbol-1)    ; Symbol
+         ("M-g W" . avy-goto-whitespace-end) ; Whitespace end
+         ("M-g p" . avy-pop-mark)         ; Pop mark
+
+         ;; From "Goto Line" section
+         ("M-g l" . avy-goto-line)        ; Line
+         ("M-g e" . avy-goto-end-of-line) ; End of line
+         ("M-g o" . avy-org-goto-heading-timer) ; Org heading (requires org-mode)
+
+         ;; From "Edit Other Line" section
+         ("M-g C" . avy-kill-ring-save-whole-line) ; Copy whole line
+         ("M-g k" . avy-kill-whole-line)  ; Kill whole line
+         ("M-g m" . avy-move-line)        ; Move line
+         ("M-g d" . avy-copy-line)        ; Duplicate line
+
+         ;; From "Edit Other Region" section
+         ("M-g r" . avy-kill-ring-save-region) ; Copy region
+         ("M-g K" . avy-kill-region)      ; Kill region
+         ("M-g M" . avy-move-region)      ; Move region
+         ("M-g D" . avy-copy-region)      ; Duplicate region
+         ("M-g t" . avy-transpose-lines-in-region) ; Transpose lines in region
+         ("C-'" . avy-goto-symbol-1)
+         ("C-c C-j" . avy-resume)
+         )
+  :custom (avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
+
 
 (use-package casual-make
   :ensure nil
