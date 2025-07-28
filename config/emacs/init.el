@@ -537,7 +537,7 @@ of corresponding breadcrumb entries."
 
 (use-package project
   :ensure nil
-  :bind ("C-x p t" . project-test)
+  :bind (("C-x p t" . project-test) ("C-x p i" . consult-imenu-multi))
   :init
   (defcustom project-test-command "just test" "Default test command for `project-test'")
   (defun project-test ()
