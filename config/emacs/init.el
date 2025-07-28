@@ -767,6 +767,9 @@ If the new path's directories does not exist, create them."
   :init
   (apheleia-global-mode +1)
   :config
+  (setf (alist-get 'toml-ts-mode apheleia-mode-alist) 'taplo)
+  (setf (alist-get 'taplo apheleia-formatters)
+        '("taplo" "format" filepath))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist)
         '(ruff ruff-isort))
   (setf (alist-get 'fourmolu apheleia-formatters)
