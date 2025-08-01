@@ -91,6 +91,8 @@
          ("M-#" . consult-register-load)
          ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
          ("C-M-#" . consult-register)
+         ("M-g i" . consult-imenu)
+         ("M-g f" . consult-flymake)
          ;; M-s bindings in `search-map'
          ("M-s d" . consult-fd)                  ;; Alternative: consult-fd
          ("M-s c" . consult-locate)
@@ -112,7 +114,21 @@
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
          ("M-r" . consult-history))                ;; orig. previous-matching-history-element
-
+  :custom (consult-imenu-config
+           '((emacs-lisp-mode :toplevel "Functions" :types
+                              ((102 "Functions" font-lock-function-name-face)
+                               (109 "Macros" font-lock-function-name-face)
+                               (112 "Packages" font-lock-constant-face)
+                               (116 "Types" font-lock-type-face)
+                               (118 "Variables" font-lock-variable-name-face)))
+             (python-ts-mode
+              :types
+              ((?f "Function" font-lock-function-name-face)
+               (?m "Method" font-lock-function-name-face)
+               (?c "Class" font-lock-property-use-face)
+               (?M "Module" font-lock-builtin-face)
+               (?F "Field" font-lock-regexp-face)
+               (?v "Variable" font-lock-constant-face)))))
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
   :hook (completion-list-mode . consult-preview-at-point-mode)
@@ -160,6 +176,7 @@
   (ido-mode -1))
 
 (add-hook 'after-init-hook #'electric-pair-mode)
+(add-hook 'after-init-hook #'electric-indent-mode)
 
 (use-package corfu
   ;; Optional customizations
@@ -394,6 +411,7 @@
   :init
   (setq major-mode-remap-alist
         '((python-mode . python-ts-mode)))
+
   :config
 
 
@@ -442,9 +460,9 @@
                 (cons #'tempel-expand
                       completion-at-point-functions)))
 
-  (add-hook 'conf-mode-hook 'tempel-setup-capf)
-  (add-hook 'prog-mode-hook 'tempel-setup-capf)
-  (add-hook 'text-mode-hook 'tempel-setup-capf)
+  (add-hook 'conf-mode-hook 'tempel-setup-capf t)
+  (add-hook 'prog-mode-hook 'tempel-setup-capf t)
+  (add-hook 'text-mode-hook 'tempel-setup-capf t)
 
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
@@ -452,7 +470,8 @@
   ;; (global-tempel-abbrev-mode)
   )
 
-(use-package tempel-collection)
+(use-package tempel-collection
+  :after tempel)
 
 (use-package ws-butler
   :hook (prog-mode markdown-mode org-mode))
@@ -464,13 +483,37 @@
   :ensure nil
   :custom
   (eglot-report-progress nil)
-  :hook (nix-ts-mode . eglot-ensure)
+  :hook ((nix-ts-mode . eglot-ensure)
+         (python-ts-mode . eglot-ensure)
+         (haskell-mode . eglot-ensure)
+         (rust-mode . eglot-ensure))
   :bind (("C-c c r" . eglot-rename)
          ("C-c c e" . eglot)
          ("C-c c i" . eglot-code-action-organize-imports)
          ("C-c c a" . eglot-code-actions)
          ("C-c c q" . eglot-code-quickfix))
   :config
+  (defun group-by-breadcrumb-kind (breadcrumb-list)
+    "Group all values in BREADCRUMB-LIST by their breadcrumb-kind property.
+Returns an alist where keys are breadcrumb-kind strings and values are lists
+of corresponding breadcrumb entries."
+    (let ((groups '()))
+      (dolist (item breadcrumb-list)
+        (let* ((breadcrumb-obj (car item))
+               (name (substring-no-properties breadcrumb-obj))
+               (position (car (get-text-property 0 'breadcrumb-region breadcrumb-obj)))
+               (kind (get-text-property 0 'breadcrumb-kind breadcrumb-obj))
+               (simple-item (cons name (set-marker (make-marker) position))))
+          (when kind
+            (let ((existing-group (assoc kind groups)))
+              (if existing-group
+                  (setcdr existing-group (cons simple-item (cdr existing-group)))
+                (push (list kind simple-item) groups))))))
+      ;; Reverse the order of items in each group to maintain original order
+      (mapcar (lambda (group)
+                (cons (car group) (reverse (cdr group))))
+              (reverse groups))))
+  (advice-add 'eglot-imenu :filter-return #'group-by-breadcrumb-kind)
   (setq-default eglot-workspace-configuration '(:basedpyright (:typeCheckingMode "standard")))
   (add-to-list 'eglot-server-programs '(nix-ts-mode . ("nil")))
 
@@ -494,7 +537,7 @@
 
 (use-package project
   :ensure nil
-  :bind ("C-x p t" . project-test)
+  :bind (("C-x p t" . project-test) ("C-x p i" . consult-imenu-multi))
   :init
   (defcustom project-test-command "just test" "Default test command for `project-test'")
   (defun project-test ()
@@ -552,7 +595,7 @@ point reaches the beginning or end of the buffer, stop there."
   :bind (:map haskell-mode-map
               (("C-c C-c" . haskell-compile)))
   :init
-  (add-hook 'haskell-mode-hook #'eglot-ensure)
+
   (add-to-list 'display-buffer-alist '("\\*haskell-compilation\\*.*" (display-buffer-in-side-window (side . bottom)))))
 
 (add-to-list 'display-buffer-alist '("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom))))
@@ -724,6 +767,9 @@ If the new path's directories does not exist, create them."
   :init
   (apheleia-global-mode +1)
   :config
+  (setf (alist-get 'toml-ts-mode apheleia-mode-alist) 'taplo)
+  (setf (alist-get 'taplo apheleia-formatters)
+        '("taplo" "format" filepath))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist)
         '(ruff ruff-isort))
   (setf (alist-get 'fourmolu apheleia-formatters)
@@ -780,10 +826,7 @@ If the new path's directories does not exist, create them."
   :bind ("C-h D" . devdocs-lookup))
 
 
-(use-package avy
-  :bind (("C-'" . avy-goto-word-0)
-         ("C-c C-j" . avy-resume))
-  :custom (avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
+
 
 (use-package ascii-art-to-unicode)
 
@@ -1007,8 +1050,6 @@ If the new path's directories does not exist, create them."
         (("s-Y" . org-download-screenshot)
          ("s-y" . org-download-yank))))
 
-(use-package eldoc-box
-  :hook (eglot-managed-mode . eldoc-box-hover-at-point-mode))
 
 (use-package lookup
   :ensure nil
@@ -1025,7 +1066,7 @@ If the new path's directories does not exist, create them."
 ;;; casual/config.el -*- lexical-binding: t; -*-
 
 (use-package casual)
-(use-package casual-avy)
+
 
 (use-package casual-calc
   :ensure nil
@@ -1042,19 +1083,42 @@ If the new path's directories does not exist, create them."
   :bind (:map dired-mode-map ("C-o" . casual-dired-tmenu))
   :after (dired transient))
 
-(use-package casual-avy
-  :ensure nil
-  :bind ("M-g" . my/custom-avy-tmenu)
-  :init
-  (defun my/custom-avy-tmenu ()
-    (interactive)
-    (require 'casual-avy)
-    (transient-append-suffix 'casual-avy-tmenu "M-n"  '("E" "Error" consult-compile-error :transient nil))
-    (transient-append-suffix 'casual-avy-tmenu "E"  '("f" "Flymake Error" consult-flymake))
-    (transient-append-suffix 'casual-avy-tmenu "p"  '("o" "Outline Item" consult-outline))
-    (transient-append-suffix 'casual-avy-tmenu "o"  '("i" "Imenu Item" consult-imenu))
-    (transient-append-suffix 'casual-avy-tmenu "i"  '("j" "Resume last jump" avy-resume))
-    (casual-avy-tmenu)))
+(use-package avy
+  :bind (
+         ;; From "Goto Thing" section
+         ("M-g c" . avy-goto-char-timer) ; Character
+         ;; Note: casual-avy-avy-goto-char-2, casual-avy-avy-goto-word-1,
+         ;; casual-avy-avy-goto-symbol-1, casual-avy-avy-goto-whitespace-end,
+         ;; and casual-avy-avy-goto-line are wrappers for avy functions
+         ;; that handle --above/--below. To bind directly, use the base avy func.
+         ("M-g 2" . avy-goto-char-2)      ; 2 Characters
+         ("M-g w" . avy-goto-word-1)      ; Word
+         ("M-g s" . avy-goto-symbol-1)    ; Symbol
+         ("M-g W" . avy-goto-whitespace-end) ; Whitespace end
+         ("M-g p" . avy-pop-mark)         ; Pop mark
+
+         ;; From "Goto Line" section
+         ("M-g l" . avy-goto-line)        ; Line
+         ("M-g e" . avy-goto-end-of-line) ; End of line
+         ("M-g o" . avy-org-goto-heading-timer) ; Org heading (requires org-mode)
+
+         ;; From "Edit Other Line" section
+         ("M-g C" . avy-kill-ring-save-whole-line) ; Copy whole line
+         ("M-g k" . avy-kill-whole-line)  ; Kill whole line
+         ("M-g m" . avy-move-line)        ; Move line
+         ("M-g d" . avy-copy-line)        ; Duplicate line
+
+         ;; From "Edit Other Region" section
+         ("M-g r" . avy-kill-ring-save-region) ; Copy region
+         ("M-g K" . avy-kill-region)      ; Kill region
+         ("M-g M" . avy-move-region)      ; Move region
+         ("M-g D" . avy-copy-region)      ; Duplicate region
+         ("M-g t" . avy-transpose-lines-in-region) ; Transpose lines in region
+         ("C-'" . avy-goto-symbol-1)
+         ("C-c C-j" . avy-resume)
+         )
+  :custom (avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
+
 
 (use-package casual-make
   :ensure nil
@@ -1122,10 +1186,11 @@ If the new path's directories does not exist, create them."
                                             (apheleia-formatters-fill-column "--line-length")
                                             "--stdin-filename" filepath "-")
                                       (ruff-isort ,(pet-executable-find "ruff") "check" "-n" "--select" "I" "--fix" "--fix-only"
-                                                  "--stdin-filename" filepath "-")))
-    (eglot-ensure))
-  (add-hook 'python-base-mode-hook 'pet-mode -10)
-  (add-hook 'python-base-mode-hook #'pet/initialise-environment))
+                                                  "--stdin-filename" filepath "-"))))
+  (add-hook 'python-base-mode-hook 'pet-mode -90)
+  (add-hook 'pet-mode-hook #'pet/initialise-environment))
+
+
 
 (use-package deadgrep
   :bind (("<f5>" . #'deadgrep)
@@ -1148,23 +1213,12 @@ If the new path's directories does not exist, create them."
 
 (setq magit-tramp-pipe-stty-settings 'pty)
 
+
 (with-eval-after-load 'tramp
   (with-eval-after-load 'compile
     (remove-hook 'compilation-mode-hook #'tramp-compile-disable-ssh-controlmaster-options)))
-(use-package rust-mode
-  :ensure t
-  :mode ("\\.rs\\'" . rust-mode)
-  :hook (rust-mode . (lambda ()
-                       ;; Sensible indentation for Rust
-                       (setq indent-tabs-mode nil)
-                       (setq tab-width 4)
-                       ;; Enable electric indent mode (usually on by default)
-                       (electric-indent-mode 1)
-                       ;; Prettify symbols (optional, but nice for things like -> to →)
-                       (prettify-symbols-mode)
-                       ;; Format on save with rustfmt (requires rustfmt to be installed)
-                       (setq rust-format-on-save t)
-                       )))
+
+(use-package rust-mode)
 
 
 (use-package flymake-collection)
