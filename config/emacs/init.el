@@ -1206,7 +1206,6 @@ If the new path's directories does not exist, create them."
 
 
 
-
 (use-package deadgrep
   :bind (("<f5>" . #'deadgrep)
          ("C-x p g" . #'deadgrep)))
