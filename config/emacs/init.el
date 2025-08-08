@@ -1258,3 +1258,13 @@ If the new path's directories does not exist, create them."
                   (height . 25)
                   (minibuffer . t)
                   (menu-bar-lines . t))))
+(use-package pr-review
+  :after magit
+  :init
+  (defun mes/pr-review-via-forge ()
+    (interactive)
+    (if-let* ((target (forge--browse-target))
+              (url (if (stringp target) target (forge-get-url target)))
+              (rev-url (pr-review-url-parse url)))
+        (pr-review url)
+      (user-error "No PR to review at point"))))
