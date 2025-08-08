@@ -685,9 +685,17 @@ point reaches the beginning or end of the buffer, stop there."
   :bind (("C-c a" . 'org-agenda-transient)
          ("C-c x" . 'org-capture-transient))
   :custom
-  (org-agenda-files '("~/org/todo.org"))
-  (org-default-notes-file "~/org/notes.org")
-  (org-directory "~/org")
+  (org-capture-templates
+   '(("l" "Logged completed task" entry
+      (file+headline org-agenda-capture-file "Tasks")
+      "* DONE %?\12 %U\12 %a\12 %i")
+     ("n" "Note" entry (file+headline org-default-notes-file "Notes")
+      "* %?\12 %U\12 %a\12 %i")
+     ("t" "Todo" entry (file+headline org-agenda-capture-file "Tasks")
+      "* TODO %?\12 %U\12 %a\12 %i")))
+  (org-agenda-files '("~/Sync/todo.org"))
+  (org-default-notes-file "~/Sync/notes.org")
+  (org-directory "~/Sync")
   (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
   :init
   (setq org-agenda-capture-file "~/org/todo.org")
