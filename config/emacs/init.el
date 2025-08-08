@@ -177,6 +177,10 @@
 
 (add-hook 'after-init-hook #'electric-pair-mode)
 (add-hook 'after-init-hook #'electric-indent-mode)
+(defun rebind-comment-new-line ()
+  (local-set-key (kbd "RET") #'comment-indent-new-line)
+  (local-set-key (kbd "<S-return>") #'newline-and-indent))
+(add-hook 'prog-mode-hook #'rebind-comment-new-line)
 
 (use-package corfu
   ;; Optional customizations
