@@ -1193,14 +1193,16 @@ If the new path's directories does not exist, create them."
   :init
   (defun pet/initialise-environment ()
     (interactive)
-    (setq-local python-shell-interpreter (or (pet-executable-find "ipython") (pet-executable-find "python"))
-                python-shell-virtualenv-root (pet-virtualenv-root)
-                eglot-server-programs `(((python-base-mode python-mode python-ts-mode) ,(pet-executable-find "basedpyright-langserver") "--stdio")))
-    (setq-local apheleia-formatters `((ruff ,(pet-executable-find "ruff") "format" "--silent"
-                                            (apheleia-formatters-fill-column "--line-length")
-                                            "--stdin-filename" filepath "-")
-                                      (ruff-isort ,(pet-executable-find "ruff") "check" "-n" "--select" "I" "--fix" "--fix-only"
-                                                  "--stdin-filename" filepath "-"))))
+    (let ((ruff (or (pet-executable-find "ruff")
+                    (concat (pet-virtualenv-root) "bin/ruff"))))
+      (setq-local apheleia-formatters `((ruff ,ruff "format" "--silent"
+                                              (apheleia-formatters-fill-column "--line-length")
+                                              "--stdin-filename" filepath "-")
+                                        (ruff-isort ,ruff "check" "-n" "--select" "I" "--fix" "--fix-only"
+                                                    "--stdin-filename" filepath "-")))
+      (setq-local python-shell-interpreter (or (pet-executable-find "ipython") (pet-executable-find "python"))
+                  python-shell-virtualenv-root (pet-virtualenv-root)
+                  eglot-server-programs `(((python-base-mode python-mode python-ts-mode) ,(pet-executable-find "basedpyright-langserver") "--stdio")))))
   (add-hook 'python-base-mode-hook 'pet-mode -90)
   (add-hook 'pet-mode-hook #'pet/initialise-environment))
 
