@@ -26,7 +26,7 @@
      ("n" "Note" entry (file+headline org-default-notes-file "Notes")
       "* %?\12 %U\12 %a\12 %i")
      ("t" "Todo" entry (file+headline org-agenda-capture-file "Tasks")
-      "* TODO %?\12 %U\12 %a\12 %i")))
+      "* TODO %?\12 %U\12 %a\12 %i")) nil nil "Customized with use-package org")
  '(package-install-upgrade-built-in t)
  '(package-selected-packages
    '(apptainer-mode copilot copilot-chat org-menu pandoc-transient
@@ -76,6 +76,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#ffffff" :foreground "#000000" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 110 :width normal :foundry "JB" :family "JetBrainsMono Nerd Font"))))
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#ffffff" :foreground "#000000" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 120 :width normal :foundry "JB" :family "JetBrainsMono Nerd Font"))))
  '(mode-line ((t (:box (:line-width (2 . 6) :style flat-button)))))
  '(mode-line-inactive ((t (:box (:line-width (2 . 6) :style flat-button))))))
