@@ -673,15 +673,11 @@ point reaches the beginning or end of the buffer, stop there."
   :config
   (add-to-list 'consult-dir-sources 'consult-dir--source-eshell t)
   (add-to-list 'consult-dir-sources 'consult-dir--source-zoxide t))
-
 (use-package elm-mode)
 
 (use-package wgrep)
 
 (use-package org
-  :ensure nil
-  :bind (("C-c a" . 'org-agenda-transient)
-         ("C-c x" . 'org-capture-transient))
   :custom
   (org-capture-templates
    '(("l" "Logged completed task" entry
@@ -694,53 +690,21 @@ point reaches the beginning or end of the buffer, stop there."
   (org-agenda-files '("~/Sync/todo.org"))
   (org-default-notes-file "~/Sync/notes.org")
   (org-directory "~/Sync")
+  (org-agenda-capture-file "~/Sync/todo.org")
   (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
   :init
-  (setq org-agenda-capture-file "~/org/todo.org")
-  (defun org-setup-transient-interface ()
-    (transient-define-prefix org-agenda-transient ()
-      "Replace the org-agenda buffer by a transient."
-      [["Built-in agendas"
-        ("a" "Current day/week"
-         (lambda () (interactive) (org-agenda nil "a")))
-        ("t" "Global todo list"
-         (lambda () (interactive) (org-agenda nil "t")))
-        ("T" "Global todo list + choose"
-         (lambda () (interactive) (org-agenda nil "T")))
-        ("m" "Search tags" (lambda () (interactive) (org-agenda nil "m")))
-        ("M" "Search tags with TODO"
-         (lambda () (interactive) (org-agenda nil "M")))
-        ("e" "Export" (lambda () (interactive) (org-agenda nil "e")))
-        ("s" "Search" (lambda () (interactive) (org-agenda nil "s")))
-        ("S" "Search with TODO"
-         (lambda () (interactive) (org-agenda nil "S")))
-        ("/" "Multi-occur" (lambda () (interactive) (org-agenda nil "/")))
-        ("<" "Restrict" (lambda () (interactive) (org-agenda nil "<")))
-        (">" "Remove restiction"
-         (lambda () (interactive) (org-agenda nil ">")))
-        ("#" "List stuck projects"
-         (lambda () (interactive) (org-agenda nil "#")))
-        ("!" "Define \"stuck\""
-         (lambda () (interactive) (org-agenda nil "!")))
-        ("C" "Configure custom agenda views"
-         (lambda () (interactive) (org-agenda nil "C")))]
-       ["Custom agendas"
-        ("A" "Daily and overview"
-         (lambda () (interactive) (org-agenda nil "A")))
-        ("H" "Habits tracker"
-         (lambda () (interactive) (org-agenda nil "H")))]])
+  (add-hook 'org-agenda-mode-hook
+            (lambda ()
+              (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
+              (auto-save-mode))))
 
-    (transient-define-prefix org-capture-transient ()
-      "Org Capture Templates"
-      ["Capture"
-       ("l" "Logged completed task" (lambda () (interactive) (org-capture nil "l")))
-       ("n" "Note" (lambda () (interactive) (org-capture nil "n")))
-       ("t" "Todo" (lambda () (interactive) (org-capture nil "t")))]))
-  (add-hook 'emacs-startup-hook #'org-setup-transient-interface))
-(add-hook 'org-agenda-mode-hook
-          (lambda ()
-            (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
-            (auto-save-mode)))
+(use-package org-transient
+  :ensure nil
+  :commands (org-agenda-transient org-capture-transient)
+  :load-path "lisp/"
+  :bind (("C-c a" . 'org-agenda-transient)
+         ("C-c x" . 'org-capture-transient)))
+
 
 (use-package org-menu
   :ensure (:host github :repo "sheijk/org-menu")
