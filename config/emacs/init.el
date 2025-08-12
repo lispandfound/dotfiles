@@ -716,6 +716,9 @@ point reaches the beginning or end of the buffer, stop there."
   :ensure nil
   :after org)
 
+(use-package ox-slack
+  :after org)
+
 (use-package gist)
 
 (blink-cursor-mode -1)
