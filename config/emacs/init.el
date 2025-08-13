@@ -678,6 +678,8 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package wgrep)
 
 (use-package org
+  :bind (:map org-mode-map
+              ("M-<return>" . org-meta-return)) ;; required because of crux override.
   :custom
   (org-capture-templates
    '(("l" "Logged completed task" entry
