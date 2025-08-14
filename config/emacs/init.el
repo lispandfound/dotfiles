@@ -1242,3 +1242,5 @@ If the new path's directories does not exist, create them."
 
 (use-package copilot-chat
   :bind (("C-c c c" . copilot-chat-display)))
+
+(use-package restart-emacs)
