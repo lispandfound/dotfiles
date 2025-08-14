@@ -1201,6 +1201,9 @@ If the new path's directories does not exist, create them."
   (with-eval-after-load 'compile
     (remove-hook 'compilation-mode-hook #'tramp-compile-disable-ssh-controlmaster-options)))
 
+(with-eval-after-load 'compile
+  (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
+
 (use-package rust-mode)
 
 
