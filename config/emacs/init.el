@@ -677,6 +677,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package wgrep)
 
+
 (use-package org
   :bind (:map org-mode-map
               ("M-<return>" . org-meta-return)) ;; required because of crux override.
@@ -706,6 +707,11 @@ point reaches the beginning or end of the buffer, stop there."
   :load-path "lisp/"
   :bind (("C-c a" . 'org-agenda-transient)
          ("C-c x" . 'org-capture-transient)))
+
+(use-package org-download
+  :hook (dired-mode . org-download-enable))
+
+(use-package org-present)
 
 
 (use-package org-menu
