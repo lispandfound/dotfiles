@@ -708,8 +708,6 @@ point reaches the beginning or end of the buffer, stop there."
   :bind (("C-c a" . 'org-agenda-transient)
          ("C-c x" . 'org-capture-transient)))
 
-(use-package org-download
-  :hook (dired-mode . org-download-enable))
 
 (use-package org-present)
 
@@ -1032,6 +1030,7 @@ If the new path's directories does not exist, create them."
   )
 (use-package org-download
   :after org
+  :hook (dired-mode . org-download-enable)
   :bind
   (:map org-mode-map
         (("s-Y" . org-download-screenshot)
