@@ -691,11 +691,13 @@ point reaches the beginning or end of the buffer, stop there."
      ("t" "Todo" entry (file+headline org-agenda-capture-file "Tasks")
       "* TODO %?\12 %U\12 %a\12 %i")))
   (org-agenda-files '("~/Sync/todo.org"))
-  (org-default-notes-file "~/Sync/notes.org")
+
   (org-directory "~/Sync")
-  (org-agenda-capture-file "~/Sync/todo.org")
+
   (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
   :init
+  (setq org-agenda-capture-file "~/Sync/todo.org")
+  (setq org-default-notes-file "~/Sync/notes.org")
   (add-hook 'org-agenda-mode-hook
             (lambda ()
               (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
