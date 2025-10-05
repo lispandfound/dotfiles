@@ -4,10 +4,13 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(TeX-view-program-selection
+   '(((output-dvi has-no-display-manager) "dvi2tty")
+     ((output-dvi style-pstricks) "dvips and gv") (output-dvi "xdvi")
+     (output-pdf "Okular") (output-pdf "xdg-open")))
  '(casual-lib-use-unicode t)
  '(consult-narrow-key "<")
  '(dired-compress-file-default-suffix ".xz")
- '(display-line-numbers t)
  '(display-time-default-load-average nil)
  '(display-time-format "%H:%M")
  '(mood-line-glyph-alist
@@ -19,14 +22,6 @@
      (:vc-good . 10004) (:buffer-narrowed . 9660)
      (:buffer-modified . 9679) (:buffer-read-only . 9632)
      (:frame-client . 8645) (:count-separator . 10005)))
- '(org-capture-templates
-   '(("l" "Logged completed task" entry
-      (file+headline org-agenda-capture-file "Tasks")
-      "* DONE %?\12 %U\12 %a\12 %i")
-     ("n" "Note" entry (file+headline org-default-notes-file "Notes")
-      "* %?\12 %U\12 %a\12 %i")
-     ("t" "Todo" entry (file+headline org-agenda-capture-file "Tasks")
-      "* TODO %?\12 %U\12 %a\12 %i")) nil nil "Customized with use-package org")
  '(package-install-upgrade-built-in t)
  '(package-selected-packages
    '(apptainer-mode copilot copilot-chat org-menu pandoc-transient
@@ -76,6 +71,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#ffffff" :foreground "#000000" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 120 :width normal :foundry "JB" :family "JetBrainsMono Nerd Font"))))
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#ffffff" :foreground "#000000" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 110 :width normal :foundry "JB" :family "JetBrainsMono Nerd Font"))))
  '(mode-line ((t (:box (:line-width (2 . 6) :style flat-button)))))
  '(mode-line-inactive ((t (:box (:line-width (2 . 6) :style flat-button))))))

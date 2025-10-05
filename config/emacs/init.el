@@ -438,6 +438,16 @@
 
 (global-set-key [remap newline] #'newline-and-indent)
 
+(defun local-disable-line-numbers ()
+  (setq-local display-line-numbers nil))
+
+(use-package reader
+  :ensure (:host codeberg :repo "divyaranjan/emacs-reader"
+                 :pre-build ("make" "all")
+                 :files ("*.el" "render-core.so"))
+  :config
+  (add-hook 'reader-mode-hook #'local-disable-line-numbers))
+
 ;; Configure Tempel
 (use-package tempel
   ;; Require trigger prefix before template name when completing.
@@ -465,8 +475,7 @@
   (add-hook 'conf-mode-hook 'tempel-setup-capf t)
   (add-hook 'prog-mode-hook 'tempel-setup-capf t)
   (add-hook 'text-mode-hook 'tempel-setup-capf t)
-  (with-eval-after-load 'eglot
-    (add-hook 'eglot-managed-mode-hook 'tempel-setup-capf t))
+
 
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
@@ -482,62 +491,48 @@
 
 (setq-default abbrev-mode t)
 
+(use-package lsp-mode
 
-(use-package eglot
-  :ensure nil
-  :custom
-  (eglot-report-progress nil)
-  :hook ((nix-ts-mode . eglot-ensure)
-         (python-ts-mode . eglot-ensure)
-         (haskell-mode . eglot-ensure)
-         (rust-mode . eglot-ensure))
-  :bind (("C-c c r" . eglot-rename)
-         ("C-c c e" . eglot)
-         ("C-c c i" . eglot-code-action-organize-imports)
-         ("C-c c a" . eglot-code-actions)
-         ("C-c c q" . eglot-code-quickfix))
+  :hook ((nix-ts-mode . lsp-deferred)
+         (haskell-mode . lsp-deferred)
+         (rust-mode . lsp-deferred)
+         (typst-mode . lsp-deferred)
+         (python-base-mode . my/python-lsp-setup))
+
+  :bind (("C-c c r" . lsp-rename)
+         ("C-c c e" . lsp) ;; start session
+         ("C-c c i" . lsp-organize-imports)
+         ("C-c c a" . lsp-execute-code-action)
+         ("C-c c q" . lsp-execute-code-action))
+  :init
+  (defun my/python-lsp-setup ()
+    "Configure buffer-local LSP clients for Python."
+    (setq-local lsp-enabled-clients '(pylsp+booster ruff-lsp+booster))
+    (lsp-deferred))
   :config
-  (defun group-by-breadcrumb-kind (breadcrumb-list)
-    "Group all values in BREADCRUMB-LIST by their breadcrumb-kind property.
-Returns an alist where keys are breadcrumb-kind strings and values are lists
-of corresponding breadcrumb entries."
-    (let ((groups '()))
-      (dolist (item breadcrumb-list)
-        (let* ((breadcrumb-obj (car item))
-               (name (substring-no-properties breadcrumb-obj))
-               (position (car (get-text-property 0 'breadcrumb-region breadcrumb-obj)))
-               (kind (get-text-property 0 'breadcrumb-kind breadcrumb-obj))
-               (simple-item (cons name (set-marker (make-marker) position))))
-          (when kind
-            (let ((existing-group (assoc kind groups)))
-              (if existing-group
-                  (setcdr existing-group (cons simple-item (cdr existing-group)))
-                (push (list kind simple-item) groups))))))
-      ;; Reverse the order of items in each group to maintain original order
-      (mapcar (lambda (group)
-                (cons (car group) (reverse (cdr group))))
-              (reverse groups))))
-  (advice-add 'eglot-imenu :filter-return #'group-by-breadcrumb-kind)
-  (setq-default eglot-workspace-configuration '(:basedpyright (:typeCheckingMode "standard")))
-  (add-to-list 'eglot-server-programs '(nix-ts-mode . ("nil")))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection
+                     (lambda ()
 
-  (defun my-filter-eglot-diagnostics (diags)
-    "Drop Pyright 'variable not accessed' notes from DIAGS."
-    (list (seq-remove (lambda (d)
-                        (and (eq (flymake-diagnostic-type d) 'eglot-note)
-                             (s-starts-with? "Pyright:" (flymake-diagnostic-text d))
-                             (s-ends-with? "is not accessed" (flymake-diagnostic-text d))))
-                      (car diags))))
+                       (list "emacs-lsp-booster" "--disable-bytecode" "--" (pet/find-exec "pylsp"))))
+    :major-modes '(python-ts-mode)
+    :server-id 'pylsp+booster))
 
-  (advice-add 'eglot--report-to-flymake :filter-args #'my-filter-eglot-diagnostics))
-
-(use-package eglot-booster
-  :ensure (:host github :repo "jdtsmith/eglot-booster")
-  :after eglot
-  :config	(eglot-booster-mode))
-(use-package flymake-ruff
-  :ensure t
-  :hook (eglot-managed-mode . flymake-ruff-load))
+  (lsp-register-client
+   (make-lsp-client
+    :add-on? t
+    :new-connection (lsp-stdio-connection
+                     (lambda () (list "emacs-lsp-booster" "--disable-bytecode" "--" (pet/find-exec "ruff") "server")))
+    :major-modes '(python-ts-mode)
+    :server-id 'ruff-lsp+booster))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection '("tinymist"))
+    :major-modes '(typst-ts-mode)
+    :activation-fn (lsp-activate-on "typst")
+    :server-id 'typst-lsp))
+  (add-to-list 'lsp-language-id-configuration '(typst-ts-mode . "typst")))
 
 (use-package project
   :ensure nil
@@ -1165,20 +1160,35 @@ If the new path's directories does not exist, create them."
 
 (use-package pet
   :init
+  (defun pet/find-exec (&rest candidates)
+    "Return the first executable found among CANDIDATES, checking venv first then system."
+    (or (seq-some
+         (lambda (cmd)
+           (when-let ((venv (pet-virtualenv-root))
+                      (bin (expand-file-name (concat "bin/" cmd) venv)))
+             (when (file-executable-p bin) bin)))
+         candidates)
+        (seq-some #'pet-executable-find candidates)))
+
   (defun pet/initialise-environment ()
+    "Setup executables and variables for Python + Apheleia + Eglot."
     (interactive)
-    (let ((ruff (or (pet-executable-find "ruff")
-                    (concat (pet-virtualenv-root) "bin/ruff"))))
-      (setq-local apheleia-formatters `((ruff ,ruff "format" "--silent"
-                                              (apheleia-formatters-fill-column "--line-length")
-                                              "--stdin-filename" filepath "-")
-                                        (ruff-isort ,ruff "check" "-n" "--select" "I" "--fix" "--fix-only"
-                                                    "--stdin-filename" filepath "-")))
-      (setq-local python-shell-interpreter (or (pet-executable-find "ipython") (pet-executable-find "python"))
-                  python-shell-virtualenv-root (pet-virtualenv-root)
-                  eglot-server-programs `(((python-base-mode python-mode python-ts-mode) ,(pet-executable-find "basedpyright-langserver") "--stdio")))))
-  (add-hook 'python-base-mode-hook 'pet-mode -90)
-  (add-hook 'pet-mode-hook #'pet/initialise-environment))
+    (let ((ruff (pet/find-exec "ruff"))
+          (py (pet/find-exec "ipython" "python")))
+      (setq-local apheleia-formatters
+                  `((ruff ,ruff "format" "--silent"
+                          (apheleia-formatters-fill-column "--line-length")
+                          "--stdin-filename" filepath "-")
+                    (ruff-isort ,ruff "check" "-n" "--select" "I" "--fix" "--fix-only"
+                                "--stdin-filename" filepath "-")))
+      (setq-local python-shell-interpreter py
+                  python-shell-virtualenv-root (pet-virtualenv-root))))
+  ;; Run pet before eglot-ensure starts
+  (add-hook 'python-base-mode-hook #'pet-mode -90)
+  (add-hook 'pet-mode-hook #'pet/initialise-environment)
+
+  )
+
 
 
 
@@ -1251,3 +1261,41 @@ If the new path's directories does not exist, create them."
   :bind (("C-c c c" . copilot-chat-display)))
 
 (use-package restart-emacs)
+
+
+(use-package tex
+  :ensure auctex
+  :hook ((LaTeX-mode . TeX-source-correlate-mode)
+         (LaTeX-mode . visual-line-mode)
+         (LaTeX-mode . flyspell-mode)
+         (LaTeX-mode . TeX-PDF-mode)
+         (LaTeX-mode . reftex-mode))
+  :init
+  (setq TeX-auto-save t
+        TeX-parse-self t
+        TeX-save-query nil
+        TeX-master nil ; query for master on first save
+        TeX-engine 'xetex ; modern default; change to 'luatex if preferred
+        TeX-PDF-mode t
+        LaTeX-item-indent 0
+        TeX-source-correlate-start-server t)
+  (with-eval-after-load 'reftex
+    (setq reftex-plug-into-AUCTeX t
+          reftex-cite-format 'default
+          reftex-ref-style-default-list '("Default" "Varioref")))
+  :config
+  (add-to-list 'TeX-command-list
+               '("LatexMk" "latexmk -pdflatex=%`%l%(mode)%(file-line-error) -pdf -interaction=nonstopmode -synctex=1 %s" TeX-run-TeX nil t
+                 :help "Run latexmk for PDF")))
+
+(setq-default display-line-numbers t)
+
+(use-package typst-ts-mode
+  :ensure (:type git :host codeberg :repo "meow_king/typst-ts-mode")
+  :bind (:map
+         typst-ts-mode-map
+         ("C-c C-c" . typst-ts-tmenu))
+  :custom
+  (typst-ts-watch-options '("--open"))
+  (typst-ts-mode-grammar-location (expand-file-name "tree-sitter/libtree-sitter-typst.so" user-emacs-directory))
+  (typst-ts-mode-enable-raw-blocks-highlight t))
