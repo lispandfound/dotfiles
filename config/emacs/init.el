@@ -584,7 +584,8 @@ point reaches the beginning or end of the buffer, stop there."
       vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)
       use-short-answers t)
 
-(use-package yaml-mode)
+(use-package yaml-mode
+  :mode ("\\.cff\\'" . yaml-ts-mode))
 
 (use-package csv-mode
   :hook (csv-mode . csv-align-mode))
