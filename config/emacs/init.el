@@ -52,7 +52,14 @@
 (use-package modus-themes
   :demand t
   :config
-  (load-theme 'modus-operandi t))
+  (defun pad-mode-line (&rest _)
+    ;; From the modus manual
+    (modus-themes-with-colors
+      (custom-set-faces
+       `(mode-line-active ((,c :box (:line-width 5 :color ,bg-mode-line-active))))
+       `(mode-line-inactive ((,c :box (:line-width 5 :color ,bg-mode-line-inactive)))))))
+  (add-hook 'modus-themes-after-load-theme-hook #'pad-mode-line)
+  (modus-themes-load-theme 'modus-operandi))
 
 (use-package mood-line
   :demand t
@@ -520,7 +527,6 @@
     :major-modes '(python-ts-mode)
     :server-id 'ty+booster))
 
-
   (lsp-register-client
    (make-lsp-client
     :add-on? t
@@ -528,6 +534,7 @@
                      (lambda () (list "emacs-lsp-booster" "--disable-bytecode" "--" (pet/find-exec "ruff") "server")))
     :major-modes '(python-ts-mode)
     :server-id 'ruff+booster))
+
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-stdio-connection '("tinymist"))
