@@ -502,6 +502,7 @@
 
   :hook ((nix-ts-mode . lsp-deferred)
          (haskell-mode . lsp-deferred)
+         (java-ts-mode . lsp-deferred)
          (rust-mode . lsp-deferred)
          (typst-mode . lsp-deferred)
          (python-base-mode . my/python-lsp-setup))
@@ -529,6 +530,15 @@
 
   (lsp-register-client
    (make-lsp-client
+    :new-connection (lsp-stdio-connection
+                     (lambda ()
+
+                       (list "emacs-lsp-booster" "--disable-bytecode" "--" "jdtls")))
+    :major-modes '(java-ts-mode)
+    :server-id 'jdtls))
+
+  (lsp-register-client
+   (make-lsp-client
     :add-on? t
     :new-connection (lsp-stdio-connection
                      (lambda () (list "emacs-lsp-booster" "--disable-bytecode" "--" (pet/find-exec "ruff") "server")))
@@ -552,6 +562,7 @@
     (interactive)
     (let ((compile-command project-test-command))
       (call-interactively #'project-compile))))
+
 
 (use-package which-key
   :demand t
