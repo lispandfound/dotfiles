@@ -508,7 +508,7 @@
   :init
   (defun my/python-lsp-setup ()
     "Configure buffer-local LSP clients for Python."
-    (setq-local lsp-enabled-clients '(pylsp+booster ruff-lsp+booster))
+    (setq-local lsp-enabled-clients '(ty+booster ruff-lsp+booster))
     (lsp-deferred))
   :config
   (lsp-register-client
@@ -516,9 +516,9 @@
     :new-connection (lsp-stdio-connection
                      (lambda ()
 
-                       (list "emacs-lsp-booster" "--disable-bytecode" "--" (pet/find-exec "pylsp"))))
+                       (list "emacs-lsp-booster" "--disable-bytecode" "--" (pet/find-exec "ty") "server")))
     :major-modes '(python-ts-mode)
-    :server-id 'pylsp+booster))
+    :server-id 'ty+booster))
 
   (lsp-register-client
    (make-lsp-client
