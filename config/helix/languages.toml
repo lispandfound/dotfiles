@@ -1,0 +1,64 @@
+[language-server.tinymist]
+command = "tinymist"
+
+[language-server.tinymist.config]
+exportPdf = "onType"
+
+[language-server.scls]
+command = "simple-completion-language-server"
+
+[language-server.harper-ls]
+command = "harper-ls"
+args = ["--stdio"]
+
+[language-server.hx-lsp]
+command = "hx-lsp"
+
+[language-server.scls.config]
+max_completion_items = 100
+feature_words = false
+feature_snippets = true
+snippets_first = true
+snippets_inline_by_word_tail = false
+feature_unicode_input = false
+feature_paths = false
+feature_citations = false
+
+
+[language-server.basedpyright]
+command = "basedpyright-langserver"
+args = ["--stdio"]
+config.reportMissingtypeStubs = false
+except-features = ["format"]
+
+[[language]]
+name = "nix"
+auto-format = true
+formatter.command = "nixfmt"
+
+[[language]]
+name = "python"
+auto-format = true
+language-servers = [
+  "ty",
+  "ruff",
+  "hx-lsp",
+  "harper-ls"
+]
+
+[[language]]
+name = "markdown"
+auto-format = true
+language-servers = ["ltex-ls-plus"]
+
+[[language]]
+name = "typst"
+auto-format = true
+language-servers = ["tinymist", "ltex-ls-plus"]
+formatter.command = "typstyle"
+
+[[language]]
+name = "git-commit"
+auto-format = true
+language-servers = ["scls"]
+

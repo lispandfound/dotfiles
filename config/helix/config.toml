@@ -1,0 +1,27 @@
+theme = "catppuccin_latte"
+
+[editor]
+jump-label-alphabet = "aoeuidhtnsfygpcrlqjkbxmwvz"
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[keys.normal]
+V   = ["goto_first_nonwhitespace", "extend_to_line_end"]
+D   = ["ensure_selections_forward", "extend_to_line_end"]
+x   = "extend_line"
+esc = ["collapse_selection", "keep_primary_selection"]
+
+[keys.normal."+"]
+d = ":pipe doq --formatter numpy"
+q = ":pipe fmt -w 80 -p '#'"
+s = ":sh dashit-fzf-popup"
+e = ":sh yazi_popup"
+
+[keys.select]
+";" = ["collapse_selection", "normal_mode"]
+x   = "extend_line"
+V   = "extend_to_line_end"
+

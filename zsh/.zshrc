@@ -26,16 +26,33 @@ zstyle ':completion:*' list-dirs-first true
 zstyle :compinstall filename '/home/jake/.zshrc'
 
 eval "$(zoxide init zsh --cmd cd)"
+export BAT_THEME="Catppuccin Latte"
 
-# initialize tv
-if command -v tv &> /dev/null; then
-    eval "$(tv init zsh)"
+# initialize fzf
+if command -v fzf &> /dev/null; then
+    eval "$(fzf --zsh)"
+    export FZF_DEFAULT_COMMAND="fd --type f"
+    export FZF_CTRL_T_COMMAND="fd"
+    export FZF_ALT_C_COMMAND="fd --type d"
+    export FZF_CTRL_T_OPTS="
+      --walker-skip .git,node_modules,target
+      --preview 'bat -n --color=always {}'
+      --bind 'ctrl-/:change-preview-window(down|hidden|)'"
+    export FZF_ALT_C_OPTS="--preview 'eza -l --icons=auto --colour=always {}'"
 fi
 
+if [ -d ~/.zshrc.d ]; then
+	for rc in ~/.zshrc.d/*; do
+		if [ -f "$rc" ]; then
+			. "$rc"
+		fi
+	done
+fi
 
 # Shell aliases
 alias cat="bat"
 alias less="bat --paging=always"
+alias ssh="kitten ssh"
 
 # Enable eza integration
 if command -v eza &> /dev/null; then
