@@ -48,7 +48,7 @@ if command -v fzf &> /dev/null; then
 			echo Missing fzf-tab completion!
 		fi
 
-		if [ ! -d ~/.zshrc.d/fzf-git.sh ]; then 
+		if [ ! -f ~/.zshrc.d/fzf-git.sh ]; then 
 			wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/refs/heads/main/fzf-git.sh -O ~/.zshrc.d/fzf-git.sh
 		fi
 
