@@ -27,6 +27,7 @@ zstyle :compinstall filename '/home/jake/.zshrc'
 
 eval "$(zoxide init zsh --cmd cd)"
 export BAT_THEME="Catppuccin Latte"
+mkdir -p ~/.zshrc.d
 
 # initialize fzf
 if command -v fzf &> /dev/null; then
@@ -39,6 +40,18 @@ if command -v fzf &> /dev/null; then
       --preview 'bat -n --color=always {}'
       --bind 'ctrl-/:change-preview-window(down|hidden|)'"
     export FZF_ALT_C_OPTS="--preview 'eza -l --icons=auto --colour=always {}'"
+    
+		if [ -f /usr/share/fzf-tab-completion/zsh/fzf-zsh-completion.sh ]; then
+			source /usr/share/fzf-tab-completion/zsh/fzf-zsh-completion.sh
+			bindkey '^I' fzf_completion
+		else
+			echo Missing fzf-tab completion!
+		fi
+
+		if [ ! -d ~/.zshrc.d/fzf-git.sh ]; then 
+			wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/refs/heads/main/fzf-git.sh -O ~/.zshrc.d/fzf-git.sh
+		fi
+
 fi
 
 if [ -d ~/.zshrc.d ]; then
@@ -51,6 +64,7 @@ fi
 
 # Shell aliases
 alias cat="bat"
+alias grep="rg"
 alias less="bat --paging=always"
 alias ssh="kitten ssh"
 
@@ -72,3 +86,4 @@ HISTFILE=~/.zsh_history
 HISTSIZE=1000
 SAVEHIST=1000
 setopt SHARE_HISTORY
+
