@@ -43,13 +43,17 @@ language-servers = [
   "ty",
   "ruff",
   "hx-lsp",
-  "harper-ls"
 ]
 
 [[language]]
 name = "markdown"
 auto-format = true
-language-servers = ["ltex-ls-plus"]
+language-servers = [
+  "marksman",
+  "harper-ls"
+]
+formatter.command = "prettier"
+formatter.args = ["--parser", "markdown"]
 
 [[language]]
 name = "typst"
