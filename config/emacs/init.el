@@ -212,7 +212,9 @@
   ;; `global-corfu-modes' to exclude certain modes.
   :bind (:map corfu-map ("SPC" . corfu-insert-separator))
   :init
-  (global-corfu-mode))
+  (global-corfu-mode)
+  (with-eval-after-load 'python
+    (add-hook 'inferior-python-mode-hook (lambda () (setq-local corfu-auto nil)))))
 
 
 (use-package orderless
@@ -417,17 +419,140 @@
               (:repeat-map python-indent-shift-right-repeat-map
                            (">" . python-indent-shift-right)
                            ("<" . python-indent-shift-left)))
+
   :init
+
   (setq major-mode-remap-alist
         '((python-mode . python-ts-mode)))
 
   :config
+  (defun python-prompt-with (packages)
+    "Spawn an IPython REPL with extra packages injected via `uv --with`.
+
+Interactively, PACKAGES comes from `completing-read-multiple`.
+If invoked with `C-u`, also prompt for a Python version to pin."
+    (interactive (list (completing-read-multiple "Packages: " nil)))
+    (let* ((uv-exec (or (executable-find "uv")
+                        (user-error "uv not found in PATH")))
+           ;; optional version, only when user gave C-u
+           (python-version (when current-prefix-arg
+                             (read-string "Python version (optional): ")))
+           ;; Filter out empty entries
+           (pkgs (seq-filter (lambda (s) (not (string-empty-p s))) packages))
+           ;; Build the --with arguments, always include ipython
+           (with-args
+            (mapcan (lambda (p) (list "--with" p))
+                    (cons "ipython" pkgs)))
+           ;; Python version flag
+           (version-args
+            (if (and python-version (not (string-empty-p python-version)))
+                (list "--python" python-version)
+              '()))
+           ;; Construct full shell command
+           (cmd (string-join
+                 (append (list uv-exec "run")
+                         version-args
+                         with-args
+                         (list "ipython" "--simple-prompt"))
+                 " "))
+           (buf-name "UV Python"))
+      (python-shell-make-comint cmd buf-name t)))
+  (setq python-shell-completion-native-enable nil)
+  (add-hook 'python-base-mode-hook
+            (lambda ()
+              (setq-local completion-at-point-functions
+                          (remove #'python-completion-at-point
+                                  completion-at-point-functions))))
+
+  ;; --- Extra flymake checkers ---
+  (defun python-extra-flymake-backends ()
+    "Enable additional Flymake checkers alongside Eglot’s."
+    ;; Buffer-local so they affect only this buffer
+    (add-hook 'flymake-diagnostic-functions
+              'flymake-collection-uv-ruff nil t)
+    (add-hook 'flymake-diagnostic-functions
+              'flymake-collection-numpydoc nil t))
+
+  (defun setup-python-environment ()
+    "Configure python-shell to use `uv run which python/ipython`."
+    (interactive)
+    (let* ((uv-exec (executable-find "uv"))
+           (ipython (when uv-exec
+                      (string-trim
+                       (ignore-errors
+                         (car (process-lines uv-exec "run" "which" "ipython"))))))
+           (python (when uv-exec
+                     (string-trim
+                      (ignore-errors
+                        (car (process-lines uv-exec "run" "which" "python")))))))
+      (cond
+       ;; Prefer IPython if found
+       ((and ipython (not (string-empty-p ipython)))
+        (setq-local python-shell-interpreter ipython
+                    python-shell-interpreter-args "--simple-prompt")
+        (message "Using IPython: %s" ipython))
+       ;; Otherwise fall back to Python
+       ((and python (not (string-empty-p python)))
+        (setq-local python-shell-interpreter python
+                    python-shell-interpreter-args "")
+        (message "Using Python: %s" python))
+       ;; If uv or both executables missing
+       (t
+        (message "Could not determine python via uv.")))))
 
 
-  (add-hook 'python-ts-mode-hook (lambda ()
-                                   (setq-local transpose-sexps-function #'treesit-transpose-sexps
-                                               python-shell-interpreter-args "--simple-prompt --classic"
-                                               devdocs-current-docs '("pandas~2" "numpy~2.0" "python~3.13" "matplotlib")))))
+
+  (add-hook 'python-ts-mode-hook #'setup-python-environment)
+  ;; --- Formatter setup ---
+  (add-hook 'python-ts-mode-hook
+            (lambda ()
+              (setq-local apheleia-formatters
+                          `((ruff "uv" "run" "ruff" "format" "--silent"
+                                  (apheleia-formatters-fill-column "--line-length")
+                                  "--stdin-filename" filepath "-")
+                            (ruff-isort "uv" "run" "ruff" "check" "-n" "--select" "I"
+                                        "--fix" "--fix-only"
+                                        "--stdin-filename" filepath "-")))))
+
+  ;; --- Eglot server setup ---
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+                 '(python-ts-mode "uv" "run" "ty" "server")))
+
+
+  ;; ------------------------------------------------------------------
+  ;; 🔥 The important part: stay out of flymake, then re-add eglot’s backend
+  ;; ------------------------------------------------------------------
+
+  ;; Step 1: tell Eglot NOT to install its flymake backend initially
+  ;; Step 2: start eglot
+  (add-hook 'python-ts-mode-hook
+            (lambda ()
+              (setq-local eglot-stay-out-of '(flymake))
+              (eglot-ensure)))
+
+  ;; Step 3: AFTER eglot starts, manually re-add eglot's flymake backend
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              (when (derived-mode-p 'python-ts-mode)
+                ;; eglot uses eglot-flymake-backend for diagnostics
+                (setq-local flymake-diagnostic-functions nil)
+                (add-hook 'flymake-diagnostic-functions
+                          #'eglot-flymake-backend
+                          nil t)
+                ;; and then add your extra checkers
+                (python-extra-flymake-backends))))
+
+  ;; --- misc python-mode things ---
+  (add-hook 'python-ts-mode-hook
+            (lambda ()
+              (setq-local transpose-sexps-function #'treesit-transpose-sexps
+                          python-shell-interpreter-args "--simple-prompt --classic"
+                          devdocs-current-docs '("pandas~2"
+                                                 "numpy~2.0"
+                                                 "python~3.13"
+                                                 "matplotlib")))))
+
 
 (use-package cython-mode)
 
@@ -450,7 +575,7 @@
 
 (use-package reader
   :ensure (:host codeberg :repo "divyaranjan/emacs-reader"
-                 :pre-build ("make" "all")
+                 :pre-build ("make" "clean" "all")
                  :files ("*.el" "render-core.so"))
   :config
   (add-hook 'reader-mode-hook #'local-disable-line-numbers))
@@ -498,60 +623,58 @@
 
 (setq-default abbrev-mode t)
 
-(use-package lsp-mode
+;; (use-package lsp-mode
 
-  :hook ((nix-ts-mode . lsp-deferred)
-         (haskell-mode . lsp-deferred)
-         (java-ts-mode . lsp-deferred)
-         (rust-mode . lsp-deferred)
-         (typst-mode . lsp-deferred)
-         (python-base-mode . my/python-lsp-setup))
+;;   :hook ((nix-ts-mode . lsp-deferred)
+;;          (haskell-mode . lsp-deferred)
+;;          (java-ts-mode . lsp-deferred)
+;;          (rust-mode . lsp-deferred)
+;;          (typst-mode . lsp-deferred)
+;;          (python-base-mode . my/python-lsp-setup))
 
-  :bind (("C-c c r" . lsp-rename)
-         ("C-c c e" . lsp) ;; start session
-         ("C-c c i" . lsp-organize-imports)
-         ("C-c c a" . lsp-execute-code-action)
-         ("C-c c q" . lsp-execute-code-action))
-  :init
-  (defun my/python-lsp-setup ()
-    "Configure buffer-local LSP clients for Python."
-    (setq-local lsp-enabled-clients '(ty+booster ruff+booster))
-    (lsp-deferred))
+;;   :bind (("C-c c r" . lsp-rename)
+;;          ("C-c c e" . lsp) ;; start session
+;;          ("C-c c i" . lsp-organize-imports)
+;;          ("C-c c a" . lsp-execute-code-action)
+;;          ("C-c c q" . lsp-execute-code-action))
+;;   :init
+;;   (defun my/python-lsp-setup ()
+;;     "Configure buffer-local LSP clients for Python."
+;;     (setq-local lsp-enabled-clients '(ty+booster ruff+booster))
+;;     (lsp-deferred))
 
-  :config
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-stdio-connection
-                     (lambda ()
+;;   :config
+;;   (lsp-register-client
+;;    (make-lsp-client
+;;     :new-connection (lsp-stdio-connection
+;;                      (lambda ()
+;;                        (list "emacs-lsp-booster" "--disable-bytecode" "--" (pet/find-exec "ty") "server")))
+;;     :major-modes '(python-ts-mode)
+;;     :server-id 'ty+booster))
 
-                       (list "emacs-lsp-booster" "--disable-bytecode" "--" (pet/find-exec "ty") "server")))
-    :major-modes '(python-ts-mode)
-    :server-id 'ty+booster))
+;;   (lsp-register-client
+;;    (make-lsp-client
+;;     :new-connection (lsp-stdio-connection
+;;                      (lambda ()
+;;                        (list "emacs-lsp-booster" "--disable-bytecode" "--" "jdtls")))
+;;     :major-modes '(java-ts-mode)
+;;     :server-id 'jdtls))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-stdio-connection
-                     (lambda ()
+;;   (lsp-register-client
+;;    (make-lsp-client
+;;     :add-on? t
+;;     :new-connection (lsp-stdio-connection
+;;                      (lambda () (list "emacs-lsp-booster" "--disable-bytecode" "--" (pet/find-exec "ruff") "server")))
+;;     :major-modes '(python-ts-mode)
+;;     :server-id 'ruff+booster))
 
-                       (list "emacs-lsp-booster" "--disable-bytecode" "--" "jdtls")))
-    :major-modes '(java-ts-mode)
-    :server-id 'jdtls))
-
-  (lsp-register-client
-   (make-lsp-client
-    :add-on? t
-    :new-connection (lsp-stdio-connection
-                     (lambda () (list "emacs-lsp-booster" "--disable-bytecode" "--" (pet/find-exec "ruff") "server")))
-    :major-modes '(python-ts-mode)
-    :server-id 'ruff+booster))
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-stdio-connection '("tinymist"))
-    :major-modes '(typst-ts-mode)
-    :activation-fn (lsp-activate-on "typst")
-    :server-id 'typst-lsp))
-  (add-to-list 'lsp-language-id-configuration '(typst-ts-mode . "typst")))
+;;   (lsp-register-client
+;;    (make-lsp-client
+;;     :new-connection (lsp-stdio-connection '("tinymist"))
+;;     :major-modes '(typst-ts-mode)
+;;     :activation-fn (lsp-activate-on "typst")
+;;     :server-id 'typst-lsp))
+;;   (add-to-list 'lsp-language-id-configuration '(typst-ts-mode . "typst")))
 
 (use-package project
   :ensure nil
@@ -605,7 +728,14 @@ point reaches the beginning or end of the buffer, stop there."
       use-short-answers t)
 
 (use-package yaml-mode
-  :mode ("\\.cff\\'" . yaml-ts-mode))
+  :mode ("\\.cff\\'" . yaml-ts-mode)
+  :init
+  (defun yaml-mode-setup-flymake ()
+    (add-hook 'flymake-diagnostic-functions 'flymake-collection-yamllint nil t)
+    (flymake-mode +1))
+
+  (add-hook 'yaml-mode-hook #'yaml-mode-setup-flymake)
+  (add-hook 'yaml-ts-mode-hook #'yaml-mode-setup-flymake))
 
 (use-package csv-mode
   :hook (csv-mode . csv-align-mode))
@@ -981,7 +1111,6 @@ If the new path's directories does not exist, create them."
 (use-package detached
   :init
   (detached-init)
-  (add-to-list 'display-buffer-alist '("\\*Detached Shell Command\\*" (display-buffer-in-side-window (side . bottom))))
   :bind (;; Replace `async-shell-command' with `detached-shell-command'
          ([remap async-shell-command] . detached-shell-command)
          ;; Replace `compile' with `detached-compile'
@@ -991,21 +1120,12 @@ If the new path's directories does not exist, create them."
          ([remap detached-open-session] . detached-consult-session))
 
   :custom ((detached-show-output-on-attach t)
-           (detached-terminal-data-command system-type)))
+           (detached-terminal-data-command system-type)
+           (detached-filter-ansi-sequences t)))
 
 
 
-(use-package dwim-shell-command
-  :bind (([remap shell-command] . dwim-shell-command)
-         :map dired-mode-map
-         ([remap dired-do-async-shell-command] . dwim-shell-command)
-         ([remap dired-do-shell-command] . dwim-shell-command)
-         ([remap dired-smart-shell-command] . dwim-shell-command)))
 
-
-(use-package dwim-shell-commands
-  :ensure nil
-  :after dwim-shell-command)
 
 (add-to-list 'display-buffer-alist
              '("^\\*vc-git" display-buffer-no-window (allow-no-window . t)))
@@ -1179,39 +1299,9 @@ If the new path's directories does not exist, create them."
   :after (magit))
 (use-package cmake-mode)
 
-(use-package pet
-  :init
-  (defun pet/find-exec (&rest candidates)
-    "Return the first executable found among CANDIDATES, checking venv first then system."
-    (or (seq-some
-         (lambda (cmd)
-           (when-let ((venv (pet-virtualenv-root))
-                      (bin (expand-file-name (concat "bin/" cmd) venv)))
-             (when (file-executable-p bin) bin)))
-         candidates)
-        (seq-some #'pet-executable-find candidates)))
-
-  (defun pet/initialise-environment ()
-    "Setup executables and variables for Python + Apheleia + Eglot."
-    (interactive)
-    (let ((ruff (pet/find-exec "ruff"))
-          (py (pet/find-exec "ipython" "python")))
-      (setq-local apheleia-formatters
-                  `((ruff ,ruff "format" "--silent"
-                          (apheleia-formatters-fill-column "--line-length")
-                          "--stdin-filename" filepath "-")
-                    (ruff-isort ,ruff "check" "-n" "--select" "I" "--fix" "--fix-only"
-                                "--stdin-filename" filepath "-")))
-      (setq-local python-shell-interpreter py
-                  python-shell-virtualenv-root (pet-virtualenv-root))))
-  ;; Run pet before eglot-ensure starts
-  (add-hook 'python-base-mode-hook #'pet-mode -90)
-  (add-hook 'pet-mode-hook #'pet/initialise-environment)
-
-  )
 
 
-
+(use-package eglot :ensure nil)
 
 (use-package deadgrep
   :bind (("<f5>" . #'deadgrep)
@@ -1242,10 +1332,68 @@ If the new path's directories does not exist, create them."
 (with-eval-after-load 'compile
   (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
 
-(use-package rust-mode)
 
 
-(use-package flymake-collection)
+(use-package rustic
+  :config
+  (setq rustic-format-on-save nil)
+  :custom
+  (rustic-cargo-use-last-stored-arguments t))
+
+
+
+(use-package flymake-collection
+  :demand t
+  :config
+  (require 'flymake-collection-define)
+
+  (flymake-collection-define-rx flymake-collection-numpydoc
+    "Numpydoc documentation checker."
+    :title "numpydoc"
+    :pre-let ((numpydoc-exec (executable-find "numpydoc_wrapper")))
+    :pre-check (unless numpydoc-exec
+                 (error "Cannot find numpydoc wrapper"))
+    :source-inplace t
+    :write-type 'file
+    :regexps ((error bol (file-name) ":" line ": " (id (* alnum)) " " (message) eol))
+    :command `(,numpydoc-exec ,flymake-collection-temp-file))
+  (flymake-collection-define-enumerate flymake-collection-uv-ruff
+    "A Python syntax and style checker uhsing Ruff.
+
+See URL `https://github.com/charliermarsh/ruff'."
+    :title "ruff"
+    :pre-let ((uv-exec (executable-find "uv")))
+    :pre-check (unless uv-exec
+                 (error "Cannot find uv executable"))
+    :write-type 'pipe
+    :command `(,uv-exec
+               "run"
+               "ruff"
+               "check"
+               "--output-format" "json"
+               ,@(when-let ((file (buffer-file-name flymake-collection-source)))
+                   (list "--stdin-filename" file))
+               "-")
+
+    :generator
+    (car (flymake-collection-parse-json
+          (buffer-substring-no-properties
+           (point-min) (point-max))))
+    :enumerate-parser
+    (let-alist it
+      (let ((loc (cons (car (flymake-diag-region
+                             flymake-collection-source
+                             .location.row .location.column))
+                       (cdr (flymake-diag-region
+                             flymake-collection-source
+                             .end_location.row .end_location.column)))))
+        (list flymake-collection-source
+              (car loc)
+              (cdr loc)
+              :warning
+              (concat (when .code
+                        (concat (propertize .code 'face 'flymake-collection-diag-id) " "))
+                      .message))))))
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 (setq bookmark-save-flag 1)
@@ -1291,23 +1439,27 @@ If the new path's directories does not exist, create them."
          (LaTeX-mode . flyspell-mode)
          (LaTeX-mode . TeX-PDF-mode)
          (LaTeX-mode . reftex-mode))
-  :init
-  (setq TeX-auto-save t
-        TeX-parse-self t
-        TeX-save-query nil
-        TeX-master nil ; query for master on first save
-        TeX-engine 'xetex ; modern default; change to 'luatex if preferred
-        TeX-PDF-mode t
-        LaTeX-item-indent 0
-        TeX-source-correlate-start-server t)
+  :custom
+  (TeX-auto-save t)
+  (TeX-parse-self t)
+  (TeX-save-query nil)
+  (TeX-master nil) ; query for master on first save
+  (TeX-PDF-mode t)
+  (LaTeX-item-indent 0)
+  (LaTeX-command-style '(("" "%(latex)")))
+  (TeX-engine-alist '((default
+                       "Tectonic"
+                       "tectonic -X compile -f plain %T"
+                       "tectonic -X watch"
+                       nil)))
+  (TeX-source-correlate-start-server t)
+  (TeX-process-asynchronous t)
+  (TeX-check-TeX nil)
+  (TeX-engine 'default)
   (with-eval-after-load 'reftex
     (setq reftex-plug-into-AUCTeX t
           reftex-cite-format 'default
-          reftex-ref-style-default-list '("Default" "Varioref")))
-  :config
-  (add-to-list 'TeX-command-list
-               '("LatexMk" "latexmk -pdflatex=%`%l%(mode)%(file-line-error) -pdf -interaction=nonstopmode -synctex=1 %s" TeX-run-TeX nil t
-                 :help "Run latexmk for PDF")))
+          reftex-ref-style-default-list '("Default" "Varioref"))))
 
 (setq-default display-line-numbers t)
 
