@@ -473,18 +473,18 @@ If invoked with `C-u`, also prompt for a Python version to pin."
     (add-hook 'flymake-diagnostic-functions
               'flymake-collection-numpydoc nil t))
 
+  (defun uv-which (uv-exec exec)
+    (when uv-exec
+      (let ((path (car (process-lines uv-exec "run" "which" exec))))
+        (when path
+          (string-trim path)))))
+
   (defun setup-python-environment ()
     "Configure python-shell to use `uv run which python/ipython`."
     (interactive)
     (let* ((uv-exec (executable-find "uv"))
-           (ipython (when uv-exec
-                      (string-trim
-                       (ignore-errors
-                         (car (process-lines uv-exec "run" "which" "ipython"))))))
-           (python (when uv-exec
-                     (string-trim
-                      (ignore-errors
-                        (car (process-lines uv-exec "run" "which" "python")))))))
+           (ipython (uv-which uv-exec "ipython"))
+           (python (uv-which uv-exec "python")))
       (cond
        ;; Prefer IPython if found
        ((and ipython (not (string-empty-p ipython)))
