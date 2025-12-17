@@ -1111,20 +1111,38 @@ If the new path's directories does not exist, create them."
 (use-package detached
   :init
   (detached-init)
+  (defun project-detached-compile ()
+    "Run `compile' in the project root."
+    (declare (interactive-only compile))
+    (interactive)
+    (let ((default-directory (project-root (project-current t)))
+          (compilation-buffer-name-function
+           (or project-compilation-buffer-name-function
+               compilation-buffer-name-function)))
+      (call-interactively #'detached-compile)))
+  (defun project-detached-recompile (&optional edit-command)
+    "Run `recompile' with appropriate buffer."
+    (declare (interactive-only recompile))
+    (interactive "P")
+    (let ((compilation-buffer-name-function
+           (or project-compilation-buffer-name-function
+               ;; Should we error instead?  When there's no
+               ;; project-specific naming, there is no point in using
+               ;; this command.
+               compilation-buffer-name-function)))
+      (detached-compile-recompile edit-command)))
   :bind (;; Replace `async-shell-command' with `detached-shell-command'
          ([remap async-shell-command] . detached-shell-command)
          ;; Replace `compile' with `detached-compile'
          ([remap compile] . detached-compile)
          ([remap recompile] . detached-compile-recompile)
          ;; Replace built in completion of sessions with `consult'
-         ([remap detached-open-session] . detached-consult-session))
-
+         ([remap detached-open-session] . detached-consult-session)
+         ([remap project-compile] . project-detached-compile)
+         ([remap project-recompile] . project-detached-recompile))
   :custom ((detached-show-output-on-attach t)
            (detached-terminal-data-command system-type)
            (detached-filter-ansi-sequences t)))
-
-
-
 
 
 (add-to-list 'display-buffer-alist
