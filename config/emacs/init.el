@@ -623,59 +623,6 @@ If invoked with `C-u`, also prompt for a Python version to pin."
 
 (setq-default abbrev-mode t)
 
-;; (use-package lsp-mode
-
-;;   :hook ((nix-ts-mode . lsp-deferred)
-;;          (haskell-mode . lsp-deferred)
-;;          (java-ts-mode . lsp-deferred)
-;;          (rust-mode . lsp-deferred)
-;;          (typst-mode . lsp-deferred)
-;;          (python-base-mode . my/python-lsp-setup))
-
-;;   :bind (("C-c c r" . lsp-rename)
-;;          ("C-c c e" . lsp) ;; start session
-;;          ("C-c c i" . lsp-organize-imports)
-;;          ("C-c c a" . lsp-execute-code-action)
-;;          ("C-c c q" . lsp-execute-code-action))
-;;   :init
-;;   (defun my/python-lsp-setup ()
-;;     "Configure buffer-local LSP clients for Python."
-;;     (setq-local lsp-enabled-clients '(ty+booster ruff+booster))
-;;     (lsp-deferred))
-
-;;   :config
-;;   (lsp-register-client
-;;    (make-lsp-client
-;;     :new-connection (lsp-stdio-connection
-;;                      (lambda ()
-;;                        (list "emacs-lsp-booster" "--disable-bytecode" "--" (pet/find-exec "ty") "server")))
-;;     :major-modes '(python-ts-mode)
-;;     :server-id 'ty+booster))
-
-;;   (lsp-register-client
-;;    (make-lsp-client
-;;     :new-connection (lsp-stdio-connection
-;;                      (lambda ()
-;;                        (list "emacs-lsp-booster" "--disable-bytecode" "--" "jdtls")))
-;;     :major-modes '(java-ts-mode)
-;;     :server-id 'jdtls))
-
-;;   (lsp-register-client
-;;    (make-lsp-client
-;;     :add-on? t
-;;     :new-connection (lsp-stdio-connection
-;;                      (lambda () (list "emacs-lsp-booster" "--disable-bytecode" "--" (pet/find-exec "ruff") "server")))
-;;     :major-modes '(python-ts-mode)
-;;     :server-id 'ruff+booster))
-
-;;   (lsp-register-client
-;;    (make-lsp-client
-;;     :new-connection (lsp-stdio-connection '("tinymist"))
-;;     :major-modes '(typst-ts-mode)
-;;     :activation-fn (lsp-activate-on "typst")
-;;     :server-id 'typst-lsp))
-;;   (add-to-list 'lsp-language-id-configuration '(typst-ts-mode . "typst")))
-
 (use-package project
   :ensure nil
   :bind (("C-x p t" . project-test) ("C-x p i" . consult-imenu-multi))
