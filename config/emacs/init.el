@@ -393,7 +393,9 @@
   (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package magit
-  :bind ("C-c g g" . magit-status)
+  :bind (("C-c g g" . magit-status)
+         :map git-commit-mode-map
+         ("C-c C-g" . copilot-chat-insert-commit-message))
   :init (with-eval-after-load 'project
           (add-to-list 'project-switch-commands '(magit-project-status "Magit" "m"))))
 
@@ -507,17 +509,17 @@ If invoked with `C-u`, also prompt for a Python version to pin."
   (add-hook 'python-ts-mode-hook
             (lambda ()
               (setq-local apheleia-formatters
-                          `((ruff "uv" "run" "ruff" "format" "--silent"
+                          `((ruff "uvx" "ruff" "format" "--silent"
                                   (apheleia-formatters-fill-column "--line-length")
                                   "--stdin-filename" filepath "-")
-                            (ruff-isort "uv" "run" "ruff" "check" "-n" "--select" "I"
+                            (ruff-isort "uvx" "ruff" "check" "-n" "--select" "I"
                                         "--fix" "--fix-only"
                                         "--stdin-filename" filepath "-")))))
 
   ;; --- Eglot server setup ---
   (with-eval-after-load 'eglot
     (add-to-list 'eglot-server-programs
-                 '(python-ts-mode "uv" "run" "ty" "server")))
+                 '(python-ts-mode "uv" "run" "--extra" "types" "--extra" "dev" "ty" "server")))
 
 
   ;; ------------------------------------------------------------------
@@ -552,10 +554,7 @@ If invoked with `C-u`, also prompt for a Python version to pin."
                                                  "numpy~2.0"
                                                  "python~3.13"
                                                  "matplotlib")))))
-
-
 (use-package cython-mode)
-
 
 (use-package python-numpydoc
   :ensure nil
@@ -1327,12 +1326,11 @@ If the new path's directories does not exist, create them."
 
 See URL `https://github.com/charliermarsh/ruff'."
     :title "ruff"
-    :pre-let ((uv-exec (executable-find "uv")))
+    :pre-let ((uv-exec (executable-find "uvx")))
     :pre-check (unless uv-exec
                  (error "Cannot find uv executable"))
     :write-type 'pipe
     :command `(,uv-exec
-               "run"
                "ruff"
                "check"
                "--output-format" "json"
