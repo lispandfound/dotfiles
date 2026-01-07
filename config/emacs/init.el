@@ -554,6 +554,14 @@ If invoked with `C-u`, also prompt for a Python version to pin."
                                                  "numpy~2.0"
                                                  "python~3.13"
                                                  "matplotlib")))))
+
+(use-package uv
+  :ensure nil
+  :load-path "lisp/"
+  :after (python)
+  :bind (:map python-ts-mode-map
+              ("C-c u" . uv-menu)))
+
 (use-package cython-mode)
 
 (use-package python-numpydoc
