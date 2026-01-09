@@ -798,10 +798,11 @@ point reaches the beginning or end of the buffer, stop there."
   :init
   (setq org-agenda-capture-file "~/Sync/todo.org")
   (setq org-default-notes-file "~/Sync/notes.org")
-  (add-hook 'org-agenda-mode-hook
-            (lambda ()
-              (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
-              (auto-save-mode))))
+  ;; (add-hook 'org-agenda-mode-hook
+  ;;           (lambda ()
+  ;;             (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
+  ;;             (auto-save-mode)))
+  )
 
 (use-package org-transient
   :ensure nil
