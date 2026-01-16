@@ -156,6 +156,8 @@
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
 
+
+
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :config
@@ -176,6 +178,18 @@
    ;; :preview-key "M-."
    :preview-key '(:debounce 0.4 any))
   )
+;;;###autoload
+(defun consult-ripgrep-all (&optional dir initial)
+  (interactive "P")
+  (let ((consult-ripgrep-args "rga --null --line-buffered --color=never --max-columns=1000  --smart-case --no-heading --with-filename --line-number"))
+    (consult-ripgrep dir initial)))
+
+(setq literature-directory "~/Sync")
+(defun search/papers ()
+  (interactive)
+  (consult-ripgrep-all literature-ory))
+
+(bind-key "s-p" #'search/papers)
 
 (use-package better-defaults
   :demand t
@@ -580,13 +594,6 @@ If invoked with `C-u`, also prompt for a Python version to pin."
 (defun local-disable-line-numbers ()
   (setq-local display-line-numbers nil))
 
-(use-package reader
-  :ensure (:host codeberg :repo "divyaranjan/emacs-reader"
-                 :pre-build ("make" "clean" "all")
-                 :files ("*.el" "render-core.so"))
-  :config
-  (add-hook 'reader-mode-hook #'local-disable-line-numbers))
-
 ;; Configure Tempel
 (use-package tempel
   ;; Require trigger prefix before template name when completing.
@@ -781,6 +788,8 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package org
   :bind (:map org-mode-map
               ("M-<return>" . org-meta-return)) ;; required because of crux override.
+  :hook
+  (org-mode . visual-line-mode)
   :custom
   (org-capture-templates
    '(("l" "Logged completed task" entry
@@ -790,14 +799,11 @@ point reaches the beginning or end of the buffer, stop there."
       "* %?\12 %U\12 %a\12 %i")
      ("t" "Todo" entry (file+headline org-agenda-capture-file "Tasks")
       "* TODO %?\12 %U\12 %a\12 %i")))
-  (org-agenda-files '("~/Sync/todo.org"))
-
   (org-directory "~/Sync")
-
   (org-todo-keywords '((sequence "TODO" "WAIT(w@/!)" "|" "DONE" "KILL")))
   :init
-  (setq org-agenda-capture-file "~/Sync/todo.org")
-  (setq org-default-notes-file "~/Sync/notes.org")
+
+  (setq org-file-apps-gnu '((remote . emacs) (system . "xdg-open \"%s\"") (t  . "xdg-open \"%s\"")))
   ;; (add-hook 'org-agenda-mode-hook
   ;;           (lambda ()
   ;;             (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
@@ -1449,14 +1455,31 @@ See URL `https://github.com/charliermarsh/ruff'."
 (use-package denote
   :ensure t
   :hook (dired-mode . denote-dired-mode)
-  :bind
-  (("C-c n n" . denote)
-   ("C-c n r" . denote-rename-file)
-   ("C-c n l" . denote-link)
-   ("C-c n b" . denote-backlinks)
-   ("C-c n d" . denote-dired)
-   ("C-c n g" . denote-grep))
+  :bind (("s-d" . denote-transient))
+  :init
+  (transient-define-prefix denote-transient ()
+    "Denote dispatch"
+    [["Note creation (d)"
+      ("dd" "new note" denote)
+      ("dj" "new or existing journal entry" denote-journal-new-or-existing-entry)
+      ("dn" "open or new" denote-open-or-create)
+      ("dt" "new specifying date and time" denote-date)
+      ("ds" "create in subdirectory " denote-subdirectory)]]
+    [["Bookkeeping (b)"
+      ("br" "prompt and rename" denote-rename-file)
+      ("bf" "rename with frontmatter" denote-rename-file-using-front-matter)
+      ("bk" "modify keywords" denote-rename-file-keywords)]
+     ["Linking (l)"
+      ("li" "insert link" denote-link)
+      ("lh" "insert link to org heading" denote-org-link-to-heading)
+      ("lb" "show backlinks" denote-backlinks)
+      ("lg" "visit backlink" denote-find-backlink)
+      ("lo" "org backlink block" denote-org-dblock-insert-backlinks)]]
+    [["Searching (s)"
+      ("sn" "consult-notes" consult-notes)
+      ("ss" "consult-notes search" consult-notes-search-in-all-notes)]])
   :config
+
   (setq denote-directory (expand-file-name "~/notes/"))
 
   ;; Automatically rename Denote buffers when opening them so that
@@ -1464,3 +1487,35 @@ See URL `https://github.com/charliermarsh/ruff'."
   ;; "[D]" followed by the file's title.  Read the doc string of
   ;; `denote-rename-buffer-format' for how to modify this.
   (denote-rename-buffer-mode 1))
+
+(use-package org-fragtog
+  :ensure t
+  :hook (org-mode . org-fragtog-mode))
+
+(use-package denote-journal
+  :ensure t
+  :after denote
+  :custom
+  (denote-journal-keyword "labnotes")
+  (denote-journal-directory (expand-file-name "~/notes/labnotes"))
+  (denote-journal-title-format 'day-date-month-year))
+(use-package denote-org
+  :after denote
+  :custom
+  ;; `denote-org-link-to-heading' controls the behavior of
+  ;; `org-store-link': setting to id makes it insert an ID in the
+  ;; PROPERTIES drawer
+  ;;
+  ;; (denote-org-store-link-to-heading 'context)
+  (denote-org-store-link-to-heading 'id))
+
+
+(use-package consult-notes
+  :ensure (:type git :host github :repo "mclear-tools/consult-notes")
+  :commands (consult-notes consult-notes-search-in-all-notes)
+  :config
+  ;; Set org-roam integration, denote integration, or org-heading integration e.g.:
+  (consult-notes-org-headings-mode)
+  (consult-notes-denote-mode)
+  ;; search only for text files in denote dir
+  (setq consult-notes-denote-files-function (lambda () (denote-directory-files nil t t))))

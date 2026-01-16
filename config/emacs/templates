@@ -59,3 +59,20 @@ python-base-mode
 
 latex-mode
 (comment "\\textcolor{blue}{" p "}")
+
+org-mode
+(journal
+ "* Summary" n
+ "- " p n n
+ "* Accomplishments" n
+ "- " p n
+ "- " p n
+ "* Insights / Ideas" n
+ "- " p n
+ "- " p n
+ "* Challenges / Questions" n
+ "- " p n
+ "- " p n
+ "* Next Steps" n
+ "- " p n
+ "- " p n)

@@ -22,6 +22,10 @@
      (:vc-good . 10004) (:buffer-narrowed . 9660)
      (:buffer-modified . 9679) (:buffer-read-only . 9632)
      (:frame-client . 8645) (:count-separator . 10005)))
+ '(org-agenda-files nil nil nil "Customized with use-package org")
+ '(org-file-apps
+   '(("\\.pdf\\'" . system) (auto-mode . emacs) (directory . emacs)
+     ("\\.mm\\'" . default) ("\\.x?html?\\'" . default)))
  '(package-install-upgrade-built-in t)
  '(package-selected-packages
    '(apptainer-mode copilot copilot-chat org-menu pandoc-transient
