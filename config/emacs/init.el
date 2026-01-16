@@ -84,12 +84,16 @@
   (require 'mood-line-segment-vc)
   (mood-line-mode))
 
+;; Display time in the mode line
+(display-time-mode)
+
+;; ============================================================================
+;; KEYBINDINGS & INPUT
 ;; ============================================================================
 ;; KEYBINDINGS & INPUT
 ;; ============================================================================
 
 ;; Swap C-t and C-x for more ergonomic keybindings
-(display-time-mode)
 (keyboard-translate ?\C-t ?\C-x)
 (keyboard-translate ?\C-x ?\C-t)
 (add-hook 'server-after-make-frame-hook
@@ -359,9 +363,7 @@
   ;; useful beyond Vertico.
   (setq read-extended-command-predicate #'command-completion-default-include-p))
 
-
-;; More built-in enhancements for TAB completion
-;; A few more useful configurations...
+;; TAB completion and indentation settings
 (use-package emacs
   :ensure nil
   :init
@@ -653,7 +655,9 @@ If invoked with `C-u`, also prompt for a Python version to pin."
 
 (use-package cython-mode)
 
-;; Python numpydoc helper
+;; ----------------------------------------------------------------------------
+;; Python documentation helper
+;; ----------------------------------------------------------------------------
 
 (use-package python-numpydoc
   :ensure nil
@@ -797,6 +801,10 @@ point reaches the beginning or end of the buffer, stop there."
   :init
 
   (add-to-list 'display-buffer-alist '("\\*haskell-compilation\\*.*" (display-buffer-in-side-window (side . bottom)))))
+
+;; ----------------------------------------------------------------------------
+;; Display Buffer Configuration
+;; ----------------------------------------------------------------------------
 
 ;; Shell and compilation buffer display configuration
 (add-to-list 'display-buffer-alist '("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom))))
