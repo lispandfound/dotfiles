@@ -206,18 +206,6 @@
    ;; :preview-key "M-."
    :preview-key '(:debounce 0.4 any))
   )
-;;;###autoload
-(defun consult-ripgrep-all (&optional dir initial)
-  (interactive "P")
-  (let ((consult-ripgrep-args "rga --null --line-buffered --color=never --max-columns=1000  --smart-case --no-heading --with-filename --line-number"))
-    (consult-ripgrep dir initial)))
-
-(setq literature-directory "~/Sync")
-(defun search/papers ()
-  (interactive)
-  (consult-ripgrep-all literature-ory))
-
-(bind-key "s-p" #'search/papers)
 
 ;; ----------------------------------------------------------------------------
 ;; Better Defaults & Basic Editor Behavior
@@ -482,6 +470,19 @@
 (use-package git-link
   :bind (("C-c g l" . git-link)))
 
+(use-package pr-review
+  :after magit
+  :init
+  (defun mes/pr-review-via-forge ()
+    (interactive)
+    (if-let* ((target (forge--browse-target))
+              (url (if (stringp target) target (forge-get-url target)))
+              (rev-url (pr-review-url-parse url)))
+        (pr-review url)
+      (user-error "No PR to review at point"))))
+
+(use-package gitignore-templates)
+
 ;; ============================================================================
 ;; PROGRAMMING MODES & LANGUAGE SUPPORT
 ;; ============================================================================
@@ -668,6 +669,39 @@ If invoked with `C-u`, also prompt for a Python version to pin."
   :hook ((shell-mode . comint-mime-setup)
          (inferior-python-mode . comint-mime-setup)))
 
+;; ----------------------------------------------------------------------------
+;; Additional Language Modes
+;; ----------------------------------------------------------------------------
+
+(use-package yaml-mode
+  :mode ("\\.cff\\'" . yaml-ts-mode)
+  :init
+  (defun yaml-mode-setup-flymake ()
+    (add-hook 'flymake-diagnostic-functions 'flymake-collection-yamllint nil t)
+    (flymake-mode +1))
+
+  (add-hook 'yaml-mode-hook #'yaml-mode-setup-flymake)
+  (add-hook 'yaml-ts-mode-hook #'yaml-mode-setup-flymake))
+
+(use-package csv-mode
+  :hook (csv-mode . csv-align-mode))
+
+(use-package haskell-mode
+  :bind (:map haskell-mode-map
+              (("C-c C-c" . haskell-compile)))
+  :init
+  (add-to-list 'display-buffer-alist '("\\*haskell-compilation\\*.*" (display-buffer-in-side-window (side . bottom)))))
+
+(use-package rustic
+  :config
+  (setq rustic-format-on-save nil)
+  :custom
+  (rustic-cargo-use-last-stored-arguments t))
+
+(use-package envrc
+  :demand t
+  :init  (envrc-global-mode))
+
 ;; ============================================================================
 ;; TEXT EDITING & TEMPLATES
 ;; ============================================================================
@@ -774,31 +808,6 @@ point reaches the beginning or end of the buffer, stop there."
       tramp-use-ssh-controlmaster-options nil
       vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)
       use-short-answers t)
-
-;; ----------------------------------------------------------------------------
-;; Additional language modes
-;; ----------------------------------------------------------------------------
-
-(use-package yaml-mode
-  :mode ("\\.cff\\'" . yaml-ts-mode)
-  :init
-  (defun yaml-mode-setup-flymake ()
-    (add-hook 'flymake-diagnostic-functions 'flymake-collection-yamllint nil t)
-    (flymake-mode +1))
-
-  (add-hook 'yaml-mode-hook #'yaml-mode-setup-flymake)
-  (add-hook 'yaml-ts-mode-hook #'yaml-mode-setup-flymake))
-
-(use-package csv-mode
-  :hook (csv-mode . csv-align-mode))
-
-
-(use-package haskell-mode
-  :bind (:map haskell-mode-map
-              (("C-c C-c" . haskell-compile)))
-  :init
-
-  (add-to-list 'display-buffer-alist '("\\*haskell-compilation\\*.*" (display-buffer-in-side-window (side . bottom)))))
 
 ;; ----------------------------------------------------------------------------
 ;; Display Buffer Configuration
@@ -937,6 +946,14 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package ox-slack
   :after org)
 
+(use-package org-download
+  :after org
+  :hook (dired-mode . org-download-enable)
+  :bind
+  (:map org-mode-map
+        (("s-Y" . org-download-screenshot)
+         ("s-y" . org-download-yank))))
+
 (use-package gist)
 
 ;; ============================================================================
@@ -1034,6 +1051,11 @@ If the new path's directories does not exist, create them."
 ;; ============================================================================
 
 (use-package just-mode)
+
+(use-package nix-ts-mode
+  :mode "\\.nix\\'")
+
+(use-package jenkinsfile-mode)
 
 ;; ----------------------------------------------------------------------------
 ;; Documentation & Help
@@ -1194,49 +1216,6 @@ If the new path's directories does not exist, create them."
   :ensure (:host github :repo "jrgant/apptainer-mode")
   :mode ("\\.def\\'" . apptainer-mode))
 
-
-(use-package tldr
-  :bind ("C-h t" . tldr)
-  :init (add-to-list 'display-buffer-alist '("\\*tldr\\*" (display-buffer-in-side-window (side . bottom)))))
-
-
-(use-package detached
-  :init
-  (detached-init)
-  (defun project-detached-compile ()
-    "Run `compile' in the project root."
-    (declare (interactive-only compile))
-    (interactive)
-    (let ((default-directory (project-root (project-current t)))
-          (compilation-buffer-name-function
-           (or project-compilation-buffer-name-function
-               compilation-buffer-name-function)))
-      (call-interactively #'detached-compile)))
-  (defun project-detached-recompile (&optional edit-command)
-    "Run `recompile' with appropriate buffer."
-    (declare (interactive-only recompile))
-    (interactive "P")
-    (let ((compilation-buffer-name-function
-           (or project-compilation-buffer-name-function
-               ;; Should we error instead?  When there's no
-               ;; project-specific naming, there is no point in using
-               ;; this command.
-               compilation-buffer-name-function)))
-      (detached-compile-recompile edit-command)))
-  :bind (;; Replace `async-shell-command' with `detached-shell-command'
-         ([remap async-shell-command] . detached-shell-command)
-         ;; Replace `compile' with `detached-compile'
-         ([remap compile] . detached-compile)
-         ([remap recompile] . detached-compile-recompile)
-         ;; Replace built in completion of sessions with `consult'
-         ([remap detached-open-session] . detached-consult-session)
-         ([remap project-compile] . project-detached-compile)
-         ([remap project-recompile] . project-detached-recompile))
-  :custom ((detached-show-output-on-attach t)
-           (detached-terminal-data-command system-type)
-           (detached-filter-ansi-sequences t)))
-
-
 (add-to-list 'display-buffer-alist
              '("^\\*vc-git" display-buffer-no-window (allow-no-window . t)))
 
@@ -1246,13 +1225,6 @@ If the new path's directories does not exist, create them."
 
 (use-package uniline
   :ensure t)
-
-
-(use-package envrc
-  :demand t
-  :init  (envrc-global-mode))
-
-(use-package jenkinsfile-mode)
 
 ;; ============================================================================
 ;; SPELL CHECKING & LINTING
@@ -1272,34 +1244,57 @@ If the new path's directories does not exist, create them."
   :ensure nil
   :hook (prog-mode . flymake-mode))
 
-;; ----------------------------------------------------------------------------
-;; Additional file type modes
-;; ----------------------------------------------------------------------------
-
-(use-package gitignore-templates)
-
-(use-package nix-ts-mode
-  :mode "\\.nix\\'")
-
-(use-package org-download
-  :after org
-  :hook (dired-mode . org-download-enable)
-  :bind
-  (:map org-mode-map
-        (("s-Y" . org-download-screenshot)
-         ("s-y" . org-download-yank))))
-
-
-(use-package lookup
-  :ensure nil
-  :bind (("C-c l" . lookup/query))
-  :load-path "lisp/"
-  :init
-  ;; Embark integration
-  (with-eval-after-load 'embark
-    (define-key embark-symbol-map (kbd "l") #'lookup/query))
+(use-package flymake-collection
+  :demand t
   :config
-  (add-hook 'kill-emacs-hook #'lookup/save-query-history))
+  (require 'flymake-collection-define)
+
+  (flymake-collection-define-rx flymake-collection-numpydoc
+    "Numpydoc documentation checker."
+    :title "numpydoc"
+    :pre-let ((numpydoc-exec (executable-find "numpydoc_wrapper")))
+    :pre-check (unless numpydoc-exec
+                 (error "Cannot find numpydoc wrapper"))
+    :source-inplace t
+    :write-type 'file
+    :regexps ((error bol (file-name) ":" line ": " (id (* alnum)) " " (message) eol))
+    :command `(,numpydoc-exec ,flymake-collection-temp-file))
+  (flymake-collection-define-enumerate flymake-collection-uv-ruff
+    "A Python syntax and style checker uhsing Ruff.
+
+See URL `https://github.com/charliermarsh/ruff'."
+    :title "ruff"
+    :pre-let ((uv-exec (executable-find "uvx")))
+    :pre-check (unless uv-exec
+                 (error "Cannot find uv executable"))
+    :write-type 'pipe
+    :command `(,uv-exec
+               "ruff"
+               "check"
+               "--output-format" "json"
+               ,@(when-let ((file (buffer-file-name flymake-collection-source)))
+                   (list "--stdin-filename" file))
+               "-")
+
+    :generator
+    (car (flymake-collection-parse-json
+          (buffer-substring-no-properties
+           (point-min) (point-max))))
+    :enumerate-parser
+    (let-alist it
+      (let ((loc (cons (car (flymake-diag-region
+                             flymake-collection-source
+                             .location.row .location.column))
+                       (cdr (flymake-diag-region
+                             flymake-collection-source
+                             .end_location.row .end_location.column)))))
+        (list flymake-collection-source
+              (car loc)
+              (cdr loc)
+              :warning
+              (concat (when .code
+                        (concat (propertize .code 'face 'flymake-collection-diag-id) " "))
+                      .message))))))
 
 ;; ============================================================================
 ;; CASUAL - TRANSIENT MENU ENHANCEMENTS
@@ -1389,6 +1384,77 @@ If the new path's directories does not exist, create them."
   :bind (("<f5>" . #'deadgrep)
          ("C-x p g" . #'deadgrep)))
 
+(use-package lookup
+  :ensure nil
+  :bind (("C-c l" . lookup/query))
+  :load-path "lisp/"
+  :init
+  ;; Embark integration
+  (with-eval-after-load 'embark
+    (define-key embark-symbol-map (kbd "l") #'lookup/query))
+  :config
+  (add-hook 'kill-emacs-hook #'lookup/save-query-history))
+
+(use-package edit-server
+  :commands edit-server-start
+  :init (if after-init-time
+            (edit-server-start)
+          (add-hook 'after-init-hook
+                    #'(lambda() (edit-server-start))))
+  :config (setq edit-server-new-frame-alist
+                '((name . "Edit with Emacs FRAME")
+                  (top . 200)
+                  (left . 200)
+                  (width . 80)
+                  (height . 25)
+                  (minibuffer . t)
+                  (menu-bar-lines . t))))
+
+(use-package copilot-chat
+  :bind (("C-c c c" . copilot-chat-display)))
+
+(use-package restart-emacs)
+
+(use-package tldr
+  :bind ("C-h t" . tldr)
+  :init (add-to-list 'display-buffer-alist '("\\*tldr\\*" (display-buffer-in-side-window (side . bottom)))))
+
+(use-package detached
+  :init
+  (detached-init)
+  (defun project-detached-compile ()
+    "Run `compile' in the project root."
+    (declare (interactive-only compile))
+    (interactive)
+    (let ((default-directory (project-root (project-current t)))
+          (compilation-buffer-name-function
+           (or project-compilation-buffer-name-function
+               compilation-buffer-name-function)))
+      (call-interactively #'detached-compile)))
+  (defun project-detached-recompile (&optional edit-command)
+    "Run `recompile' with appropriate buffer."
+    (declare (interactive-only recompile))
+    (interactive "P")
+    (let ((compilation-buffer-name-function
+           (or project-compilation-buffer-name-function
+               ;; Should we error instead?  When there's no
+               ;; project-specific naming, there is no point in using
+               ;; this command.
+               compilation-buffer-name-function)))
+      (detached-compile-recompile edit-command)))
+  :bind (;; Replace `async-shell-command' with `detached-shell-command'
+         ([remap async-shell-command] . detached-shell-command)
+         ;; Replace `compile' with `detached-compile'
+         ([remap compile] . detached-compile)
+         ([remap recompile] . detached-compile-recompile)
+         ;; Replace built in completion of sessions with `consult'
+         ([remap detached-open-session] . detached-consult-session)
+         ([remap project-compile] . project-detached-compile)
+         ([remap project-recompile] . project-detached-recompile))
+  :custom ((detached-show-output-on-attach t)
+           (detached-terminal-data-command system-type)
+           (detached-filter-ansi-sequences t)))
+
 ;; ============================================================================
 ;; REMOTE FILE ACCESS - TRAMP
 ;; ============================================================================
@@ -1418,107 +1484,9 @@ If the new path's directories does not exist, create them."
 (with-eval-after-load 'compile
   (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
 
-;; ----------------------------------------------------------------------------
-;; Rust Support
-;; ----------------------------------------------------------------------------
-
-(use-package rustic
-  :config
-  (setq rustic-format-on-save nil)
-  :custom
-  (rustic-cargo-use-last-stored-arguments t))
-
-;; ----------------------------------------------------------------------------
-;; Flymake checkers (custom definitions)
-;; ----------------------------------------------------------------------------
-
-(use-package flymake-collection
-  :demand t
-  :config
-  (require 'flymake-collection-define)
-
-  (flymake-collection-define-rx flymake-collection-numpydoc
-    "Numpydoc documentation checker."
-    :title "numpydoc"
-    :pre-let ((numpydoc-exec (executable-find "numpydoc_wrapper")))
-    :pre-check (unless numpydoc-exec
-                 (error "Cannot find numpydoc wrapper"))
-    :source-inplace t
-    :write-type 'file
-    :regexps ((error bol (file-name) ":" line ": " (id (* alnum)) " " (message) eol))
-    :command `(,numpydoc-exec ,flymake-collection-temp-file))
-  (flymake-collection-define-enumerate flymake-collection-uv-ruff
-    "A Python syntax and style checker uhsing Ruff.
-
-See URL `https://github.com/charliermarsh/ruff'."
-    :title "ruff"
-    :pre-let ((uv-exec (executable-find "uvx")))
-    :pre-check (unless uv-exec
-                 (error "Cannot find uv executable"))
-    :write-type 'pipe
-    :command `(,uv-exec
-               "ruff"
-               "check"
-               "--output-format" "json"
-               ,@(when-let ((file (buffer-file-name flymake-collection-source)))
-                   (list "--stdin-filename" file))
-               "-")
-
-    :generator
-    (car (flymake-collection-parse-json
-          (buffer-substring-no-properties
-           (point-min) (point-max))))
-    :enumerate-parser
-    (let-alist it
-      (let ((loc (cons (car (flymake-diag-region
-                             flymake-collection-source
-                             .location.row .location.column))
-                       (cdr (flymake-diag-region
-                             flymake-collection-source
-                             .end_location.row .end_location.column)))))
-        (list flymake-collection-source
-              (car loc)
-              (cdr loc)
-              :warning
-              (concat (when .code
-                        (concat (propertize .code 'face 'flymake-collection-diag-id) " "))
-                      .message))))))
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 (setq bookmark-save-flag 1)
-
-
-(use-package edit-server
-  :commands edit-server-start
-  :init (if after-init-time
-            (edit-server-start)
-          (add-hook 'after-init-hook
-                    #'(lambda() (edit-server-start))))
-  :config (setq edit-server-new-frame-alist
-                '((name . "Edit with Emacs FRAME")
-                  (top . 200)
-                  (left . 200)
-                  (width . 80)
-                  (height . 25)
-                  (minibuffer . t)
-                  (menu-bar-lines . t))))
-
-
-(use-package pr-review
-  :after magit
-  :init
-  (defun mes/pr-review-via-forge ()
-    (interactive)
-    (if-let* ((target (forge--browse-target))
-              (url (if (stringp target) target (forge-get-url target)))
-              (rev-url (pr-review-url-parse url)))
-        (pr-review url)
-      (user-error "No PR to review at point"))))
-
-(use-package copilot-chat
-  :bind (("C-c c c" . copilot-chat-display)))
-
-(use-package restart-emacs)
 
 ;; ============================================================================
 ;; LATEX & TYPESETTING
@@ -1568,6 +1536,27 @@ See URL `https://github.com/charliermarsh/ruff'."
 ;; ============================================================================
 ;; NOTES & KNOWLEDGE MANAGEMENT
 ;; ============================================================================
+
+;; ----------------------------------------------------------------------------
+;; Literature Search
+;; ----------------------------------------------------------------------------
+
+;;;###autoload
+(defun consult-ripgrep-all (&optional dir initial)
+  (interactive "P")
+  (let ((consult-ripgrep-args "rga --null --line-buffered --color=never --max-columns=1000  --smart-case --no-heading --with-filename --line-number"))
+    (consult-ripgrep dir initial)))
+
+(setq literature-directory "~/Sync")
+(defun search/papers ()
+  (interactive)
+  (consult-ripgrep-all literature-ory))
+
+(bind-key "s-p" #'search/papers)
+
+;; ----------------------------------------------------------------------------
+;; Denote - Simple note-taking system
+;; ----------------------------------------------------------------------------
 
 (use-package denote
   :ensure t
