@@ -1260,7 +1260,7 @@ If the new path's directories does not exist, create them."
     :regexps ((error bol (file-name) ":" line ": " (id (* alnum)) " " (message) eol))
     :command `(,numpydoc-exec ,flymake-collection-temp-file))
   (flymake-collection-define-enumerate flymake-collection-uv-ruff
-    "A Python syntax and style checker uhsing Ruff.
+    "A Python syntax and style checker using Ruff.
 
 See URL `https://github.com/charliermarsh/ruff'."
     :title "ruff"
@@ -1550,7 +1550,7 @@ See URL `https://github.com/charliermarsh/ruff'."
 (setq literature-directory "~/Sync")
 (defun search/papers ()
   (interactive)
-  (consult-ripgrep-all literature-ory))
+  (consult-ripgrep-all literature-directory))
 
 (bind-key "s-p" #'search/papers)
 
