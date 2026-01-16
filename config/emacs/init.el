@@ -218,7 +218,7 @@
 (bind-key "s-p" #'search/papers)
 
 ;; ----------------------------------------------------------------------------
-;; Orderless - Flexible completion style
+;; Better Defaults & Basic Editor Behavior
 ;; ----------------------------------------------------------------------------
 
 (use-package better-defaults
