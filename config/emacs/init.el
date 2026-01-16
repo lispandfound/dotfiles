@@ -483,6 +483,9 @@
 
 (use-package gitignore-templates)
 
+(use-package magit-lfs
+  :after (magit))
+
 ;; ============================================================================
 ;; PROGRAMMING MODES & LANGUAGE SUPPORT
 ;; ============================================================================
@@ -702,6 +705,8 @@ If invoked with `C-u`, also prompt for a Python version to pin."
   :demand t
   :init  (envrc-global-mode))
 
+(use-package elm-mode)
+
 ;; ============================================================================
 ;; TEXT EDITING & TEMPLATES
 ;; ============================================================================
@@ -889,7 +894,6 @@ point reaches the beginning or end of the buffer, stop there."
   :config
   (add-to-list 'consult-dir-sources 'consult-dir--source-eshell t)
   (add-to-list 'consult-dir-sources 'consult-dir--source-zoxide t))
-(use-package elm-mode)
 
 (use-package wgrep)
 
@@ -953,6 +957,10 @@ point reaches the beginning or end of the buffer, stop there."
   (:map org-mode-map
         (("s-Y" . org-download-screenshot)
          ("s-y" . org-download-yank))))
+
+(use-package ox-reveal
+  :after org
+  :init (require 'ox-reveal))
 
 (use-package gist)
 
@@ -1057,19 +1065,6 @@ If the new path's directories does not exist, create them."
 
 (use-package jenkinsfile-mode)
 
-;; ----------------------------------------------------------------------------
-;; Documentation & Help
-;; ----------------------------------------------------------------------------
-
-(use-package devdocs
-  :bind ("C-h D" . devdocs-lookup))
-
-;; ----------------------------------------------------------------------------
-;; Miscellaneous utilities
-;; ----------------------------------------------------------------------------
-
-(use-package ascii-art-to-unicode)
-
 (repeat-mode)
 
 (defun hl-todo-and-notes ()
@@ -1105,6 +1100,10 @@ If the new path's directories does not exist, create them."
            :files ("cylc/flow/etc/syntax/cylc-mode.el"))
   :mode ("suite.*\\.rc\\'" "\\.cylc\\'"))
 
+(use-package apptainer-mode
+  :ensure (:host github :repo "jrgant/apptainer-mode")
+  :mode ("\\.def\\'" . apptainer-mode))
+
 
 (use-package grip-mode
   :bind (:map markdown-mode-command-map
@@ -1112,11 +1111,6 @@ If the new path's directories does not exist, create them."
 
 ;; The default bind for query-replace-regexp is stupid... C-M-%... who thought that was less useful than `move-to-window-line'!
 (bind-key "M-r" #'query-replace-regexp)
-
-(use-package ox-reveal
-  :after org
-  :init (require 'ox-reveal))
-
 
 (setq sentence-end-double-space nil)
 
@@ -1211,11 +1205,6 @@ If the new path's directories does not exist, create them."
   :demand t
   :config (winner-mode))
 
-
-(use-package apptainer-mode
-  :ensure (:host github :repo "jrgant/apptainer-mode")
-  :mode ("\\.def\\'" . apptainer-mode))
-
 (add-to-list 'display-buffer-alist
              '("^\\*vc-git" display-buffer-no-window (allow-no-window . t)))
 
@@ -1297,6 +1286,30 @@ See URL `https://github.com/charliermarsh/ruff'."
                       .message))))))
 
 ;; ============================================================================
+;; DOCUMENTATION & HELP
+;; ============================================================================
+
+(use-package devdocs
+  :bind ("C-h D" . devdocs-lookup))
+
+(use-package tldr
+  :bind ("C-h t" . tldr)
+  :init (add-to-list 'display-buffer-alist '("\\*tldr\\*" (display-buffer-in-side-window (side . bottom)))))
+
+(use-package lookup
+  :ensure nil
+  :bind (("C-c l" . lookup/query))
+  :load-path "lisp/"
+  :init
+  ;; Embark integration
+  (with-eval-after-load 'embark
+    (define-key embark-symbol-map (kbd "l") #'lookup/query))
+  :config
+  (add-hook 'kill-emacs-hook #'lookup/save-query-history))
+
+(use-package ascii-art-to-unicode)
+
+;; ============================================================================
 ;; CASUAL - TRANSIENT MENU ENHANCEMENTS
 ;; ============================================================================
 ;; Casual provides user-friendly transient menus for various Emacs modes
@@ -1373,9 +1386,6 @@ See URL `https://github.com/charliermarsh/ruff'."
 ;; ADDITIONAL DEVELOPMENT TOOLS
 ;; ============================================================================
 
-(use-package magit-lfs
-  :after (magit))
-
 (use-package cmake-mode)
 
 (use-package eglot :ensure nil)
@@ -1383,17 +1393,6 @@ See URL `https://github.com/charliermarsh/ruff'."
 (use-package deadgrep
   :bind (("<f5>" . #'deadgrep)
          ("C-x p g" . #'deadgrep)))
-
-(use-package lookup
-  :ensure nil
-  :bind (("C-c l" . lookup/query))
-  :load-path "lisp/"
-  :init
-  ;; Embark integration
-  (with-eval-after-load 'embark
-    (define-key embark-symbol-map (kbd "l") #'lookup/query))
-  :config
-  (add-hook 'kill-emacs-hook #'lookup/save-query-history))
 
 (use-package edit-server
   :commands edit-server-start
@@ -1414,10 +1413,6 @@ See URL `https://github.com/charliermarsh/ruff'."
   :bind (("C-c c c" . copilot-chat-display)))
 
 (use-package restart-emacs)
-
-(use-package tldr
-  :bind ("C-h t" . tldr)
-  :init (add-to-list 'display-buffer-alist '("\\*tldr\\*" (display-buffer-in-side-window (side . bottom)))))
 
 (use-package detached
   :init
