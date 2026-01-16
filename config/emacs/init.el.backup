@@ -666,18 +666,14 @@ If invoked with `C-u`, also prompt for a Python version to pin."
   :hook ((shell-mode . comint-mime-setup)
          (inferior-python-mode . comint-mime-setup)))
 
-;; ============================================================================
-;; TEXT EDITING & TEMPLATES
-;; ============================================================================
+;; ----------------------------------------------------------------------------
+;; Haskell Configuration
+;; ----------------------------------------------------------------------------
 
 (global-set-key [remap newline] #'newline-and-indent)
 
 (defun local-disable-line-numbers ()
   (setq-local display-line-numbers nil))
-
-;; ----------------------------------------------------------------------------
-;; Tempel - Simple template system
-;; ----------------------------------------------------------------------------
 
 ;; Configure Tempel
 (use-package tempel
@@ -773,10 +769,6 @@ point reaches the beginning or end of the buffer, stop there."
       vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)
       use-short-answers t)
 
-;; ----------------------------------------------------------------------------
-;; Additional language modes
-;; ----------------------------------------------------------------------------
-
 (use-package yaml-mode
   :mode ("\\.cff\\'" . yaml-ts-mode)
   :init
@@ -798,12 +790,7 @@ point reaches the beginning or end of the buffer, stop there."
 
   (add-to-list 'display-buffer-alist '("\\*haskell-compilation\\*.*" (display-buffer-in-side-window (side . bottom)))))
 
-;; Shell and compilation buffer display configuration
 (add-to-list 'display-buffer-alist '("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom))))
-
-;; ----------------------------------------------------------------------------
-;; Environment & Path Management
-;; ----------------------------------------------------------------------------
 
 (use-package exec-path-from-shell
   :demand t
@@ -878,9 +865,6 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package wgrep)
 
-;; ============================================================================
-;; ORG MODE & PRODUCTIVITY
-;; ============================================================================
 
 (use-package org
   :bind (:map org-mode-map
@@ -933,15 +917,10 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package gist)
 
-;; ============================================================================
-;; EDITOR BEHAVIOR & BUILT-IN SETTINGS
-;; ============================================================================
-
 (blink-cursor-mode -1)
 (global-auto-revert-mode)
 (recentf-mode)
 (savehist-mode)
-(setq initial-major-mode 'text-mode)
 
 (defun bedrock--backup-file-name (fpath)
   "Return a new file path of a given file path.
@@ -953,9 +932,6 @@ If the new path's directories does not exist, create them."
     backupFilePath))
 (setq make-backup-file-name-function 'bedrock--backup-file-name)
 
-;; ============================================================================
-;; FILE CONVERSION & FORMATTING
-;; ============================================================================
 
 (use-package pandoc-transient
   :ensure (:host github :repo "lispandfound/pandoc-transient")
@@ -976,10 +952,6 @@ If the new path's directories does not exist, create them."
   (setf (alist-get 'haskell-mode apheleia-mode-alist)
         'fourmolu)
   )
-
-;; ============================================================================
-;; TEXT EDITING ENHANCEMENTS
-;; ============================================================================
 
 (defun clone-buffer-other-window ()
   (interactive)
@@ -1023,22 +995,13 @@ If the new path's directories does not exist, create them."
                                        "<:<" ";;;"))
   (global-ligature-mode t))
 
-;; ============================================================================
-;; FILE MODES & SYNTAX SUPPORT
-;; ============================================================================
-
 (use-package just-mode)
-
-;; ----------------------------------------------------------------------------
-;; Documentation & Help
-;; ----------------------------------------------------------------------------
 
 (use-package devdocs
   :bind ("C-h D" . devdocs-lookup))
 
-;; ----------------------------------------------------------------------------
-;; Miscellaneous utilities
-;; ----------------------------------------------------------------------------
+
+
 
 (use-package ascii-art-to-unicode)
 
@@ -1052,10 +1015,6 @@ If the new path's directories does not exist, create them."
 (use-package edit-indirect)
 
 (use-package mermaid-mode)
-
-;; ----------------------------------------------------------------------------
-;; Markdown Support
-;; ----------------------------------------------------------------------------
 
 (use-package markdown-mode
   :bind (:map markdown-mode-map
@@ -1101,9 +1060,6 @@ If the new path's directories does not exist, create them."
         (insert (s-snake-case camel-case-str)))
     (message "No region selected")))
 
-;; ============================================================================
-;; BUFFER & WINDOW MANAGEMENT
-;; ============================================================================
 
 (use-package ibuffer
   :ensure nil
@@ -1248,9 +1204,6 @@ If the new path's directories does not exist, create them."
 
 (use-package jenkinsfile-mode)
 
-;; ============================================================================
-;; SPELL CHECKING & LINTING
-;; ============================================================================
 
 (use-package jinx
   :custom (jinx-languages "en_AU")
@@ -1266,15 +1219,13 @@ If the new path's directories does not exist, create them."
   :ensure nil
   :hook (prog-mode . flymake-mode))
 
-;; ----------------------------------------------------------------------------
-;; Additional file type modes
-;; ----------------------------------------------------------------------------
+(setq initial-major-mode 'text-mode)
 
 (use-package gitignore-templates)
-
 (use-package nix-ts-mode
-  :mode "\\.nix\\'")
+  :mode "\\.nix\\'"
 
+  )
 (use-package org-download
   :after org
   :hook (dired-mode . org-download-enable)
@@ -1295,10 +1246,8 @@ If the new path's directories does not exist, create them."
   :config
   (add-hook 'kill-emacs-hook #'lookup/save-query-history))
 
-;; ============================================================================
-;; CASUAL - TRANSIENT MENU ENHANCEMENTS
-;; ============================================================================
-;; Casual provides user-friendly transient menus for various Emacs modes
+
+;;; casual/config.el -*- lexical-binding: t; -*-
 
 (use-package casual)
 
@@ -1364,28 +1313,59 @@ If the new path's directories does not exist, create them."
   :ensure nil
   :bind (:map isearch-mode-map ("C-o" . casual-isearch-tmenu)))
 
+(use-package casual-ibuffer
+  :ensure nil
+  :bind (:map
+         ibuffer-mode-map
+         ("C-o" . casual-ibuffer-tmenu)
+         ("F" . casual-ibuffer-filter-tmenu)
+         ("s" . casual-ibuffer-sortby-tmenu)
+         ("<double-mouse-1>" . ibuffer-visit-buffer) ; optional
+         ("M-<double-mouse-1>" . ibuffer-visit-buffer-other-window) ; optional
+         ("{" . ibuffer-backwards-next-marked) ; optional
+         ("}" . ibuffer-forward-next-marked)   ; optional
+         ("[" . ibuffer-backward-filter-group) ; optional
+         ("]" . ibuffer-forward-filter-group)  ; optional
+         ("$" . ibuffer-toggle-filter-group))  ; optional
+  :after (ibuffer))
+
 (use-package casual-image
   :ensure nil
   :bind (:map image-mode-map ("C-o" . casual-image-tmenu)))
 
-;; ============================================================================
-;; ADDITIONAL DEVELOPMENT TOOLS
-;; ============================================================================
+(use-package casual-bookmarks
+  :ensure nil
+  :bind (:map bookmark-bmenu-mode-map
+              ("C-o" . casual-bookmarks-tmenu)
+              ("S" . casual-bookmarks-sortby-tmenu)
+              ("J" . bookmark-jump))
+  :after (bookmark))
 
+(use-package casual-agenda
+  :ensure nil
+  :after org-agenda  ;; Ensure org-agenda is loaded first
+  :bind (:map
+         org-agenda-mode-map
+         ("C-o" . casual-agenda-tmenu)
+         ("M-j" . org-agenda-clock-goto) ; optional
+         ("J" . bookmark-jump))) ; optional
+
+(use-package casual-editkit
+  :ensure nil
+  :bind (("C-c C-h" . casual-editkit-main-tmenu))
+  :hook (rectangle-mark-mode . (lambda ()
+                                 (define-key rectangle-mark-mode-map (kbd "C-o") #'casual-editkit-rectangle-tmenu))))
 (use-package magit-lfs
   :after (magit))
-
 (use-package cmake-mode)
+
+
 
 (use-package eglot :ensure nil)
 
 (use-package deadgrep
   :bind (("<f5>" . #'deadgrep)
          ("C-x p g" . #'deadgrep)))
-
-;; ============================================================================
-;; REMOTE FILE ACCESS - TRAMP
-;; ============================================================================
 
 (setq remote-file-name-inhibit-locks t
       tramp-use-scp-direct-remote-copying t
@@ -1412,9 +1392,7 @@ If the new path's directories does not exist, create them."
 (with-eval-after-load 'compile
   (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
 
-;; ----------------------------------------------------------------------------
-;; Rust Support
-;; ----------------------------------------------------------------------------
+
 
 (use-package rustic
   :config
@@ -1422,9 +1400,7 @@ If the new path's directories does not exist, create them."
   :custom
   (rustic-cargo-use-last-stored-arguments t))
 
-;; ----------------------------------------------------------------------------
-;; Flymake checkers (custom definitions)
-;; ----------------------------------------------------------------------------
+
 
 (use-package flymake-collection
   :demand t
@@ -1514,9 +1490,6 @@ See URL `https://github.com/charliermarsh/ruff'."
 
 (use-package restart-emacs)
 
-;; ============================================================================
-;; LATEX & TYPESETTING
-;; ============================================================================
 
 (use-package tex
   :ensure auctex
@@ -1559,9 +1532,6 @@ See URL `https://github.com/charliermarsh/ruff'."
   (typst-ts-mode-grammar-location (expand-file-name "tree-sitter/libtree-sitter-typst.so" user-emacs-directory))
   (typst-ts-mode-enable-raw-blocks-highlight t))
 
-;; ============================================================================
-;; NOTES & KNOWLEDGE MANAGEMENT
-;; ============================================================================
 
 (use-package denote
   :ensure t
@@ -1630,5 +1600,3 @@ See URL `https://github.com/charliermarsh/ruff'."
   (consult-notes-denote-mode)
   ;; search only for text files in denote dir
   (setq consult-notes-denote-files-function (lambda () (denote-directory-files nil t t))))
-
-;;; init.el ends here
