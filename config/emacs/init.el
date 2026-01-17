@@ -985,6 +985,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package org
   :bind (:map org-mode-map
+              ("C-c M-o" . jake/open-note-in-browser)
               ("M-<return>" . org-meta-return)) ;; required because of crux override.
   :hook
   (org-mode . visual-line-mode)
@@ -1020,6 +1021,68 @@ point reaches the beginning or end of the buffer, stop there."
 			  :image-converter
 			  ("convert -density %D -trim -antialias %f -quality 300 %O")))
   (setq org-preview-latex-default-process 'tectonic)
+  (require 'ox-publish)
+
+  (require 'ox-publish)
+
+  (setq org-publish-project-alist
+        `(
+          ("lisp-notes-local"
+           :base-directory "~/notes/"
+           :base-extension "org"
+           :publishing-directory "/tmp/notes/"
+           :recursive t
+           :publishing-function org-html-publish-to-html
+           :auto-preamble t
+           ;; Add this line to inject the CSS:
+           :html-head "<link rel='stylesheet' type='text/css' href='/style.css'/>")
+
+          ("lisp-static-local"
+           :base-directory "~/notes/"
+           :base-extension "png\\|jpg\\|gif\\|pdf\\|css"
+           :publishing-directory "/tmp/notes/"
+           :recursive t
+           :publishing-function org-publish-attachment)
+          ))
+
+  ;; THE DEPLOY FUNCTION
+  (defun jake/deploy-notes ()
+    "Build everything locally, then use rsync filters to distribute to VPS."
+    (interactive)
+    (message "Building all notes locally...")
+    (org-publish "lisp-notes-local" t)
+    (org-publish "lisp-static-local" t)
+
+    (message "Deploying to VPS...")
+
+    ;; 1. Sync EVERYTHING to the PRIVATE folder (The 'Master' copy)
+    (call-process-shell-command
+     "rsync -avz --delete /tmp/notes/ jake@vps:/var/www/lispandfound.xyz/private/")
+
+    ;; 2. Sync ONLY 'public' files to the PUBLIC folder
+    ;; We include anything with '__' and 'public' in the name, and exclude everything else.
+    (call-process-shell-command
+     (concat "rsync -avz --delete "
+             "--include='*__*public*.html' " ;; Keep public HTML
+             "--include='*/' "               ;; Keep directories (to look inside them)
+             "--exclude='*' "                ;; Exclude everything else
+             "/tmp/notes/ jake@vps:/var/www/lispandfound.xyz/public/"))
+
+    (message "Deployment successful!"))
+  (defun jake/open-note-in-browser (&optional arg)
+    "Open the private URL of the current note in a browser.
+With a prefix ARG (C-u), copy the public URL to the kill ring instead."
+    (interactive "P")
+    (let* ((filename (file-name-nondirectory (buffer-file-name)))
+           (basename (file-name-sans-extension filename))
+           (url (concat "https://lispandfound.xyz/private/" basename ".html"))
+           (public-url (concat "https://lispandfound.xyz/public/" basename ".html")))
+      (if arg
+          (progn
+            (kill-new public-url)
+            (message "Copied to clipboard: %s" public-url))
+        (browse-url url))))
+
   )
 
 (use-package org-transient
