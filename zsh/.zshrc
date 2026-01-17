@@ -60,6 +60,10 @@ alias cat="bat"
 alias grep="rg"
 alias less="bat --paging=always"
 
+if [ $TERM = "xterm-kitty" ]
+then alias ssh="kitten ssh"
+fi
+
 
 # Enable eza integration
 if command -v eza &> /dev/null; then
