@@ -94,7 +94,7 @@ fi
 echo "Setting up zsh..."
 if [[ "$SHELL" != *"zsh"* ]]; then
     echo "Changing default shell to zsh..."
-    chsh -s $(which zsh)
+    chsh -s "$(which zsh)"
 fi
 
 # Install grml-zsh-config if not present
