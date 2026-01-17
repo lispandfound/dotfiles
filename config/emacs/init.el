@@ -808,6 +808,20 @@ point reaches the beginning or end of the buffer, stop there."
   ;;           (lambda ()
   ;;             (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
   ;;             (auto-save-mode)))
+  ;;
+  :config
+  (add-to-list 'org-preview-latex-process-alist
+	       '(tectonic :programs ("tectonic" "convert")
+			  :description "pdf > png"
+			  :message "you need install the programs: tectonic and imagemagick."
+			  :image-input-type "pdf"
+			  :image-output-type "png"
+			  :image-size-adjust (1.0 . 1.0)
+			  :latex-compiler
+			  ("tectonic -Z shell-escape-cwd=%o --outfmt pdf --outdir %o %f")
+			  :image-converter
+			  ("convert -density %D -trim -antialias %f -quality 300 %O")))
+  (setq org-preview-latex-default-process 'tectonic)
   )
 
 (use-package org-transient
