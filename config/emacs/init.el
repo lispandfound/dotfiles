@@ -1154,17 +1154,17 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
   (transient-define-prefix denote-transient ()
     "Denote dispatch"
     [["Note creation (d)"
-      ("dd" "new note" denote)
-      ("dj" "new or existing journal entry" denote-journal-new-or-existing-entry)
-      ("dn" "open or new" denote-open-or-create)
-      ("dt" "new specifying date and time" denote-date)
-      ("ds" "create in subdirectory " denote-subdirectory)]]
+      ("d" "new note" denote)
+      ("j" "new or existing journal entry" denote-journal-new-or-existing-entry)
+      ("n" "open or new" denote-open-or-create)
+      ("t" "new specifying date and time" denote-date)
+      ("+" "create in subdirectory " denote-subdirectory)]]
     [["Bookkeeping (b)"
       ("br" "prompt and rename" denote-rename-file)
       ("bf" "rename with frontmatter" denote-rename-file-using-front-matter)
       ("bk" "modify keywords" denote-rename-file-keywords)]
      ["Linking (l)"
-      ("li" "insert link" denote-link)
+      ("i" "insert link" denote-link)
       ("lh" "insert link to org heading" denote-org-link-to-heading)
       ("lb" "show backlinks" denote-backlinks)
       ("lg" "visit backlink" denote-find-backlink)
