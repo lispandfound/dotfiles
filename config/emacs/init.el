@@ -254,7 +254,7 @@
                                        "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
                                        ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
                                        "<:<" ";;;"))
-  (global-ligature-mode t))
+  (global-ligature-mode t)))
 
 ;; ----------------------------------------------------------------------------
 ;; Corfu - In-buffer completion popup
@@ -1634,6 +1634,7 @@ See URL `https://github.com/charliermarsh/ruff'."
   (TeX-process-asynchronous t)
   (TeX-check-TeX nil)
   (TeX-engine 'default)
+  :config
   (with-eval-after-load 'reftex
     (setq reftex-plug-into-AUCTeX t
           reftex-cite-format 'default
