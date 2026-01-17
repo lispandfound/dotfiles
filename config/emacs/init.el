@@ -749,9 +749,7 @@ If invoked with `C-u`, also prompt for a Python version to pin."
 
 (use-package haskell-mode
   :bind (:map haskell-mode-map
-              (("C-c C-c" . haskell-compile)))
-  :init
-  (add-to-list 'display-buffer-alist '("\\*haskell-compilation\\*.*" (display-buffer-in-side-window (side . bottom)))))
+              (("C-c C-c" . haskell-compile))))
 
 (use-package rustic
   :config
@@ -892,9 +890,18 @@ point reaches the beginning or end of the buffer, stop there."
 ;; ----------------------------------------------------------------------------
 ;; Display Buffer Configuration
 ;; ----------------------------------------------------------------------------
+(use-package popper
+  :bind (("C-=" . popper-toggle)
+         (:repeat-map popper-toggle-repeat-map
+                      ("=" . popper-cycle)
+                      ("-" . popper-toggle)
+                      ("t" . popper-toggle-type)))
+  :demand t
+  :config
+  (popper-mode))
 
-;; Shell and compilation buffer display configuration
-(add-to-list 'display-buffer-alist '("\\`.*e?shell\\*" (display-buffer-in-side-window (side . bottom))))
+(add-to-list 'display-buffer-alist
+             '("^\\*vc-git" display-buffer-no-window (allow-no-window . t)))
 
 ;; ----------------------------------------------------------------------------
 ;; Environment & Path Management
@@ -1288,15 +1295,7 @@ If the new path's directories does not exist, create them."
                                  (define-key rectangle-mark-mode-map (kbd "C-o") #'casual-editkit-rectangle-tmenu))))
 
 
-(use-package popper
-  :bind (("C-=" . popper-toggle)
-         (:repeat-map popper-toggle-repeat-map
-                      ("=" . popper-cycle)
-                      ("-" . popper-toggle)
-                      ("t" . popper-toggle-type)))
-  :demand t
-  :config
-  (popper-mode))
+
 
 
 
@@ -1307,8 +1306,7 @@ If the new path's directories does not exist, create them."
   :demand t
   :config (winner-mode))
 
-(add-to-list 'display-buffer-alist
-             '("^\\*vc-git" display-buffer-no-window (allow-no-window . t)))
+
 
 (bind-key "M-/" #'hippie-expand)
 (global-prettify-symbols-mode)
@@ -1395,8 +1393,7 @@ See URL `https://github.com/charliermarsh/ruff'."
   :bind ("C-h D" . devdocs-lookup))
 
 (use-package tldr
-  :bind ("C-h t" . tldr)
-  :init (add-to-list 'display-buffer-alist '("\\*tldr\\*" (display-buffer-in-side-window (side . bottom)))))
+  :bind ("C-h t" . tldr))
 
 (use-package lookup
   :ensure nil
