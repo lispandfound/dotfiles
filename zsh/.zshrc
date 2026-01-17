@@ -67,7 +67,7 @@ fi
 alias cat="bat"
 alias grep="rg"
 alias less="bat --paging=always"
-alias ssh="kitten ssh"
+
 
 # Enable eza integration
 if command -v eza &> /dev/null; then
