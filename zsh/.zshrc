@@ -41,26 +41,18 @@ if command -v fzf &> /dev/null; then
       --preview 'bat -n --color=always {}'
       --bind 'ctrl-/:change-preview-window(down|hidden|)'"
     export FZF_ALT_C_OPTS="--preview 'eza -l --icons=auto --colour=always {}'"
-
-		if [ -f /usr/share/fzf-tab-completion/zsh/fzf-zsh-completion.sh ]; then
-			source /usr/share/fzf-tab-completion/zsh/fzf-zsh-completion.sh
-			bindkey '^I' fzf_completion
-		else
-			echo Missing fzf-tab completion!
-		fi
-
-		if [ ! -f ~/.zshrc.d/fzf-git.sh ]; then
-			wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/refs/heads/main/fzf-git.sh -O ~/.zshrc.d/fzf-git.sh
-		fi
+    if [ ! -f ~/.zshrc.d/fzf-git.sh ]; then
+	wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/refs/heads/main/fzf-git.sh -O ~/.zshrc.d/fzf-git.sh
+    fi
 
 fi
 
 if [ -d ~/.zshrc.d ]; then
-	for rc in ~/.zshrc.d/*; do
-		if [ -f "$rc" ]; then
-			. "$rc"
-		fi
-	done
+    for rc in ~/.zshrc.d/*; do
+	if [ -f "$rc" ]; then
+	    . "$rc"
+	fi
+    done
 fi
 
 # Shell aliases
