@@ -1,5 +1,6 @@
 # Initialize zoxide
 # completion
+
 autoload -U +X compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
 
@@ -40,7 +41,7 @@ if command -v fzf &> /dev/null; then
       --preview 'bat -n --color=always {}'
       --bind 'ctrl-/:change-preview-window(down|hidden|)'"
     export FZF_ALT_C_OPTS="--preview 'eza -l --icons=auto --colour=always {}'"
-    
+
 		if [ -f /usr/share/fzf-tab-completion/zsh/fzf-zsh-completion.sh ]; then
 			source /usr/share/fzf-tab-completion/zsh/fzf-zsh-completion.sh
 			bindkey '^I' fzf_completion
@@ -48,7 +49,7 @@ if command -v fzf &> /dev/null; then
 			echo Missing fzf-tab completion!
 		fi
 
-		if [ ! -f ~/.zshrc.d/fzf-git.sh ]; then 
+		if [ ! -f ~/.zshrc.d/fzf-git.sh ]; then
 			wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/refs/heads/main/fzf-git.sh -O ~/.zshrc.d/fzf-git.sh
 		fi
 
@@ -66,7 +67,7 @@ fi
 alias cat="bat"
 alias grep="rg"
 alias less="bat --paging=always"
-alias ssh="kitten ssh"
+
 
 # Enable eza integration
 if command -v eza &> /dev/null; then
@@ -77,6 +78,7 @@ if command -v eza &> /dev/null; then
 fi
 
 
+prompt default # required to turn off grml prompt
 eval "$(starship init zsh)"
 
 alias hx=helix
@@ -86,4 +88,3 @@ HISTFILE=~/.zsh_history
 HISTSIZE=1000
 SAVEHIST=1000
 setopt SHARE_HISTORY
-

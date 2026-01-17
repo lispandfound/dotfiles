@@ -1,13 +1,14 @@
 #!/bin/bash
 
 # Arch Linux Setup Script
-# Converts Nix home-manager configuration to Arch Linux setup
+# Idempotent setup for dotfiles and programs
 
 set -eou pipefail
 
 echo "Setting up development environment on Arch Linux..."
 
 # Update system
+echo "Updating system packages..."
 sudo pacman -Syu --noconfirm
 
 # Install packages from official repositories
@@ -17,41 +18,51 @@ sudo pacman -S --needed --noconfirm \
     bat \
     bottom \
     cargo \
-    git \
-    git-lfs \
-    git-delta \
+    emacs \
     eza \
     fd \
     file \
-    zsh \
     fzf \
-    television \
     gawk \
     gcc \
+    git \
+    git-delta \
+    git-lfs \
     github-cli \
     gnupg \
-    sed \
-    tar \
+    helix \
+    imagemagick \
     jq \
     nodejs \
+    openssh \
     p7zip \
     pandoc \
+    python \
+    python-pip \
     ripgrep \
-    rust \
+    rsync \
+    sed \
+    starship \
     stow \
+    tar \
+    tectonic \
+    television \
     tldr \
     tree \
     unzip \
     watchexec \
+    wget \
     which \
     xan \
     xz \
     yazi \
+    zenith \
     zip \
     zoxide \
-    zstd \
-    zenith
+    zsh \
+    zstd
 
+# Install AUR packages
 echo "Installing AUR packages..."
 if command -v yay &> /dev/null; then
     AUR_HELPER="yay"
@@ -59,7 +70,7 @@ elif command -v paru &> /dev/null; then
     AUR_HELPER="paru"
 else
     echo "No AUR helper found. Installing paru..."
-    sudo pacman -S --needed --noconfirm base-devel git
+    sudo pacman -S --needed --noconfirm base-devel
     git clone https://aur.archlinux.org/paru.git /tmp/paru
     cd /tmp/paru
     makepkg -si --noconfirm
@@ -67,51 +78,59 @@ else
     AUR_HELPER="paru"
 fi
 
-$AUR_HELPER -S --needed --noconfirm dtach-ng
+# Install AUR packages if AUR helper is available
+$AUR_HELPER -S --needed --noconfirm \
+    dtach-ng
+
+# Install Python tools via cargo/pip
+echo "Installing Python package manager (uv)..."
+if ! command -v uv &> /dev/null; then
+    # Ensure cargo is available
+    if command -v cargo &> /dev/null; then
+        cargo install uv
+    else
+        echo "Warning: cargo not found, skipping uv installation. Please install cargo first."
+    fi
+fi
 
 # Set up zsh as default shell
 echo "Setting up zsh..."
 if [[ "$SHELL" != *"zsh"* ]]; then
     echo "Changing default shell to zsh..."
-    chsh -s $(which zsh)
+    chsh -s "$(which zsh)"
 fi
 
-# Install grml-zsh-config
-echo "Installing grml-zsh-config..."
+# Install grml-zsh-config if not present
+echo "Checking for grml-zsh-config..."
 if [[ ! -f /etc/zsh/zshrc.grml ]]; then
     sudo pacman -S --needed --noconfirm grml-zsh-config
 fi
 
-# Create .zshrc configuration
-echo "Setting up .zshrc configuration..."
-cat > ~/.zshrc << 'EOF'
-# Load grml config first
-if [[ -f /etc/zsh/zshrc.grml ]]; then
-    source /etc/zsh/zshrc.grml
+# Use stow to symlink dotfiles
+echo "Staging dotfiles with stow..."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Stow zsh configuration
+if [[ -d "$SCRIPT_DIR/zsh" ]]; then
+    echo "Staging zsh configuration..."
+    stow -d "$SCRIPT_DIR" -t "$HOME" zsh
 fi
 
-# Initialize zoxide
-eval "$(zoxide init zsh --cmd cd)"
-
-# Initialize tv
-if command -v tv &> /dev/null; then
-    eval "$(tv init zsh)"
+# Stow config directory (.config)
+if [[ -d "$SCRIPT_DIR/config" ]]; then
+    echo "Staging config files..."
+    # Stow each config subdirectory individually to ~/.config
+    for config_dir in "$SCRIPT_DIR/config"/*; do
+        if [[ -d "$config_dir" ]]; then
+            config_name=$(basename "$config_dir")
+            echo "  - Staging $config_name..."
+            stow -d "$SCRIPT_DIR/config" -t "$HOME/.config" "$config_name"
+        fi
+    done
 fi
-
-# Shell aliases
-alias cat="bat"
-alias less="bat --paging=always"
-
-# Enable eza integration
-if command -v eza &> /dev/null; then
-    alias ls="eza --icons=auto"
-    alias ll="eza --icons=auto -l"
-    alias la="eza --icons=auto -la"
-    alias lt="eza --icons=auto --tree"
-fi
-EOF
 
 # Git configuration
+echo "Configuring git..."
 git config --global github.user "lispandfound"
 git config --global push.default "current"
 git config --global pull.rebase false
@@ -121,3 +140,12 @@ git config --global core.pager delta
 git config --global interactive.diffFilter "delta --color-only"
 git config --global delta.navigate true
 git config --global delta.side-by-side true
+
+echo ""
+echo "============================================"
+echo "Setup complete!"
+echo "============================================"
+echo ""
+echo "Dotfiles have been staged with stow."
+echo "Please restart your shell or run: exec zsh"
+echo ""
