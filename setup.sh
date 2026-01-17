@@ -85,7 +85,12 @@ $AUR_HELPER -S --needed --noconfirm \
 # Install Python tools via cargo/pip
 echo "Installing Python package manager (uv)..."
 if ! command -v uv &> /dev/null; then
-    cargo install uv
+    # Ensure cargo is available
+    if command -v cargo &> /dev/null; then
+        cargo install uv
+    else
+        echo "Warning: cargo not found, skipping uv installation. Please install cargo first."
+    fi
 fi
 
 # Set up zsh as default shell
@@ -114,7 +119,14 @@ fi
 # Stow config directory (.config)
 if [[ -d "$SCRIPT_DIR/config" ]]; then
     echo "Staging config files..."
-    stow -d "$SCRIPT_DIR" -t "$HOME/.config" config
+    # Stow each config subdirectory individually to ~/.config
+    for config_dir in "$SCRIPT_DIR/config"/*; do
+        if [[ -d "$config_dir" ]]; then
+            config_name=$(basename "$config_dir")
+            echo "  - Staging $config_name..."
+            stow -d "$SCRIPT_DIR/config" -t "$HOME/.config" "$config_name"
+        fi
+    done
 fi
 
 # Git configuration
