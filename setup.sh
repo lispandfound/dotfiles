@@ -41,7 +41,6 @@ sudo pacman -S --needed --noconfirm \
     python-pip \
     ripgrep \
     rsync \
-    rust \
     sed \
     starship \
     stow \
@@ -81,8 +80,7 @@ fi
 
 # Install AUR packages if AUR helper is available
 $AUR_HELPER -S --needed --noconfirm \
-    dtach-ng \
-    ghostty-git
+    dtach-ng
 
 # Install Python tools via cargo/pip
 echo "Installing Python package manager (uv)..."
