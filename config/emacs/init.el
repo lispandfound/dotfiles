@@ -223,6 +223,62 @@
   (local-set-key (kbd "<S-return>") #'newline-and-indent))
 (add-hook 'prog-mode-hook #'rebind-comment-new-line)
 
+(use-package which-key
+  :demand t
+  :config
+  (which-key-mode))
+
+(repeat-mode)
+
+(defun hl-todo-and-notes ()
+  (font-lock-add-keywords nil'(("\\<\\(TODO\\|NOTE\\):" 1 font-lock-warning-face t))))
+
+(add-hook 'prog-mode-hook #'hl-todo-and-notes)
+
+(use-package edit-indirect)
+
+(defun clone-buffer-other-window ()
+  (interactive)
+  (switch-to-buffer-other-window (current-buffer)))
+
+(global-set-key (kbd "C-c b") #'clone-buffer-other-window)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+(use-package transpose-frame
+  :bind (("C-x 4 x" . transpose-frame)
+         ("C-x 4 t" . rotate-frame)))
+
+(use-package embrace
+  :bind ("C-," . #'embrace-commander))
+
+(use-package expreg
+  :init
+  (defvar-keymap expreg-expand-repeat-map
+    :doc "Repeatedly expand selection up tree sitter nodes."
+    :repeat t
+    "<return>" #'expreg-expand
+    "-" #'expreg-contract)
+  (bind-key "<C-return>" #'expreg-expand))
+
+
+(use-package ligature
+  :demand t
+  :config
+  (ligature-set-ligatures 'prog-mode '("--" "---" "==" "===" "!=" "!==" "=!="
+                                       "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
+                                       "??" "???" "?:" "?." "?=" "<:" ":<" ":>" ">:" "<:<" "<>" "<<<" ">>>"
+                                       "<<" ">>" "||" "-|" "_|_" "|-" "||-" "|=" "||=" "##" "###" "####"
+                                       "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#=" "^=" "<$>" "<$"
+                                       "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</" "</>" "/>" "<!--" "<#--"
+                                       "-->" "->" "->>" "<<-" "<-" "<=<" "=<<" "<<=" "<==" "<=>" "<==>"
+                                       "==>" "=>" "=>>" ">=>" ">>=" ">>-" ">-" "-<" "-<<" ">->" "<-<" "<-|"
+                                       "<=|" "|=>" "|->" "<->" "<~~" "<~" "<~>" "~~" "~~>" "~>" "~-" "-~"
+                                       "~@" "[||]" "|]" "[|" "|}" "{|" "[<" ">]" "|>" "<|" "||>" "<||"
+                                       "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
+                                       ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
+                                       "<:<" ";;;"))
+  (global-ligature-mode t))
+
 ;; ----------------------------------------------------------------------------
 ;; Corfu - In-buffer completion popup
 ;; ----------------------------------------------------------------------------
@@ -486,6 +542,8 @@
 (use-package magit-lfs
   :after (magit))
 
+(use-package gist)
+
 ;; ============================================================================
 ;; PROGRAMMING MODES & LANGUAGE SUPPORT
 ;; ============================================================================
@@ -701,11 +759,31 @@ If invoked with `C-u`, also prompt for a Python version to pin."
   :custom
   (rustic-cargo-use-last-stored-arguments t))
 
+(use-package cylc-mode
+  :ensure (cylc-mode
+           :host github
+           :repo "cylc/cylc-flow"
+           :files ("cylc/flow/etc/syntax/cylc-mode.el"))
+  :mode ("suite.*\\.rc\\'" "\\.cylc\\'"))
+
+(use-package apptainer-mode
+  :ensure (:host github :repo "jrgant/apptainer-mode")
+  :mode ("\\.def\\'" . apptainer-mode))
+
 (use-package envrc
   :demand t
   :init  (envrc-global-mode))
 
 (use-package elm-mode)
+
+(use-package just-mode)
+
+(use-package nix-ts-mode
+  :mode "\\.nix\\'")
+
+(use-package jenkinsfile-mode)
+(use-package mermaid-mode)
+(use-package cmake-mode)
 
 ;; ============================================================================
 ;; TEXT EDITING & TEMPLATES
@@ -774,10 +852,7 @@ If invoked with `C-u`, also prompt for a Python version to pin."
       (call-interactively #'project-compile))))
 
 
-(use-package which-key
-  :demand t
-  :config
-  (which-key-mode))
+
 
 (defun smarter-move-beginning-of-line (arg)
   "Move point back to indentation of beginning of line.
@@ -962,7 +1037,100 @@ point reaches the beginning or end of the buffer, stop there."
   :after org
   :init (require 'ox-reveal))
 
-(use-package gist)
+;; ============================================================================
+;; NOTES & KNOWLEDGE MANAGEMENT
+;; ============================================================================
+
+;; ----------------------------------------------------------------------------
+;; Literature Search
+;; ----------------------------------------------------------------------------
+
+;;;###autoload
+(defun consult-ripgrep-all (&optional dir initial)
+  (interactive "P")
+  (let ((consult-ripgrep-args "rga --null --line-buffered --color=never --max-columns=1000  --smart-case --no-heading --with-filename --line-number"))
+    (consult-ripgrep dir initial)))
+
+(setq literature-directory "~/Sync")
+(defun search/papers ()
+  (interactive)
+  (consult-ripgrep-all literature-directory))
+
+(bind-key "s-p" #'search/papers)
+
+;; ----------------------------------------------------------------------------
+;; Denote - Simple note-taking system
+;; ----------------------------------------------------------------------------
+
+(use-package denote
+  :ensure t
+  :hook (dired-mode . denote-dired-mode)
+  :bind (("s-d" . denote-transient))
+  :init
+  (transient-define-prefix denote-transient ()
+    "Denote dispatch"
+    [["Note creation (d)"
+      ("dd" "new note" denote)
+      ("dj" "new or existing journal entry" denote-journal-new-or-existing-entry)
+      ("dn" "open or new" denote-open-or-create)
+      ("dt" "new specifying date and time" denote-date)
+      ("ds" "create in subdirectory " denote-subdirectory)]]
+    [["Bookkeeping (b)"
+      ("br" "prompt and rename" denote-rename-file)
+      ("bf" "rename with frontmatter" denote-rename-file-using-front-matter)
+      ("bk" "modify keywords" denote-rename-file-keywords)]
+     ["Linking (l)"
+      ("li" "insert link" denote-link)
+      ("lh" "insert link to org heading" denote-org-link-to-heading)
+      ("lb" "show backlinks" denote-backlinks)
+      ("lg" "visit backlink" denote-find-backlink)
+      ("lo" "org backlink block" denote-org-dblock-insert-backlinks)]]
+    [["Searching (s)"
+      ("sn" "consult-notes" consult-notes)
+      ("ss" "consult-notes search" consult-notes-search-in-all-notes)]])
+  :config
+
+  (setq denote-directory (expand-file-name "~/notes/"))
+
+  ;; Automatically rename Denote buffers when opening them so that
+  ;; instead of their long file name they have, for example, a literal
+  ;; "[D]" followed by the file's title.  Read the doc string of
+  ;; `denote-rename-buffer-format' for how to modify this.
+  (denote-rename-buffer-mode 1))
+
+(use-package org-fragtog
+  :ensure t
+  :hook (org-mode . org-fragtog-mode))
+
+(use-package denote-journal
+  :ensure t
+  :after denote
+  :custom
+  (denote-journal-keyword "labnotes")
+  (denote-journal-directory (expand-file-name "~/notes/labnotes"))
+  (denote-journal-title-format 'day-date-month-year))
+(use-package denote-org
+  :after denote
+  :custom
+  ;; `denote-org-link-to-heading' controls the behavior of
+  ;; `org-store-link': setting to id makes it insert an ID in the
+  ;; PROPERTIES drawer
+  ;;
+  ;; (denote-org-store-link-to-heading 'context)
+  (denote-org-store-link-to-heading 'id))
+
+
+(use-package consult-notes
+  :ensure (:type git :host github :repo "mclear-tools/consult-notes")
+  :commands (consult-notes consult-notes-search-in-all-notes)
+  :config
+  ;; Set org-roam integration, denote integration, or org-heading integration e.g.:
+  (consult-notes-org-headings-mode)
+  (consult-notes-denote-mode)
+  ;; search only for text files in denote dir
+  (setq consult-notes-denote-files-function (lambda () (denote-directory-files nil t t))))
+
+
 
 ;; ============================================================================
 ;; EDITOR BEHAVIOR & BUILT-IN SETTINGS
@@ -992,7 +1160,6 @@ If the new path's directories does not exist, create them."
   :ensure (:host github :repo "lispandfound/pandoc-transient")
   :bind (("C-c P" . pandoc-convert-transient)))
 
-
 (use-package apheleia
   :init
   (apheleia-global-mode +1)
@@ -1007,74 +1174,6 @@ If the new path's directories does not exist, create them."
   (setf (alist-get 'haskell-mode apheleia-mode-alist)
         'fourmolu)
   )
-
-;; ============================================================================
-;; TEXT EDITING ENHANCEMENTS
-;; ============================================================================
-
-(defun clone-buffer-other-window ()
-  (interactive)
-  (switch-to-buffer-other-window (current-buffer)))
-
-(global-set-key (kbd "C-c b") #'clone-buffer-other-window)
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-(use-package transpose-frame
-  :bind (("C-x 4 x" . transpose-frame)
-         ("C-x 4 t" . rotate-frame)))
-
-(use-package embrace
-  :bind ("C-," . #'embrace-commander))
-
-(use-package expreg
-  :init
-  (defvar-keymap expreg-expand-repeat-map
-    :doc "Repeatedly expand selection up tree sitter nodes."
-    :repeat t
-    "<return>" #'expreg-expand
-    "-" #'expreg-contract)
-  (bind-key "<C-return>" #'expreg-expand))
-
-
-(use-package ligature
-  :demand t
-  :config
-  (ligature-set-ligatures 'prog-mode '("--" "---" "==" "===" "!=" "!==" "=!="
-                                       "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
-                                       "??" "???" "?:" "?." "?=" "<:" ":<" ":>" ">:" "<:<" "<>" "<<<" ">>>"
-                                       "<<" ">>" "||" "-|" "_|_" "|-" "||-" "|=" "||=" "##" "###" "####"
-                                       "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#=" "^=" "<$>" "<$"
-                                       "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</" "</>" "/>" "<!--" "<#--"
-                                       "-->" "->" "->>" "<<-" "<-" "<=<" "=<<" "<<=" "<==" "<=>" "<==>"
-                                       "==>" "=>" "=>>" ">=>" ">>=" ">>-" ">-" "-<" "-<<" ">->" "<-<" "<-|"
-                                       "<=|" "|=>" "|->" "<->" "<~~" "<~" "<~>" "~~" "~~>" "~>" "~-" "-~"
-                                       "~@" "[||]" "|]" "[|" "|}" "{|" "[<" ">]" "|>" "<|" "||>" "<||"
-                                       "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
-                                       ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
-                                       "<:<" ";;;"))
-  (global-ligature-mode t))
-
-;; ============================================================================
-;; FILE MODES & SYNTAX SUPPORT
-;; ============================================================================
-
-(use-package just-mode)
-
-(use-package nix-ts-mode
-  :mode "\\.nix\\'")
-
-(use-package jenkinsfile-mode)
-
-(repeat-mode)
-
-(defun hl-todo-and-notes ()
-  (font-lock-add-keywords nil'(("\\<\\(TODO\\|NOTE\\):" 1 font-lock-warning-face t))))
-
-(add-hook 'prog-mode-hook #'hl-todo-and-notes)
-
-(use-package edit-indirect)
-
-(use-package mermaid-mode)
 
 ;; ----------------------------------------------------------------------------
 ;; Markdown Support
@@ -1092,17 +1191,6 @@ If the new path's directories does not exist, create them."
 
 (use-package visual-fill-column
   :hook (gfm-mode))
-
-(use-package cylc-mode
-  :ensure (cylc-mode
-           :host github
-           :repo "cylc/cylc-flow"
-           :files ("cylc/flow/etc/syntax/cylc-mode.el"))
-  :mode ("suite.*\\.rc\\'" "\\.cylc\\'"))
-
-(use-package apptainer-mode
-  :ensure (:host github :repo "jrgant/apptainer-mode")
-  :mode ("\\.def\\'" . apptainer-mode))
 
 
 (use-package grip-mode
@@ -1386,8 +1474,6 @@ See URL `https://github.com/charliermarsh/ruff'."
 ;; ADDITIONAL DEVELOPMENT TOOLS
 ;; ============================================================================
 
-(use-package cmake-mode)
-
 (use-package eglot :ensure nil)
 
 (use-package deadgrep
@@ -1527,98 +1613,5 @@ See URL `https://github.com/charliermarsh/ruff'."
   (typst-ts-watch-options '("--open"))
   (typst-ts-mode-grammar-location (expand-file-name "tree-sitter/libtree-sitter-typst.so" user-emacs-directory))
   (typst-ts-mode-enable-raw-blocks-highlight t))
-
-;; ============================================================================
-;; NOTES & KNOWLEDGE MANAGEMENT
-;; ============================================================================
-
-;; ----------------------------------------------------------------------------
-;; Literature Search
-;; ----------------------------------------------------------------------------
-
-;;;###autoload
-(defun consult-ripgrep-all (&optional dir initial)
-  (interactive "P")
-  (let ((consult-ripgrep-args "rga --null --line-buffered --color=never --max-columns=1000  --smart-case --no-heading --with-filename --line-number"))
-    (consult-ripgrep dir initial)))
-
-(setq literature-directory "~/Sync")
-(defun search/papers ()
-  (interactive)
-  (consult-ripgrep-all literature-directory))
-
-(bind-key "s-p" #'search/papers)
-
-;; ----------------------------------------------------------------------------
-;; Denote - Simple note-taking system
-;; ----------------------------------------------------------------------------
-
-(use-package denote
-  :ensure t
-  :hook (dired-mode . denote-dired-mode)
-  :bind (("s-d" . denote-transient))
-  :init
-  (transient-define-prefix denote-transient ()
-    "Denote dispatch"
-    [["Note creation (d)"
-      ("dd" "new note" denote)
-      ("dj" "new or existing journal entry" denote-journal-new-or-existing-entry)
-      ("dn" "open or new" denote-open-or-create)
-      ("dt" "new specifying date and time" denote-date)
-      ("ds" "create in subdirectory " denote-subdirectory)]]
-    [["Bookkeeping (b)"
-      ("br" "prompt and rename" denote-rename-file)
-      ("bf" "rename with frontmatter" denote-rename-file-using-front-matter)
-      ("bk" "modify keywords" denote-rename-file-keywords)]
-     ["Linking (l)"
-      ("li" "insert link" denote-link)
-      ("lh" "insert link to org heading" denote-org-link-to-heading)
-      ("lb" "show backlinks" denote-backlinks)
-      ("lg" "visit backlink" denote-find-backlink)
-      ("lo" "org backlink block" denote-org-dblock-insert-backlinks)]]
-    [["Searching (s)"
-      ("sn" "consult-notes" consult-notes)
-      ("ss" "consult-notes search" consult-notes-search-in-all-notes)]])
-  :config
-
-  (setq denote-directory (expand-file-name "~/notes/"))
-
-  ;; Automatically rename Denote buffers when opening them so that
-  ;; instead of their long file name they have, for example, a literal
-  ;; "[D]" followed by the file's title.  Read the doc string of
-  ;; `denote-rename-buffer-format' for how to modify this.
-  (denote-rename-buffer-mode 1))
-
-(use-package org-fragtog
-  :ensure t
-  :hook (org-mode . org-fragtog-mode))
-
-(use-package denote-journal
-  :ensure t
-  :after denote
-  :custom
-  (denote-journal-keyword "labnotes")
-  (denote-journal-directory (expand-file-name "~/notes/labnotes"))
-  (denote-journal-title-format 'day-date-month-year))
-(use-package denote-org
-  :after denote
-  :custom
-  ;; `denote-org-link-to-heading' controls the behavior of
-  ;; `org-store-link': setting to id makes it insert an ID in the
-  ;; PROPERTIES drawer
-  ;;
-  ;; (denote-org-store-link-to-heading 'context)
-  (denote-org-store-link-to-heading 'id))
-
-
-(use-package consult-notes
-  :ensure (:type git :host github :repo "mclear-tools/consult-notes")
-  :commands (consult-notes consult-notes-search-in-all-notes)
-  :config
-  ;; Set org-roam integration, denote integration, or org-heading integration e.g.:
-  (consult-notes-org-headings-mode)
-  (consult-notes-denote-mode)
-  ;; search only for text files in denote dir
-  (setq consult-notes-denote-files-function (lambda () (denote-directory-files nil t t))))
 
 ;;; init.el ends here
