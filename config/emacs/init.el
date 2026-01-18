@@ -963,7 +963,7 @@ point reaches the beginning or end of the buffer, stop there."
               ("C-c M-o" . jake/open-note-in-browser)
               ("M-<return>" . org-meta-return)) ;; required because of crux override.
   :hook
-  (org-mode . visual-wrap-prefix-mode)
+  (org-mode . visual-line-mode)
   :custom
   (org-capture-templates
    '(("l" "Logged completed task" entry
@@ -1251,7 +1251,7 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
   :bind (:map markdown-mode-map
               ("<C-return>" . markdown-insert-header-like-org))
   :mode ("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode)
-  :hook (gfm-mode . visual-wrap-prefix-mode)
+  :hook (gfm-mode . visual-line-mode)
   :init
   (defun markdown-insert-header-like-org ()
     (interactive)
