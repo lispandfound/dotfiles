@@ -1187,11 +1187,21 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
 
 (setopt initial-major-mode 'text-mode)
 
-(setq backup-directory-alist
-      `((".*" . ,(concat user-emacs-directory "backups/"))))
+(let ((backup-dir (concat user-emacs-directory "backups/"))
+      (auto-save-dir (concat user-emacs-directory "auto-save/")))
 
-(setq auto-save-file-name-transforms
-      `((".*" ,(concat user-emacs-directory "auto-save/") t)))
+  (unless (file-directory-p backup-dir)
+    (make-directory backup-dir))
+
+  (setq backup-directory-alist
+        `((".*" . ,backup-dir)))
+
+  (unless (file-directory-p auto-save-dir)
+    (make-directory auto-save-dir))
+
+  (setq auto-save-file-name-transforms
+        `((".*" ,auto-save-dir t))))
+
 
 ;; ============================================================================
 ;; FILE CONVERSION & FORMATTING
