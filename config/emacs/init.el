@@ -226,20 +226,18 @@
          ("C-x 4 t" . rotate-frame)))
 
 (use-package embrace
-  :bind ("C-," . #'embrace-commander))
+  :bind ("C-," . embrace-commander))
 
 (use-package expreg
-  :init
-  (defvar-keymap expreg-expand-repeat-map
-    :doc "Repeatedly expand selection up tree sitter nodes."
-    :repeat t
-    "<return>" #'expreg-expand
-    "-" #'expreg-contract)
-  (bind-key "<C-return>" #'expreg-expand))
+  :bind
+  (("<C-return>" . expreg-expand)
+   (:repeat-map expreg-expand-repeat-map
+                ("<return>" . expreg-expand)
+                ("-"  . expreg-contract))))
 
 
 (use-package ligature
-  :demand t
+  :hook (prog-mode)
   :config
   (ligature-set-ligatures 'prog-mode '("--" "---" "==" "===" "!=" "!==" "=!="
                                        "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
@@ -253,8 +251,7 @@
                                        "~@" "[||]" "|]" "[|" "|}" "{|" "[<" ">]" "|>" "<|" "||>" "<||"
                                        "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
                                        ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
-                                       "<:<" ";;;"))
-  (global-ligature-mode t)))
+                                       "<:<" ";;;")))
 
 ;; ----------------------------------------------------------------------------
 ;; Corfu - In-buffer completion popup
@@ -475,7 +472,7 @@
 ;; ============================================================================
 
 (use-package magit
-  :bind (("C-c g g" . magit-status)
+  :bind (("C-x g" . magit-status)
          :map git-commit-mode-map
          ("C-c C-g" . copilot-chat-insert-commit-message))
   :init (with-eval-after-load 'project
@@ -718,8 +715,8 @@ If invoked with `C-u`, also prompt for a Python version to pin."
 
 (use-package cylc-mode
   :vc (:url "https://github.com/cylc/cylc-flow"
-       :branch "master"
-       :lisp-dir "cylc/flow/etc/syntax")
+            :rev :last-vc
+            :lisp-dir "cylc/flow/etc/syntax/")
   :mode ("suite.*\\.rc\\'" "\\.cylc\\'"))
 
 (use-package apptainer-mode
@@ -879,7 +876,7 @@ point reaches the beginning or end of the buffer, stop there."
 (delete-selection-mode)
 
 (use-package comment-dwim-2
-  :bind ("M-;" . #'comment-dwim-2))
+  :bind ("M-;" . comment-dwim-2))
 
 (use-package crux
   :bind (("C-k" . crux-smart-kill-line)
@@ -903,7 +900,7 @@ point reaches the beginning or end of the buffer, stop there."
     "Return list of previous eshell directories."
     (delete-dups (mapcar 'abbreviate-file-name
                          (ring-elements eshell-last-dir-ring))))
-  
+
   (defun eshell/z (&optional regexp)
     "Navigate to a previously visited directory in eshell."
     (cond
@@ -918,7 +915,7 @@ point reaches the beginning or end of the buffer, stop there."
                                              :face consult-file
                                              :enabled ,(lambda () (and (boundp 'eshell-last-dir-ring) eshell-last-dir-ring))
                                              :items ,#'jake/eshell-previous-directories))
-  
+
   (defun jake/consult-dir-zoxide-dirs ()
     "Return list of zoxide dirs."
     (mapcar (lambda (line) (concat line "/")) (split-string (shell-command-to-string "zoxide query --list") "\n" t)))
@@ -1187,17 +1184,14 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
 (global-auto-revert-mode)
 (recentf-mode)
 (savehist-mode)
+
 (setopt initial-major-mode 'text-mode)
 
-(defun jake/backup-file-name (fpath)
-  "Return a new file path of a given file path.
-If the new path's directories does not exist, create them."
-  (let* ((backupRootDir (concat user-emacs-directory "emacs-backup/"))
-         (filePath (replace-regexp-in-string "[A-Za-z]:" "" fpath )) ; remove Windows driver letter in path
-         (backupFilePath (replace-regexp-in-string "//" "/" (concat backupRootDir filePath "~") )))
-    (make-directory (file-name-directory backupFilePath) (file-name-directory backupFilePath))
-    backupFilePath))
-(setopt make-backup-file-name-function 'jake/backup-file-name)
+(setq backup-directory-alist
+      `((".*" . ,(concat user-emacs-directory "backups/"))))
+
+(setq auto-save-file-name-transforms
+      `((".*" ,(concat user-emacs-directory "auto-save/") t)))
 
 ;; ============================================================================
 ;; FILE CONVERSION & FORMATTING
@@ -1433,6 +1427,21 @@ See URL `https://github.com/charliermarsh/ruff'."
   (add-hook 'kill-emacs-hook #'jake/lookup-save-query-history))
 
 (use-package ascii-art-to-unicode)
+
+(use-package helpful
+  :bind (;; Replace `async-shell-command' with `detached-shell-command'
+         ([remap describe-function] . helpful-callable)
+         ([remap describe-variable] . helpful-variable)
+         ([remap describe-key] . helpful-key)
+         ([remap describe-command] . helpful-command)
+         ([remap describe-symbol] . helpful-symbol)))
+
+(use-package elisp-demos
+  :after helpful
+  :init
+  (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
+
+
 
 ;; ============================================================================
 ;; CASUAL - TRANSIENT MENU ENHANCEMENTS
