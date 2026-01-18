@@ -340,11 +340,11 @@
 (use-package vertico-directory
   :ensure nil
   :after vertico
-  :init
-  (keymap-set vertico-map "RET" #'vertico-directory-enter)
-  (keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
-  (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
-  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
+  :bind (:map vertico-map
+              ("RET"  . vertico-directory-enter)
+              ("DEL"  . vertico-directory-delete-char)
+              ("M-DEL"  . vertico-directory-delete-word))
+  :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy))
 
 
 ;; ----------------------------------------------------------------------------
