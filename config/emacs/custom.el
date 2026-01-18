@@ -39,10 +39,11 @@
                            envrc exec-path-from-shell expreg
                            flymake-collection forge gist git-link
                            gitignore-templates grip-mode haskell-mode
-                           helpful jenkinsfile-mode jinx just-mode
-                           ligature magit-lfs marginalia mermaid-mode
-                           modus-themes mood-line nix-ts-mode
-                           orderless org-download org-fragtog org-menu
+                           helpful ibuffer-project jenkinsfile-mode
+                           jinx just-mode ligature magit-lfs
+                           marginalia mermaid-mode modus-themes
+                           mood-line nix-ts-mode orderless
+                           org-download org-fragtog org-menu
                            org-present ox-reveal ox-slack
                            pandoc-transient popper pr-review pyvenv
                            restart-emacs rustic tempel-collection

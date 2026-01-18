@@ -182,10 +182,25 @@
 ;; Better Defaults & Basic Editor Behavior
 ;; ----------------------------------------------------------------------------
 
-(use-package better-defaults
-  :demand t
-  :config
-  (ido-mode -1))
+(use-package emacs
+  :custom
+  (uniquify-buffer-name-style 'forward) ; Distinguish buffers with same name
+
+  ;; --- Editor Behavior ---
+  (save-place-mode 1)               ; Remember cursor position in files
+  (indent-tabs-mode nil)            ; Use spaces, not tabs
+  (require-final-newline t)         ; Always end files with a newline
+  (load-prefer-newer t)             ; Don't load stale .elc files
+  (visible-bell t)                  ; Flash instead of beep
+
+  ;; --- Smooth Workflows ---
+  (save-interprogram-paste-before-kill t) ; Save clipboard to kill-ring before replacing
+  (mouse-yank-at-point t)           ; Paste where cursor is, not where mouse is
+  (ediff-window-setup-function 'ediff-setup-windows-plain) ; No extra Ediff frames
+
+  :bind
+  ;; 'zap-to-char' kills the char; 'zap-up-to-char' kills everything BEFORE it.
+  ("M-z" . zap-up-to-char))
 
 (add-hook 'after-init-hook #'electric-pair-mode)
 (add-hook 'after-init-hook #'electric-indent-mode)
@@ -373,8 +388,7 @@
   (advice-add #'completing-read-multiple :filter-args #'jake/crm-indicator)
 
   ;; Do not allow the cursor in the minibuffer prompt
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-  (bind-key "M-o" #'other-window-prefix))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
 
 ;; TAB completion and indentation settings
 (use-package emacs
@@ -707,11 +721,9 @@ If invoked with `C-u`, also prompt for a Python version to pin."
   :bind (:map haskell-mode-map
               (("C-c C-c" . haskell-compile))))
 
-(use-package rustic
-  :custom
-  (rustic-format-on-save nil)
-  (rustic-lsp-client 'eglot)
-  (rustic-cargo-use-last-stored-arguments t))
+(use-package rust-ts-mode
+  :ensure nil
+  :hook (rust-ts-mode . eglot-ensure))
 
 (use-package cylc-mode
   :vc (:url "https://github.com/cylc/cylc-flow"
@@ -882,6 +894,11 @@ point reaches the beginning or end of the buffer, stop there."
   :bind (("C-k" . crux-smart-kill-line)
          ("C-c M-d" . crux-duplicate-and-comment-current-line-or-region)
          ("C-c S" . crux-find-user-init-file)
+         ("C-c o" . crux-open-with)
+         ("M-o" . crux-other-window-or-switch-buffer)
+         ("C-c n" . crux-cleanup-buffer-or-region)
+         ("C-c D" . crux-find-directory-dir-locals-file)
+         ("C-g" . crux-keyboard-quit-dwim)
          ("<M-return>" . crux-smart-open-line)
          ("C-^" . crux-top-join-line)
          ("<M-S-return>" . crux-smart-open-line-above)))
@@ -946,7 +963,7 @@ point reaches the beginning or end of the buffer, stop there."
               ("C-c M-o" . jake/open-note-in-browser)
               ("M-<return>" . org-meta-return)) ;; required because of crux override.
   :hook
-  (org-mode . visual-line-mode)
+  (org-mode . visual-wrap-prefix-mode)
   :custom
   (org-capture-templates
    '(("l" "Logged completed task" entry
@@ -968,16 +985,16 @@ point reaches the beginning or end of the buffer, stop there."
   ;;
   :config
   (add-to-list 'org-preview-latex-process-alist
-	       '(tectonic :programs ("tectonic" "convert")
-			  :description "pdf > png"
-			  :message "you need install the programs: tectonic and imagemagick."
-			  :image-input-type "pdf"
-			  :image-output-type "png"
-			  :image-size-adjust (1.0 . 1.0)
-			  :latex-compiler
-			  ("tectonic -Z shell-escape-cwd=%o --outfmt pdf --outdir %o %f")
-			  :image-converter
-			  ("convert -density %D -trim -antialias %f -quality 300 %O")))
+               '(tectonic :programs ("tectonic" "convert")
+                          :description "pdf > png"
+                          :message "you need install the programs: tectonic and imagemagick."
+                          :image-input-type "pdf"
+                          :image-output-type "png"
+                          :image-size-adjust (1.0 . 1.0)
+                          :latex-compiler
+                          ("tectonic -Z shell-escape-cwd=%o --outfmt pdf --outdir %o %f")
+                          :image-converter
+                          ("convert -density %D -trim -antialias %f -quality 300 %O")))
   (setq org-preview-latex-default-process 'tectonic)
   (require 'ox-publish)
 
@@ -1234,14 +1251,12 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
   :bind (:map markdown-mode-map
               ("<C-return>" . markdown-insert-header-like-org))
   :mode ("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode)
+  :hook (gfm-mode . visual-wrap-prefix-mode)
   :init
   (defun markdown-insert-header-like-org ()
     (interactive)
     (let ((outline-regexp "[#]+"))
       (outline-insert-heading))))
-
-(use-package visual-fill-column
-  :hook (gfm-mode))
 
 
 (use-package grip-mode
@@ -1268,7 +1283,16 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
 
 (use-package ibuffer
   :ensure nil
+  :bind ("C-x C-b" . ibuffer)
   :hook (ibuffer-mode . ibuffer-auto-mode))
+
+(use-package ibuffer-project
+  :hook (ibuffer-mode . jake/ibuffer-project-group-order)
+  :init
+  (defun jake/ibuffer-project-group-order ()
+    (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+    (unless (eq ibuffer-sorting-mode 'project-file-relative)
+      (ibuffer-do-sort-by-project-file-relative))))
 
 (use-package all-the-icons-ibuffer
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
@@ -1531,10 +1555,6 @@ See URL `https://github.com/charliermarsh/ruff'."
 ;; ============================================================================
 
 (use-package eglot :ensure nil)
-
-(use-package deadgrep
-  :bind (("<f5>" . #'deadgrep)
-         ("C-x p g" . #'deadgrep)))
 
 (use-package edit-server
   :commands edit-server-start
