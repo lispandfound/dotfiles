@@ -1574,8 +1574,6 @@ See URL `https://github.com/charliermarsh/ruff'."
 (use-package copilot-chat
   :bind (("C-c c c" . copilot-chat-display)))
 
-(use-package restart-emacs)
-
 (use-package detached
   :init
   (detached-init)
