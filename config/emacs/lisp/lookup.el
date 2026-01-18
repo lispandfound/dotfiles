@@ -13,47 +13,47 @@
 ;;
 ;;; Code:
 
-(defvar lookup/sources
+(defvar jake/lookup-sources
   '(("DuckDuckGo" . "https://duckduckgo.com/?q=%s")
     ("GitHub" . "https://github.com/search?type=code&q=%s")
     ("ucgmsim org" . "https://github.com/search?type=code&q=org%%3Aucgmsim%%20%s"))
   "Alist of search providers and their URL templates.")
 
-(defvar lookup/query-history nil
-  "History of queries used in `lookup/query`.")
+(defvar jake/lookup-query-history nil
+  "History of queries used in `jake/lookup-query`.")
 
-(defvar lookup/history-file
+(defvar jake/lookup-history-file
   (expand-file-name "my-lookup-history.el" user-emacs-directory)
-  "File where `lookup/query-history` is saved.")
+  "File where `jake/lookup-query-history` is saved.")
 
 ;;;###autoload
-(defun lookup/save-query-history ()
-  "Save `lookup/query-history` to disk."
-  (with-temp-file lookup/history-file
-    (insert (format ";; Auto-generated lookup query history\n(setq lookup/query-history '%S)\n"
-                    lookup/query-history))))
+(defun jake/lookup-save-query-history ()
+  "Save `jake/lookup-query-history` to disk."
+  (with-temp-file jake/lookup-history-file
+    (insert (format ";; Auto-generated lookup query history\n(setq jake/lookup-query-history '%S)\n"
+                    jake/lookup-query-history))))
 
 ;;;###autoload
-(defun lookup/load-query-history ()
-  "Load `lookup/query-history` from disk, if it exists."
-  (when (file-exists-p lookup/history-file)
-    (load-file lookup/history-file)))
+(defun jake/lookup-load-query-history ()
+  "Load `jake/lookup-query-history` from disk, if it exists."
+  (when (file-exists-p jake/lookup-history-file)
+    (load-file jake/lookup-history-file)))
 
 ;;;###autoload
-(defun lookup/query (query)
+(defun jake/lookup-query (query)
   "Prompt for a search provider and search for QUERY in browser."
   (interactive
-   (list (read-string "Search for: " nil 'lookup/query-history (thing-at-point 'symbol t))))
-  (unless lookup/query-history
+   (list (read-string "Search for: " nil 'jake/lookup-query-history (thing-at-point 'symbol t))))
+  (unless jake/lookup-query-history
     ;; Initialize history on load
-    (lookup/load-query-history))
-  (let* ((provider (completing-read "Search with: " (mapcar #'car lookup/sources)))
-         (template (cdr (assoc provider lookup/sources))))
-    (add-to-list 'lookup/query-history query)
+    (jake/lookup-load-query-history))
+  (let* ((provider (completing-read "Search with: " (mapcar #'car jake/lookup-sources)))
+         (template (cdr (assoc provider jake/lookup-sources))))
+    (add-to-list 'jake/lookup-query-history query)
     (browse-url (format template (url-hexify-string query)))))
 
 ;; Save on exit
-(add-hook 'kill-emacs-hook #'lookup/save-query-history)
+(add-hook 'kill-emacs-hook #'jake/lookup-save-query-history)
 
 
 (provide 'lookup)

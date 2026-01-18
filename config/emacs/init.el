@@ -9,59 +9,34 @@
 ;; CUSTOM FILE
 ;; ============================================================================
 
-(setq custom-file (concat user-emacs-directory "custom.el"))
+(setopt custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file 'noerror)
 
 ;; ============================================================================
-;; PACKAGE MANAGER - ELPACA
+;; PACKAGE MANAGER - Native use-package (Emacs 29+)
 ;; ============================================================================
 
-(defvar elpaca-installer-version 0.11)
-(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
-(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
-(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                              :ref nil :depth 1 :inherit ignore
-                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                              :build (:not elpaca--activate-package)))
-(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
-       (build (expand-file-name "elpaca/" elpaca-builds-directory))
-       (order (cdr elpaca-order))
-       (default-directory repo))
-  (add-to-list 'load-path (if (file-exists-p build) build repo))
-  (unless (file-exists-p repo)
-    (make-directory repo t)
-    (when (<= emacs-major-version 28) (require 'subr-x))
-    (condition-case-unless-debug err
-        (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                  ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
-                                                  ,@(when-let* ((depth (plist-get order :depth)))
-                                                      (list (format "--depth=%d" depth) "--no-single-branch"))
-                                                  ,(plist-get order :repo) ,repo))))
-                  ((zerop (call-process "git" nil buffer t "checkout"
-                                        (or (plist-get order :ref) "--"))))
-                  (emacs (concat invocation-directory invocation-name))
-                  ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                        "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                  ((require 'elpaca))
-                  ((elpaca-generate-autoloads "elpaca" repo)))
-            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-          (error "%s" (with-current-buffer buffer (buffer-string))))
-      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
-  (unless (require 'elpaca-autoloads nil t)
-    (require 'elpaca)
-    (elpaca-generate-autoloads "elpaca" repo)
-    (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
-(add-hook 'after-init-hook #'elpaca-process-queues)
-(elpaca `(,@elpaca-order))
+(require 'use-package)
+(require 'package)
 
-(elpaca elpaca-use-package
-  ;; Enable use-package :ensure support for Elpaca.
-  (elpaca-use-package-mode))
+;; Configure package archives
+(setopt package-archives
+        '(("melpa" . "https://melpa.org/packages/")
+          ("gnu" . "https://elpa.gnu.org/packages/")
+          ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
+
+(package-initialize)
+
+;; Ensure use-package always installs missing packages
+(setopt use-package-always-ensure t)
 
 ;; ============================================================================
 ;; UI & APPEARANCE
 ;; ============================================================================
+
+;; Enable modern smooth scrolling (Emacs 29+)
+(when (fboundp 'pixel-scroll-precision-mode)
+  (pixel-scroll-precision-mode 1))
 
 (use-package transient
   :demand t)
@@ -69,13 +44,13 @@
 (use-package modus-themes
   :demand t
   :config
-  (defun pad-mode-line (&rest _)
+  (defun jake/pad-mode-line (&rest _)
     ;; From the modus manual
     (modus-themes-with-colors
       (custom-set-faces
        `(mode-line-active ((,c :box (:line-width 5 :color ,bg-mode-line-active))))
        `(mode-line-inactive ((,c :box (:line-width 5 :color ,bg-mode-line-inactive)))))))
-  (add-hook 'modus-themes-after-load-theme-hook #'pad-mode-line)
+  (add-hook 'modus-themes-after-load-theme-hook #'jake/pad-mode-line)
   (modus-themes-load-theme 'modus-operandi))
 
 (use-package mood-line
@@ -92,12 +67,13 @@
 ;; ============================================================================
 
 ;; Swap C-t and C-x for more ergonomic keybindings
-(keyboard-translate ?\C-t ?\C-x)
-(keyboard-translate ?\C-x ?\C-t)
-(add-hook 'server-after-make-frame-hook
-          (lambda ()
-            (keyboard-translate ?\C-t ?\C-x)
-            (keyboard-translate ?\C-x ?\C-t)))
+(defun jake/setup-keyboard-swap ()
+  "Setup C-t and C-x keyboard swap."
+  (keyboard-translate ?\C-t ?\C-x)
+  (keyboard-translate ?\C-x ?\C-t))
+
+(jake/setup-keyboard-swap)
+(add-hook 'server-after-make-frame-hook #'jake/setup-keyboard-swap)
 (global-unset-key (kbd "C-t"))          ; unbind the transpose-char key because it annoys me
 
 ;; ============================================================================
@@ -149,21 +125,25 @@
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
          ("M-r" . consult-history))                ;; orig. previous-matching-history-element
-  :custom (consult-imenu-config
-           '((emacs-lisp-mode :toplevel "Functions" :types
-                              ((102 "Functions" font-lock-function-name-face)
-                               (109 "Macros" font-lock-function-name-face)
-                               (112 "Packages" font-lock-constant-face)
-                               (116 "Types" font-lock-type-face)
-                               (118 "Variables" font-lock-variable-name-face)))
-             (python-ts-mode
-              :types
-              ((?f "Function" font-lock-function-name-face)
-               (?m "Method" font-lock-function-name-face)
-               (?c "Class" font-lock-property-use-face)
-               (?M "Module" font-lock-builtin-face)
-               (?F "Field" font-lock-regexp-face)
-               (?v "Variable" font-lock-constant-face)))))
+  :custom
+  (consult-imenu-config
+   '((emacs-lisp-mode :toplevel "Functions" :types
+                      ((102 "Functions" font-lock-function-name-face)
+                       (109 "Macros" font-lock-function-name-face)
+                       (112 "Packages" font-lock-constant-face)
+                       (116 "Types" font-lock-type-face)
+                       (118 "Variables" font-lock-variable-name-face)))
+     (python-ts-mode
+      :types
+      ((?f "Function" font-lock-function-name-face)
+       (?m "Method" font-lock-function-name-face)
+       (?c "Class" font-lock-property-use-face)
+       (?M "Module" font-lock-builtin-face)
+       (?F "Field" font-lock-regexp-face)
+       (?v "Variable" font-lock-constant-face)))))
+  (register-preview-function #'consult-register-format)
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref)
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
   :hook (completion-list-mode . consult-preview-at-point-mode)
@@ -171,18 +151,9 @@
   ;; The :init configuration is always executed (Not lazy)
   :init
 
-  ;; Optionally configure the register formatting. This improves the register
-  ;; preview for `consult-register', `consult-register-load',
-  ;; `consult-register-store' and the Emacs built-ins.
-  (setq register-preview-function #'consult-register-format)
-
   ;; Optionally tweak the register preview window.
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
-
-  ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
 
 
 
@@ -218,10 +189,13 @@
 
 (add-hook 'after-init-hook #'electric-pair-mode)
 (add-hook 'after-init-hook #'electric-indent-mode)
-(defun rebind-comment-new-line ()
+
+(defun jake/rebind-comment-new-line ()
+  "Rebind RET to comment-indent-new-line in prog-mode."
   (local-set-key (kbd "RET") #'comment-indent-new-line)
   (local-set-key (kbd "<S-return>") #'newline-and-indent))
-(add-hook 'prog-mode-hook #'rebind-comment-new-line)
+
+(add-hook 'prog-mode-hook #'jake/rebind-comment-new-line)
 
 (use-package which-key
   :demand t
@@ -230,18 +204,21 @@
 
 (repeat-mode)
 
-(defun hl-todo-and-notes ()
+(defun jake/hl-todo-and-notes ()
+  "Highlight TODO and NOTE keywords in prog-mode."
   (font-lock-add-keywords nil'(("\\<\\(TODO\\|NOTE\\):" 1 font-lock-warning-face t))))
 
-(add-hook 'prog-mode-hook #'hl-todo-and-notes)
+(add-hook 'prog-mode-hook #'jake/hl-todo-and-notes)
 
-(use-package edit-indirect)
+(use-package edit-indirect
+  :defer t)
 
-(defun clone-buffer-other-window ()
+(defun jake/clone-buffer-other-window ()
+  "Clone current buffer in another window."
   (interactive)
   (switch-to-buffer-other-window (current-buffer)))
 
-(global-set-key (kbd "C-c b") #'clone-buffer-other-window)
+(global-set-key (kbd "C-c b") #'jake/clone-buffer-other-window)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (use-package transpose-frame
@@ -249,20 +226,18 @@
          ("C-x 4 t" . rotate-frame)))
 
 (use-package embrace
-  :bind ("C-," . #'embrace-commander))
+  :bind ("C-," . embrace-commander))
 
 (use-package expreg
-  :init
-  (defvar-keymap expreg-expand-repeat-map
-    :doc "Repeatedly expand selection up tree sitter nodes."
-    :repeat t
-    "<return>" #'expreg-expand
-    "-" #'expreg-contract)
-  (bind-key "<C-return>" #'expreg-expand))
+  :bind
+  (("<C-return>" . expreg-expand)
+   (:repeat-map expreg-expand-repeat-map
+                ("<return>" . expreg-expand)
+                ("-"  . expreg-contract))))
 
 
 (use-package ligature
-  :demand t
+  :hook (prog-mode)
   :config
   (ligature-set-ligatures 'prog-mode '("--" "---" "==" "===" "!=" "!==" "=!="
                                        "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
@@ -276,8 +251,7 @@
                                        "~@" "[||]" "|]" "[|" "|}" "{|" "[<" ">]" "|>" "<|" "||>" "<||"
                                        "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
                                        ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
-                                       "<:<" ";;;"))
-  (global-ligature-mode t))
+                                       "<:<" ";;;")))
 
 ;; ----------------------------------------------------------------------------
 ;; Corfu - In-buffer completion popup
@@ -380,52 +354,36 @@
 ;; A few more useful configurations...
 (use-package emacs
   :ensure nil
+  :custom
+  (minibuffer-prompt-properties
+   '(read-only t cursor-intangible t face minibuffer-prompt))
+  (enable-recursive-minibuffers t)
+  (read-extended-command-predicate #'command-completion-default-include-p)
   :init
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
+  (defun jake/crm-indicator (args)
+    "Add CRM indicator to completing-read-multiple."
     (cons (format "[CRM%s] %s"
                   (replace-regexp-in-string
                    "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
                    crm-separator)
                   (car args))
           (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+  (advice-add #'completing-read-multiple :filter-args #'jake/crm-indicator)
 
   ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-  (bind-key "M-o" #'other-window-prefix)
-  ;; Support opening new minibuffers from inside existing minibuffers.
-  (setq enable-recursive-minibuffers t)
-
-  ;; Emacs 28 and newer: Hide commands in M-x which do not work in the current
-  ;; mode.  Vertico commands are hidden in normal buffers. This setting is
-  ;; useful beyond Vertico.
-  (setq read-extended-command-predicate #'command-completion-default-include-p))
+  (bind-key "M-o" #'other-window-prefix))
 
 ;; TAB completion and indentation settings
 (use-package emacs
   :ensure nil
-  :init
-  ;; TAB cycle if there are only few candidates
-  ;; (setq completion-cycle-threshold 3)
-
-  ;; Enable indentation+completion using the TAB key.
-  ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete)
-  (setq tab-first-completion nil)
-
-
-  ;; Emacs 30 and newer: Disable Ispell completion function. As an alternative,
-  ;; try `cape-dict'.
-  (setq text-mode-ispell-word-completion nil)
-
-  ;; Emacs 28 and newer: Hide commands in M-x which do not apply to the current
-  ;; mode.  Corfu commands are hidden, since they are not used via M-x. This
-  ;; setting is useful beyond Corfu.
-  (setq read-extended-command-predicate #'command-completion-default-include-p))
+  :custom
+  (tab-always-indent 'complete)
+  (tab-first-completion nil)
+  (text-mode-ispell-word-completion nil)
+  (read-extended-command-predicate #'command-completion-default-include-p))
 
 
 ;; ----------------------------------------------------------------------------
@@ -514,7 +472,7 @@
 ;; ============================================================================
 
 (use-package magit
-  :bind (("C-c g g" . magit-status)
+  :bind (("C-x g" . magit-status)
          :map git-commit-mode-map
          ("C-c C-g" . copilot-chat-insert-commit-message))
   :init (with-eval-after-load 'project
@@ -529,7 +487,7 @@
 (use-package pr-review
   :after magit
   :init
-  (defun mes/pr-review-via-forge ()
+  (defun jake/pr-review-via-forge ()
     (interactive)
     (if-let* ((target (forge--browse-target))
               (url (if (stringp target) target (forge-get-url target)))
@@ -573,13 +531,12 @@
                            (">" . python-indent-shift-right)
                            ("<" . python-indent-shift-left)))
 
-  :init
-
-  (setq major-mode-remap-alist
-        '((python-mode . python-ts-mode)))
+  :custom
+  (major-mode-remap-alist '((python-mode . python-ts-mode)))
+  (python-shell-completion-native-enable nil)
 
   :config
-  (defun python-prompt-with (packages)
+  (defun jake/python-prompt-with (packages)
     "Spawn an IPython REPL with extra packages injected via `uv --with`.
 
 Interactively, PACKAGES comes from `completing-read-multiple`.
@@ -610,7 +567,6 @@ If invoked with `C-u`, also prompt for a Python version to pin."
                  " "))
            (buf-name "UV Python"))
       (python-shell-make-comint cmd buf-name t)))
-  (setq python-shell-completion-native-enable nil)
   (add-hook 'python-base-mode-hook
             (lambda ()
               (setq-local completion-at-point-functions
@@ -618,7 +574,7 @@ If invoked with `C-u`, also prompt for a Python version to pin."
                                   completion-at-point-functions))))
 
   ;; --- Extra flymake checkers ---
-  (defun python-extra-flymake-backends ()
+  (defun jake/python-extra-flymake-backends ()
     "Enable additional Flymake checkers alongside Eglot’s."
     ;; Buffer-local so they affect only this buffer
     (add-hook 'flymake-diagnostic-functions
@@ -626,18 +582,18 @@ If invoked with `C-u`, also prompt for a Python version to pin."
     (add-hook 'flymake-diagnostic-functions
               'flymake-collection-numpydoc nil t))
 
-  (defun uv-which (uv-exec exec)
+  (defun jake/uv-which (uv-exec exec)
     (when uv-exec
       (let ((path (car (process-lines uv-exec "run" "which" exec))))
         (when path
           (string-trim path)))))
 
-  (defun setup-python-environment ()
+  (defun jake/setup-python-environment ()
     "Configure python-shell to use `uv run which python/ipython`."
     (interactive)
     (let* ((uv-exec (executable-find "uv"))
-           (ipython (uv-which uv-exec "ipython"))
-           (python (uv-which uv-exec "python")))
+           (ipython (jake/uv-which uv-exec "ipython"))
+           (python (jake/uv-which uv-exec "python")))
       (cond
        ;; Prefer IPython if found
        ((and ipython (not (string-empty-p ipython)))
@@ -655,7 +611,7 @@ If invoked with `C-u`, also prompt for a Python version to pin."
 
 
 
-  (add-hook 'python-ts-mode-hook #'setup-python-environment)
+  (add-hook 'python-ts-mode-hook #'jake/setup-python-environment)
   ;; --- Formatter setup ---
   (add-hook 'python-ts-mode-hook
             (lambda ()
@@ -694,7 +650,7 @@ If invoked with `C-u`, also prompt for a Python version to pin."
                           #'eglot-flymake-backend
                           nil t)
                 ;; and then add your extra checkers
-                (python-extra-flymake-backends))))
+                (jake/python-extra-flymake-backends))))
 
   ;; --- misc python-mode things ---
   (add-hook 'python-ts-mode-hook
@@ -737,12 +693,12 @@ If invoked with `C-u`, also prompt for a Python version to pin."
 (use-package yaml-mode
   :mode ("\\.cff\\'" . yaml-ts-mode)
   :init
-  (defun yaml-mode-setup-flymake ()
+  (defun jake/yaml-mode-setup-flymake ()
     (add-hook 'flymake-diagnostic-functions 'flymake-collection-yamllint nil t)
     (flymake-mode +1))
 
-  (add-hook 'yaml-mode-hook #'yaml-mode-setup-flymake)
-  (add-hook 'yaml-ts-mode-hook #'yaml-mode-setup-flymake))
+  (add-hook 'yaml-mode-hook #'jake/yaml-mode-setup-flymake)
+  (add-hook 'yaml-ts-mode-hook #'jake/yaml-mode-setup-flymake))
 
 (use-package csv-mode
   :hook (csv-mode . csv-align-mode))
@@ -758,14 +714,13 @@ If invoked with `C-u`, also prompt for a Python version to pin."
   (rustic-cargo-use-last-stored-arguments t))
 
 (use-package cylc-mode
-  :ensure (cylc-mode
-           :host github
-           :repo "cylc/cylc-flow"
-           :files ("cylc/flow/etc/syntax/cylc-mode.el"))
+  :vc (:url "https://github.com/cylc/cylc-flow"
+            :rev :last-vc
+            :lisp-dir "cylc/flow/etc/syntax/")
   :mode ("suite.*\\.rc\\'" "\\.cylc\\'"))
 
 (use-package apptainer-mode
-  :ensure (:host github :repo "jrgant/apptainer-mode")
+  :vc (:url "https://github.com/jrgant/apptainer-mode")
   :mode ("\\.def\\'" . apptainer-mode))
 
 (use-package envrc
@@ -789,7 +744,7 @@ If invoked with `C-u`, also prompt for a Python version to pin."
 
 (global-set-key [remap newline] #'newline-and-indent)
 
-(defun local-disable-line-numbers ()
+(defun jake/local-disable-line-numbers ()
   (setq-local display-line-numbers nil))
 
 ;; ----------------------------------------------------------------------------
@@ -841,10 +796,12 @@ If invoked with `C-u`, also prompt for a Python version to pin."
 
 (use-package project
   :ensure nil
-  :bind (("C-x p t" . project-test) ("C-x p i" . consult-imenu-multi))
+  :bind (("C-x p t" . jake/project-test) ("C-x p i" . consult-imenu-multi))
+  :custom
+  (project-test-command "just test")
   :init
-  (defcustom project-test-command "just test" "Default test command for `project-test'")
-  (defun project-test ()
+  (defun jake/project-test ()
+    "Run project test command."
     (interactive)
     (let ((compile-command project-test-command))
       (call-interactively #'project-compile))))
@@ -852,7 +809,7 @@ If invoked with `C-u`, also prompt for a Python version to pin."
 
 
 
-(defun smarter-move-beginning-of-line (arg)
+(defun jake/smarter-move-beginning-of-line (arg)
   "Move point back to indentation of beginning of line.
 
 Move point to the first non-whitespace character on this line.
@@ -875,17 +832,17 @@ point reaches the beginning or end of the buffer, stop there."
     (when (= orig-point (point))
       (move-beginning-of-line 1))))
 
-;; remap C-a to `smarter-move-beginning-of-line'
+;; remap C-a to `jake/smarter-move-beginning-of-line'
 (global-set-key [remap move-beginning-of-line]
-                'smarter-move-beginning-of-line)
+                'jake/smarter-move-beginning-of-line)
 
-(setq dired-dwim-target t
-      dired-auto-revert-buffer t
-      dired-listing-switches "-alFh"
-      isearch-lazy-count t
-      tramp-use-ssh-controlmaster-options nil
-      vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)
-      use-short-answers t)
+(setopt dired-dwim-target t
+        dired-auto-revert-buffer t
+        dired-listing-switches "-alFh"
+        isearch-lazy-count t
+        tramp-use-ssh-controlmaster-options nil
+        vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)
+        use-short-answers t)
 
 ;; ----------------------------------------------------------------------------
 ;; Display Buffer Configuration
@@ -919,7 +876,7 @@ point reaches the beginning or end of the buffer, stop there."
 (delete-selection-mode)
 
 (use-package comment-dwim-2
-  :bind ("M-;" . #'comment-dwim-2))
+  :bind ("M-;" . comment-dwim-2))
 
 (use-package crux
   :bind (("C-k" . crux-smart-kill-line)
@@ -939,24 +896,27 @@ point reaches the beginning or end of the buffer, stop there."
          ("C-x C-d" . consult-dir)
          ("C-x C-j" . consult-dir-jump-file))
   :init
-  (defun eshell--previous-directories ()
+  (defun jake/eshell-previous-directories ()
+    "Return list of previous eshell directories."
     (delete-dups (mapcar 'abbreviate-file-name
                          (ring-elements eshell-last-dir-ring))))
+
   (defun eshell/z (&optional regexp)
     "Navigate to a previously visited directory in eshell."
     (cond
      ((and (not regexp) (featurep 'consult-dir))
       (eshell/cd (substring-no-properties (consult-dir--pick "Switch directory: "))))
      (t (eshell/cd (if regexp (eshell-find-previous-directory regexp)
-                     (completing-read "cd: " (eshell--previous-directories)))))))
+                     (completing-read "cd: " (jake/eshell-previous-directories)))))))
 
   (defvar consult-dir--source-eshell `(:name "Eshell"
                                              :narrow ?e
                                              :category file
                                              :face consult-file
                                              :enabled ,(lambda () (and (boundp 'eshell-last-dir-ring) eshell-last-dir-ring))
-                                             :items ,#'eshell--previous-directories))
-  (defun consult-dir--zoxide-dirs ()
+                                             :items ,#'jake/eshell-previous-directories))
+
+  (defun jake/consult-dir-zoxide-dirs ()
     "Return list of zoxide dirs."
     (mapcar (lambda (line) (concat line "/")) (split-string (shell-command-to-string "zoxide query --list") "\n" t)))
 
@@ -968,10 +928,8 @@ point reaches the beginning or end of the buffer, stop there."
                 :face     consult-file
                 :history  file-name-history
                 :enabled  ,(lambda () (executable-find "zoxide"))
-                :items    ,#'consult-dir--zoxide-dirs)
+                :items    ,#'jake/consult-dir-zoxide-dirs)
     "Zoxide directory source for `consult-dir'.")
-
-  ;; Adding to the list of consult-dir sources
 
   :config
   (add-to-list 'consult-dir-sources 'consult-dir--source-eshell t)
@@ -1097,7 +1055,7 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
 
 
 (use-package org-menu
-  :ensure (:host github :repo "sheijk/org-menu")
+  :vc (:url "https://github.com/sheijk/org-menu")
   :after org
   :bind (:map org-mode-map
               ("C-o" . 'org-menu)))
@@ -1130,17 +1088,20 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
 ;; ----------------------------------------------------------------------------
 
 ;;;###autoload
-(defun consult-ripgrep-all (&optional dir initial)
+(defun jake/consult-ripgrep-all (&optional dir initial)
+  "Use ripgrep-all for searching with consult."
   (interactive "P")
   (let ((consult-ripgrep-args "rga --null --line-buffered --color=never --max-columns=1000  --smart-case --no-heading --with-filename --line-number"))
     (consult-ripgrep dir initial)))
 
-(setq literature-directory "~/Sync")
-(defun search/papers ()
-  (interactive)
-  (consult-ripgrep-all literature-directory))
+(setopt literature-directory "~/Sync")
 
-(bind-key "s-p" #'search/papers)
+(defun jake/search-papers ()
+  "Search papers using ripgrep-all in literature directory."
+  (interactive)
+  (jake/consult-ripgrep-all literature-directory))
+
+(bind-key "s-p" #'jake/search-papers)
 
 ;; ----------------------------------------------------------------------------
 ;; Denote - Simple note-taking system
@@ -1149,9 +1110,11 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
 (use-package denote
   :ensure t
   :hook (dired-mode . denote-dired-mode)
-  :bind (("s-d" . denote-transient))
+  :bind (("s-d" . jake/denote-transient))
+  :custom
+  (denote-directory (expand-file-name "~/notes/"))
   :init
-  (transient-define-prefix denote-transient ()
+  (transient-define-prefix jake/denote-transient ()
     "Denote dispatch"
     [["Note creation (d)"
       ("d" "new note" denote)
@@ -1173,9 +1136,6 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
       ("sn" "consult-notes" consult-notes)
       ("ss" "consult-notes search" consult-notes-search-in-all-notes)]])
   :config
-
-  (setq denote-directory (expand-file-name "~/notes/"))
-
   ;; Automatically rename Denote buffers when opening them so that
   ;; instead of their long file name they have, for example, a literal
   ;; "[D]" followed by the file's title.  Read the doc string of
@@ -1205,14 +1165,14 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
 
 
 (use-package consult-notes
-  :ensure (:type git :host github :repo "mclear-tools/consult-notes")
+  :vc (:url "https://github.com/mclear-tools/consult-notes")
   :commands (consult-notes consult-notes-search-in-all-notes)
   :config
   ;; Set org-roam integration, denote integration, or org-heading integration e.g.:
   (consult-notes-org-headings-mode)
   (consult-notes-denote-mode)
   ;; search only for text files in denote dir
-  (setq consult-notes-denote-files-function (lambda () (denote-directory-files nil t t))))
+  (setopt consult-notes-denote-files-function (lambda () (denote-directory-files nil t t))))
 
 
 
@@ -1224,24 +1184,21 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
 (global-auto-revert-mode)
 (recentf-mode)
 (savehist-mode)
-(setq initial-major-mode 'text-mode)
 
-(defun bedrock--backup-file-name (fpath)
-  "Return a new file path of a given file path.
-If the new path's directories does not exist, create them."
-  (let* ((backupRootDir (concat user-emacs-directory "emacs-backup/"))
-         (filePath (replace-regexp-in-string "[A-Za-z]:" "" fpath )) ; remove Windows driver letter in path
-         (backupFilePath (replace-regexp-in-string "//" "/" (concat backupRootDir filePath "~") )))
-    (make-directory (file-name-directory backupFilePath) (file-name-directory backupFilePath))
-    backupFilePath))
-(setq make-backup-file-name-function 'bedrock--backup-file-name)
+(setopt initial-major-mode 'text-mode)
+
+(setq backup-directory-alist
+      `((".*" . ,(concat user-emacs-directory "backups/"))))
+
+(setq auto-save-file-name-transforms
+      `((".*" ,(concat user-emacs-directory "auto-save/") t)))
 
 ;; ============================================================================
 ;; FILE CONVERSION & FORMATTING
 ;; ============================================================================
 
 (use-package pandoc-transient
-  :ensure (:host github :repo "lispandfound/pandoc-transient")
+  :vc (:url "https://github.com/lispandfound/pandoc-transient")
   :bind (("C-c P" . pandoc-convert-transient)))
 
 (use-package apheleia
@@ -1284,10 +1241,10 @@ If the new path's directories does not exist, create them."
 ;; The default bind for query-replace-regexp is stupid... C-M-%... who thought that was less useful than `move-to-window-line'!
 (bind-key "M-r" #'query-replace-regexp)
 
-(setq sentence-end-double-space nil)
+(setopt sentence-end-double-space nil)
 
-(defun to-snake-case (start end)
-  "Change selected text to snake case format"
+(defun jake/to-snake-case (start end)
+  "Change selected text to snake case format."
   (interactive "r")
   (if (use-region-p)
       (let ((camel-case-str (buffer-substring start end)))
@@ -1460,16 +1417,31 @@ See URL `https://github.com/charliermarsh/ruff'."
 
 (use-package lookup
   :ensure nil
-  :bind (("C-c l" . lookup/query))
+  :bind (("C-c l" . jake/lookup-query))
   :load-path "lisp/"
   :init
   ;; Embark integration
   (with-eval-after-load 'embark
-    (define-key embark-symbol-map (kbd "l") #'lookup/query))
+    (define-key embark-symbol-map (kbd "l") #'jake/lookup-query))
   :config
-  (add-hook 'kill-emacs-hook #'lookup/save-query-history))
+  (add-hook 'kill-emacs-hook #'jake/lookup-save-query-history))
 
 (use-package ascii-art-to-unicode)
+
+(use-package helpful
+  :bind (;; Replace `async-shell-command' with `detached-shell-command'
+         ([remap describe-function] . helpful-callable)
+         ([remap describe-variable] . helpful-variable)
+         ([remap describe-key] . helpful-key)
+         ([remap describe-command] . helpful-command)
+         ([remap describe-symbol] . helpful-symbol)))
+
+(use-package elisp-demos
+  :after helpful
+  :init
+  (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
+
+
 
 ;; ============================================================================
 ;; CASUAL - TRANSIENT MENU ENHANCEMENTS
@@ -1614,11 +1586,11 @@ See URL `https://github.com/charliermarsh/ruff'."
 ;; REMOTE FILE ACCESS - TRAMP
 ;; ============================================================================
 
-(setq remote-file-name-inhibit-locks t
-      tramp-use-scp-direct-remote-copying t
-      remote-file-name-inhibit-auto-save-visited t
-      tramp-copy-size-limit (* 1024 1024)
-      tramp-verbose 2)
+(setopt remote-file-name-inhibit-locks t
+        tramp-use-scp-direct-remote-copying t
+        remote-file-name-inhibit-auto-save-visited t
+        tramp-copy-size-limit (* 1024 1024)
+        tramp-verbose 2)
 
 (connection-local-set-profile-variables
  'remote-direct-async-process
@@ -1629,7 +1601,7 @@ See URL `https://github.com/charliermarsh/ruff'."
  '(:application tramp :protocol "scp")
  'remote-direct-async-process)
 
-(setq magit-tramp-pipe-stty-settings 'pty)
+(setopt magit-tramp-pipe-stty-settings 'pty)
 
 
 (with-eval-after-load 'tramp
@@ -1641,7 +1613,7 @@ See URL `https://github.com/charliermarsh/ruff'."
 
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
-(setq bookmark-save-flag 1)
+(setopt bookmark-save-flag 1)
 
 ;; ============================================================================
 ;; LATEX & TYPESETTING
@@ -1671,15 +1643,14 @@ See URL `https://github.com/charliermarsh/ruff'."
   (TeX-process-asynchronous t)
   (TeX-check-TeX nil)
   (TeX-engine 'default)
+  :config
   (with-eval-after-load 'reftex
     (setq reftex-plug-into-AUCTeX t
           reftex-cite-format 'default
           reftex-ref-style-default-list '("Default" "Varioref"))))
 
-(setq-default display-line-numbers t)
-
 (use-package typst-ts-mode
-  :ensure (:type git :host codeberg :repo "meow_king/typst-ts-mode")
+  :vc (:url "https://codeberg.org/meow_king/typst-ts-mode")
   :bind (:map
          typst-ts-mode-map
          ("C-c C-c" . typst-ts-tmenu))
