@@ -708,9 +708,9 @@ If invoked with `C-u`, also prompt for a Python version to pin."
               (("C-c C-c" . haskell-compile))))
 
 (use-package rustic
-  :config
-  (setq rustic-format-on-save nil)
   :custom
+  (rustic-format-on-save nil)
+  (rustic-lsp-client 'eglot)
   (rustic-cargo-use-last-stored-arguments t))
 
 (use-package cylc-mode
