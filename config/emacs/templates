@@ -76,3 +76,20 @@ org-mode
  "* Next Steps" n
  "- " p n
  "- " p n)
+
+gfm-mode
+(t "- [ ] " p)
+(td "- [x] " p)
+(table "| " p " | " p " |" n "|---" (make-string (length p) ?-) " | --- |" n "| " p " | " p " |")
+(pre "```" p n r n "```")
+(py "```python" n r n "```")
+(sh "```bash" n r n "```")
+(note "> [!NOTE]" n "> " p)
+(tip "> [!TIP]" n "> " p)
+(imp "> [!IMPORTANT]" n "> " p)
+(war "> [!WARNING]" n "> " p)
+(cau "> [!CAUTION]" n "> " p)
+(det "<details>" n "<summary>" p "</summary>" n r n "</details>")
+(foot "[^" p "]: " p)
+(li "[" p "](https://" q ")")
+(img "![" p "](" q ")")
