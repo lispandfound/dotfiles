@@ -598,7 +598,7 @@ If invoked with `C-u`, also prompt for a Python version to pin."
 
   (defun jake/uv-which (uv-exec exec)
     (when uv-exec
-      (let ((path (car (process-lines uv-exec "run" "which" exec))))
+      (let ((path (car (ignore-errors (process-lines uv-exec "run" "which" exec)))))
         (when path
           (string-trim path)))))
 
