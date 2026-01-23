@@ -1672,6 +1672,10 @@ See URL `https://github.com/charliermarsh/ruff'."
   (TeX-check-TeX nil)
   (TeX-engine 'default)
   :config
+  (let ((tex-list (assoc "TeX" TeX-command-list))
+        (latex-list (assoc "LaTeX" TeX-command-list)))
+    (setf (cadr tex-list) "%(tex)"
+          (cadr latex-list) "%l"))
   (with-eval-after-load 'reftex
     (setq reftex-plug-into-AUCTeX t
           reftex-cite-format 'default

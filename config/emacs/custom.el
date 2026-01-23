@@ -28,38 +28,16 @@
      ("\\.mm\\'" . default) ("\\.x?html?\\'" . default)))
  '(package-install-upgrade-built-in t)
  '(package-selected-packages
-   '(all-the-icons-ibuffer apheleia apptainer-mode ascii-art-to-unicode
-                           auctex avy better-defaults cape casual
-                           cmake-mode comint-mime comment-dwim-2
-                           consult-dir consult-notes copilot-chat
-                           corfu crux cylc-mode cython-mode deadgrep
-                           denote-journal denote-org detached devdocs
-                           dumb-jump edit-indirect edit-server
-                           elisp-demos elm-mode embark-consult embrace
-                           envrc exec-path-from-shell expreg
-                           flymake-collection forge gist git-link
-                           gitignore-templates grip-mode haskell-mode
-                           helpful ibuffer-project jenkinsfile-mode
-                           jinx just-mode ligature magit-lfs
-                           marginalia mermaid-mode modus-themes
-                           mood-line nix-ts-mode orderless
-                           org-download org-fragtog org-menu
-                           org-present ox-reveal ox-slack
-                           pandoc-transient popper pr-review pyvenv
-                           restart-emacs rustic tempel-collection
-                           titlecase tldr transpose-frame treesit-auto
-                           typst-ts-mode uniline vertico
-                           visual-fill-column wgrep ws-butler
-                           yaml-mode))
+   '(apptainer-mode consult-notes cylc-mode org-menu pandoc-transient
+                    typst-ts-mode))
  '(package-vc-selected-packages
-   '((cylc-mode :url "https://github.com/cylc/cylc-flow" :lisp-dir
-                "cylc/flow/etc/syntax/")
-     (typst-ts-mode :url
-                    "https://codeberg.org/meow_king/typst-ts-mode")
+   '((typst-ts-mode :url "https://codeberg.org/meow_king/typst-ts-mode")
      (pandoc-transient :url
                        "https://github.com/lispandfound/pandoc-transient")
      (org-menu :url "https://github.com/sheijk/org-menu")
      (apptainer-mode :url "https://github.com/jrgant/apptainer-mode")
+     (cylc-mode :url "https://github.com/cylc/cylc-flow" :lisp-dir
+                "cylc/flow/etc/syntax/")
      (copilot-chat :url "https://github.com/chep/copilot-chat.el"
                    :branch "shell-maker-update")
      (copilot :url "https://github.com/copilot-emacs/copilot.el"
@@ -69,7 +47,7 @@
    '("\\*tldr\\*" "Output\\*$" "\\*Async Shell Command\\*"
      compilation-mode help-mode eshell-mode "\\*Messages\\*$"
      devdocs-mode inferior-python-mode occur-mode "\\*Embark"
-     detached-compilation-mode helpful-mode))
+     detached-compilation-mode helpful-mode ibuffer-mode))
  '(popper-window-height 20)
  '(proced-auto-update-flag 'visible)
  '(proced-auto-update-interval 1)
