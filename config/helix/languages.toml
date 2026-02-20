@@ -25,6 +25,10 @@ feature_paths = false
 feature_citations = false
 
 
+[language-server.ty]
+command = "uv"
+args = ["run", "ty", "server"]
+
 [language-server.basedpyright]
 command = "basedpyright-langserver"
 args = ["--stdio"]

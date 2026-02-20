@@ -10,6 +10,9 @@
      (output-pdf "Okular") (output-pdf "xdg-open")))
  '(casual-lib-use-unicode t)
  '(consult-narrow-key "<")
+ '(custom-safe-themes
+   '("9320df14f443b15ad1f0633b04816a5242b9097d1c60c7abb12869e03e39c52d"
+     default))
  '(dired-compress-file-default-suffix ".xz")
  '(display-time-default-load-average nil)
  '(display-time-format "%H:%M")
@@ -28,8 +31,8 @@
      ("\\.mm\\'" . default) ("\\.x?html?\\'" . default)))
  '(package-install-upgrade-built-in t)
  '(package-selected-packages
-   '(apptainer-mode consult-notes cylc-mode org-menu pandoc-transient
-                    typst-ts-mode))
+   '(apptainer-mode consult-notes cylc-mode denote-review org-menu
+                    pandoc-transient typst-ts-mode))
  '(package-vc-selected-packages
    '((typst-ts-mode :url "https://codeberg.org/meow_king/typst-ts-mode")
      (pandoc-transient :url

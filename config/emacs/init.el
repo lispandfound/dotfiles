@@ -41,17 +41,16 @@
 (use-package transient
   :demand t)
 
-(use-package modus-themes
-  :demand t
-  :config
-  (defun jake/pad-mode-line (&rest _)
-    ;; From the modus manual
-    (modus-themes-with-colors
-      (custom-set-faces
-       `(mode-line-active ((,c :box (:line-width 5 :color ,bg-mode-line-active))))
-       `(mode-line-inactive ((,c :box (:line-width 5 :color ,bg-mode-line-inactive)))))))
-  (add-hook 'modus-themes-after-load-theme-hook #'jake/pad-mode-line)
-  (modus-themes-load-theme 'modus-operandi))
+(defun jake/pad-mode-line (&rest _)
+  ;; From the modus manual
+  (modus-themes-with-colors
+    (custom-set-faces
+     `(mode-line-active ((,c :box (:line-width 5 :color ,bg-mode-line-active))))
+     `(mode-line-inactive ((,c :box (:line-width 5 :color ,bg-mode-line-inactive)))))))
+(add-hook 'modus-themes-after-load-theme-hook #'jake/pad-mode-line)
+(load-theme 'modus-operandi)
+
+
 
 (use-package mood-line
   :demand t
@@ -1158,6 +1157,9 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
   ;; "[D]" followed by the file's title.  Read the doc string of
   ;; `denote-rename-buffer-format' for how to modify this.
   (denote-rename-buffer-mode 1))
+
+(use-package denote-review
+  :ensure t)
 
 (use-package org-fragtog
   :ensure t
