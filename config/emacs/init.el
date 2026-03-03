@@ -600,46 +600,12 @@ If invoked with `C-u`, also prompt for a Python version to pin."
       (let ((path (car (ignore-errors (process-lines uv-exec "run" "which" exec)))))
         (when path
           (string-trim path)))))
+  (setq python-shell-interpreter "uv"
+        python-shell-interpreter-args "run --with ipython ipython --simple-prompt")
 
-  (defun jake/setup-python-environment ()
-    "Configure python-shell to use `uv run which python/ipython`."
-    (interactive)
-    (let* ((uv-exec (executable-find "uv"))
-           (ipython (jake/uv-which uv-exec "ipython"))
-           (python (jake/uv-which uv-exec "python")))
-      (cond
-       ;; Prefer IPython if found
-       ((and ipython (not (string-empty-p ipython)))
-        (setq-local python-shell-interpreter ipython
-                    python-shell-interpreter-args "--simple-prompt")
-        (message "Using IPython: %s" ipython))
-       ;; Otherwise fall back to Python
-       ((and python (not (string-empty-p python)))
-        (setq-local python-shell-interpreter python
-                    python-shell-interpreter-args "")
-        (message "Using Python: %s" python))
-       ;; If uv or both executables missing
-       (t
-        (message "Could not determine python via uv.")))))
-
-
-
-  (add-hook 'python-ts-mode-hook #'jake/setup-python-environment)
-  ;; --- Formatter setup ---
-  (add-hook 'python-ts-mode-hook
-            (lambda ()
-              (setq-local apheleia-formatters
-                          `((ruff "uvx" "ruff" "format" "--silent"
-                                  (apheleia-formatters-fill-column "--line-length")
-                                  "--stdin-filename" filepath "-")
-                            (ruff-isort "uvx" "ruff" "check" "-n" "--select" "I"
-                                        "--fix" "--fix-only"
-                                        "--stdin-filename" filepath "-")))))
-
-  ;; --- Eglot server setup ---
   (with-eval-after-load 'eglot
     (add-to-list 'eglot-server-programs
-                 '(python-ts-mode "uv" "run" "--extra" "types" "--extra" "dev" "ty" "server")))
+                 '(python-ts-mode "uv" "run" "--with" "ty" "ty" "server")))
 
 
   ;; ------------------------------------------------------------------
@@ -669,7 +635,6 @@ If invoked with `C-u`, also prompt for a Python version to pin."
   (add-hook 'python-ts-mode-hook
             (lambda ()
               (setq-local transpose-sexps-function #'treesit-transpose-sexps
-                          python-shell-interpreter-args "--simple-prompt --classic"
                           devdocs-current-docs '("pandas~2"
                                                  "numpy~2.0"
                                                  "python~3.13"
@@ -1235,6 +1200,9 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
   (apheleia-global-mode +1)
   :config
   (setf (alist-get 'toml-ts-mode apheleia-mode-alist) 'taplo)
+  (setf (alist-get 'ruff apheleia-formatters) (cons "uvx" (alist-get 'ruff apheleia-formatters)))
+  (setf (alist-get 'ruff-isort apheleia-formatters) (cons "uvx" (alist-get 'ruff-isort apheleia-formatters)))
+
   (setf (alist-get 'taplo apheleia-formatters)
         '("taplo" "format" filepath))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist)
@@ -1400,10 +1368,10 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
     :pre-let ((numpydoc-exec (executable-find "numpydoc_wrapper")))
     :pre-check (unless numpydoc-exec
                  (error "Cannot find numpydoc wrapper"))
-    :source-inplace t
     :write-type 'file
     :regexps ((error bol (file-name) ":" line ": " (id (* alnum)) " " (message) eol))
-    :command `(,numpydoc-exec ,flymake-collection-temp-file))
+    :command `(,numpydoc-exec ,flymake-collection-temp-file ,@(when-let ((file (buffer-file-name flymake-collection-source)))
+                                                                (list file))))
   (flymake-collection-define-enumerate flymake-collection-uv-ruff
     "A Python syntax and style checker using Ruff.
 
