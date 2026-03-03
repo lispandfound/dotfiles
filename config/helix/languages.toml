@@ -27,7 +27,7 @@ feature_citations = false
 
 [language-server.ty]
 command = "uv"
-args = ["run", "ty", "server"]
+args = ["run", "--with", "ty", "ty", "server"]
 
 [language-server.basedpyright]
 command = "basedpyright-langserver"
