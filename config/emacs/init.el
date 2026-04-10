@@ -127,11 +127,11 @@
   :custom
   (consult-imenu-config
    '((emacs-lisp-mode :toplevel "Functions" :types
-                      ((102 "Functions" font-lock-function-name-face)
-                       (109 "Macros" font-lock-function-name-face)
-                       (112 "Packages" font-lock-constant-face)
-                       (116 "Types" font-lock-type-face)
-                       (118 "Variables" font-lock-variable-name-face)))
+      ((102 "Functions" font-lock-function-name-face)
+       (109 "Macros" font-lock-function-name-face)
+       (112 "Packages" font-lock-constant-face)
+       (116 "Types" font-lock-type-face)
+       (118 "Variables" font-lock-variable-name-face)))
      (python-ts-mode
       :types
       ((?f "Function" font-lock-function-name-face)
@@ -691,8 +691,8 @@ If invoked with `C-u`, also prompt for a Python version to pin."
 
 (use-package cylc-mode
   :vc (:url "https://github.com/cylc/cylc-flow"
-            :rev :last-vc
-            :lisp-dir "cylc/flow/etc/syntax/")
+       :rev :last-vc
+       :lisp-dir "cylc/flow/etc/syntax/")
   :mode ("suite.*\\.rc\\'" "\\.cylc\\'"))
 
 (use-package apptainer-mode
@@ -891,11 +891,11 @@ point reaches the beginning or end of the buffer, stop there."
                      (completing-read "cd: " (jake/eshell-previous-directories)))))))
 
   (defvar consult-dir--source-eshell `(:name "Eshell"
-                                             :narrow ?e
-                                             :category file
-                                             :face consult-file
-                                             :enabled ,(lambda () (and (boundp 'eshell-last-dir-ring) eshell-last-dir-ring))
-                                             :items ,#'jake/eshell-previous-directories))
+                                       :narrow ?e
+                                       :category file
+                                       :face consult-file
+                                       :enabled ,(lambda () (and (boundp 'eshell-last-dir-ring) eshell-last-dir-ring))
+                                       :items ,#'jake/eshell-previous-directories))
 
   (defun jake/consult-dir-zoxide-dirs ()
     "Return list of zoxide dirs."
@@ -904,12 +904,12 @@ point reaches the beginning or end of the buffer, stop there."
   ;; A consult source that calls this function
   (defvar consult-dir--source-zoxide
     `(:name     "Zoxide dirs"
-                :narrow   ?z
-                :category file
-                :face     consult-file
-                :history  file-name-history
-                :enabled  ,(lambda () (executable-find "zoxide"))
-                :items    ,#'jake/consult-dir-zoxide-dirs)
+      :narrow   ?z
+      :category file
+      :face     consult-file
+      :history  file-name-history
+      :enabled  ,(lambda () (executable-find "zoxide"))
+      :items    ,#'jake/consult-dir-zoxide-dirs)
     "Zoxide directory source for `consult-dir'.")
 
   :config
@@ -950,15 +950,15 @@ point reaches the beginning or end of the buffer, stop there."
   :config
   (add-to-list 'org-preview-latex-process-alist
                '(tectonic :programs ("tectonic" "convert")
-                          :description "pdf > png"
-                          :message "you need install the programs: tectonic and imagemagick."
-                          :image-input-type "pdf"
-                          :image-output-type "png"
-                          :image-size-adjust (1.0 . 1.0)
-                          :latex-compiler
-                          ("tectonic -Z shell-escape-cwd=%o --outfmt pdf --outdir %o %f")
-                          :image-converter
-                          ("convert -density %D -trim -antialias %f -quality 300 %O")))
+                 :description "pdf > png"
+                 :message "you need install the programs: tectonic and imagemagick."
+                 :image-input-type "pdf"
+                 :image-output-type "png"
+                 :image-size-adjust (1.0 . 1.0)
+                 :latex-compiler
+                 ("tectonic -Z shell-escape-cwd=%o --outfmt pdf --outdir %o %f")
+                 :image-converter
+                 ("convert -density %D -trim -antialias %f -quality 300 %O")))
   (setq org-preview-latex-default-process 'tectonic)
   (require 'ox-publish)
 
@@ -1088,75 +1088,12 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
 ;; Denote - Simple note-taking system
 ;; ----------------------------------------------------------------------------
 
-(use-package denote
-  :ensure t
-  :hook (dired-mode . denote-dired-mode)
-  :bind (("s-d" . jake/denote-transient))
-  :custom
-  (denote-directory (expand-file-name "~/notes/"))
-  :init
-  (transient-define-prefix jake/denote-transient ()
-    "Denote dispatch"
-    [["Note creation (d)"
-      ("d" "new note" denote)
-      ("j" "new or existing journal entry" denote-journal-new-or-existing-entry)
-      ("n" "open or new" denote-open-or-create)
-      ("t" "new specifying date and time" denote-date)
-      ("+" "create in subdirectory " denote-subdirectory)]]
-    [["Bookkeeping (b)"
-      ("br" "prompt and rename" denote-rename-file)
-      ("bf" "rename with frontmatter" denote-rename-file-using-front-matter)
-      ("bk" "modify keywords" denote-rename-file-keywords)]
-     ["Linking (l)"
-      ("i" "insert link" denote-link)
-      ("lh" "insert link to org heading" denote-org-link-to-heading)
-      ("lb" "show backlinks" denote-backlinks)
-      ("lg" "visit backlink" denote-find-backlink)
-      ("lo" "org backlink block" denote-org-dblock-insert-backlinks)]]
-    [["Searching (s)"
-      ("sn" "consult-notes" consult-notes)
-      ("ss" "consult-notes search" consult-notes-search-in-all-notes)]])
-  :config
-  ;; Automatically rename Denote buffers when opening them so that
-  ;; instead of their long file name they have, for example, a literal
-  ;; "[D]" followed by the file's title.  Read the doc string of
-  ;; `denote-rename-buffer-format' for how to modify this.
-  (denote-rename-buffer-mode 1))
-
-(use-package denote-review
-  :ensure t)
 
 (use-package org-fragtog
   :ensure t
   :hook (org-mode . org-fragtog-mode))
 
-(use-package denote-journal
-  :ensure t
-  :after denote
-  :custom
-  (denote-journal-keyword "labnotes")
-  (denote-journal-directory (expand-file-name "~/notes/labnotes"))
-  (denote-journal-title-format 'day-date-month-year))
-(use-package denote-org
-  :after denote
-  :custom
-  ;; `denote-org-link-to-heading' controls the behavior of
-  ;; `org-store-link': setting to id makes it insert an ID in the
-  ;; PROPERTIES drawer
-  ;;
-  ;; (denote-org-store-link-to-heading 'context)
-  (denote-org-store-link-to-heading 'id))
 
-
-(use-package consult-notes
-  :vc (:url "https://github.com/mclear-tools/consult-notes")
-  :commands (consult-notes consult-notes-search-in-all-notes)
-  :config
-  ;; Set org-roam integration, denote integration, or org-heading integration e.g.:
-  (consult-notes-org-headings-mode)
-  (consult-notes-denote-mode)
-  ;; search only for text files in denote dir
-  (setopt consult-notes-denote-files-function (lambda () (denote-directory-files nil t t))))
 
 
 
@@ -1363,51 +1300,51 @@ With a prefix ARG (C-u), copy the public URL to the kill ring instead."
   (require 'flymake-collection-define)
 
   (flymake-collection-define-rx flymake-collection-numpydoc
-    "Numpydoc documentation checker."
-    :title "numpydoc"
-    :pre-let ((numpydoc-exec (executable-find "numpydoc_wrapper")))
-    :pre-check (unless numpydoc-exec
-                 (error "Cannot find numpydoc wrapper"))
-    :write-type 'file
-    :regexps ((error bol (file-name) ":" line ": " (id (* alnum)) " " (message) eol))
-    :command `(,numpydoc-exec ,flymake-collection-temp-file ,@(when-let ((file (buffer-file-name flymake-collection-source)))
-                                                                (list file))))
+                                "Numpydoc documentation checker."
+                                :title "numpydoc"
+                                :pre-let ((numpydoc-exec (executable-find "numpydoc_wrapper")))
+                                :pre-check (unless numpydoc-exec
+                                             (error "Cannot find numpydoc wrapper"))
+                                :write-type 'file
+                                :regexps ((error bol (file-name) ":" line ": " (id (* alnum)) " " (message) eol))
+                                :command `(,numpydoc-exec ,flymake-collection-temp-file ,@(when-let ((file (buffer-file-name flymake-collection-source)))
+                                                                                            (list file))))
   (flymake-collection-define-enumerate flymake-collection-uv-ruff
-    "A Python syntax and style checker using Ruff.
+                                       "A Python syntax and style checker using Ruff.
 
 See URL `https://github.com/charliermarsh/ruff'."
-    :title "ruff"
-    :pre-let ((uv-exec (executable-find "uvx")))
-    :pre-check (unless uv-exec
-                 (error "Cannot find uv executable"))
-    :write-type 'pipe
-    :command `(,uv-exec
-               "ruff"
-               "check"
-               "--output-format" "json"
-               ,@(when-let ((file (buffer-file-name flymake-collection-source)))
-                   (list "--stdin-filename" file))
-               "-")
+                                       :title "ruff"
+                                       :pre-let ((uv-exec (executable-find "uvx")))
+                                       :pre-check (unless uv-exec
+                                                    (error "Cannot find uv executable"))
+                                       :write-type 'pipe
+                                       :command `(,uv-exec
+                                                  "ruff"
+                                                  "check"
+                                                  "--output-format" "json"
+                                                  ,@(when-let ((file (buffer-file-name flymake-collection-source)))
+                                                      (list "--stdin-filename" file))
+                                                  "-")
 
-    :generator
-    (car (flymake-collection-parse-json
-          (buffer-substring-no-properties
-           (point-min) (point-max))))
-    :enumerate-parser
-    (let-alist it
-      (let ((loc (cons (car (flymake-diag-region
-                             flymake-collection-source
-                             .location.row .location.column))
-                       (cdr (flymake-diag-region
-                             flymake-collection-source
-                             .end_location.row .end_location.column)))))
-        (list flymake-collection-source
-              (car loc)
-              (cdr loc)
-              :warning
-              (concat (when .code
-                        (concat (propertize .code 'face 'flymake-collection-diag-id) " "))
-                      .message))))))
+                                       :generator
+                                       (car (flymake-collection-parse-json
+                                             (buffer-substring-no-properties
+                                              (point-min) (point-max))))
+                                       :enumerate-parser
+                                       (let-alist it
+                                         (let ((loc (cons (car (flymake-diag-region
+                                                                flymake-collection-source
+                                                                .location.row .location.column))
+                                                          (cdr (flymake-diag-region
+                                                                flymake-collection-source
+                                                                .end_location.row .end_location.column)))))
+                                           (list flymake-collection-source
+                                                 (car loc)
+                                                 (cdr loc)
+                                                 :warning
+                                                 (concat (when .code
+                                                           (concat (propertize .code 'face 'flymake-collection-diag-id) " "))
+                                                         .message))))))
 
 ;; ============================================================================
 ;; DOCUMENTATION & HELP
