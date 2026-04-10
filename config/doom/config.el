@@ -73,24 +73,20 @@
  "M-r" #'query-replace-regexp)
 
 (use-package! igist
-              :init
-              (map!
-               :leader
-               "ng" #'igist-dispatch))
+  :init
+  (map!
+   :leader
+   "ng" #'igist-dispatch))
 
 (after! python
-        (setq lsp-pyright-langserver-command "basedpyright")
-        (defvar-keymap python-indent-shift-right-repeat-map
-          :repeat t
-          ">" #'python-indent-shift-right
-          "<" #'python-indent-shift-left))
+  (defvar-keymap python-indent-shift-right-repeat-map
+    :repeat t
+    ">" #'python-indent-shift-right
+    "<" #'python-indent-shift-left))
 
 (after! (:and python apheleia)
-        (push '(python-mode . ruff) apheleia-mode-alist)
-        (push '(python-ts-mode . ruff) apheleia-mode-alist)
-
-
-        )
+  (push '(python-mode . ruff) apheleia-mode-alist)
+  (push '(python-ts-mode . ruff) apheleia-mode-alist))
 
 (setenv "DICTIONARY" "en_AU")
 (setq ispell-local-dictionary "en_AU")
@@ -101,60 +97,57 @@
 
 
 (after! latex
-        (defun conf/enable-shell-escape ()
-          (setq-local TeX-command-extra-options "--shell-escape"))
-        (add-hook! latex-mode-hook #'conf/enable-shell-escape))
+  (defun conf/enable-shell-escape ()
+    (setq-local TeX-command-extra-options "--shell-escape"))
+  (add-hook! latex-mode-hook #'conf/enable-shell-escape))
 
 
 
 (use-package! cylc-mode
-              :mode ("suite.*\\.rc\\'" "\\.cylc\\'"))
-
-(use-package! ox-slack :after (org))
-
+  :mode ("suite.*\\.rc\\'" "\\.cylc\\'"))
 
 (use-package! dwim-shell-command
-              :ensure t
-              :bind (([remap shell-command] . dwim-shell-command)
-                     :map dired-mode-map
-                     ([remap dired-do-async-shell-command] . dwim-shell-command)
-                     ([remap dired-do-shell-command] . dwim-shell-command)
-                     ([remap dired-smart-shell-command] . dwim-shell-command)))
+  :ensure t
+  :bind (([remap shell-command] . dwim-shell-command)
+         :map dired-mode-map
+         ([remap dired-do-async-shell-command] . dwim-shell-command)
+         ([remap dired-do-shell-command] . dwim-shell-command)
+         ([remap dired-smart-shell-command] . dwim-shell-command)))
 
 (use-package! dwim-shell-commands :after dwim-shell-command)
 
 (use-package! detached
-              :init
-              (detached-init)
-              :bind (;; Replace `async-shell-command' with `detached-shell-command'
-                     ([remap async-shell-command] . detached-shell-command)
-                     ;; Replace `compile' with `detached-compile'
-                     ([remap compile] . detached-compile)
-                     ([remap recompile] . detached-compile-recompile)
-                     ;; Replace built in completion of sessions with `consult'
-                     ([remap detached-open-session] . detached-consult-session))
-              :custom ((detached-show-output-on-attach t)
-                       (detached-notification-function (lambda (t) nil))
-                       (detached-terminal-data-command system-type)))
+  :init
+  (detached-init)
+  :bind (;; Replace `async-shell-command' with `detached-shell-command'
+         ([remap async-shell-command] . detached-shell-command)
+         ;; Replace `compile' with `detached-compile'
+         ([remap compile] . detached-compile)
+         ([remap recompile] . detached-compile-recompile)
+         ;; Replace built in completion of sessions with `consult'
+         ([remap detached-open-session] . detached-consult-session))
+  :custom ((detached-show-output-on-attach t)
+           (detached-notification-function (lambda (t) nil))
+           (detached-terminal-data-command system-type)))
 
 
 
 
 (use-package! edit-server
-              :ensure t
-              :commands edit-server-start
-              :init (if after-init-time
-                        (edit-server-start)
-                      (add-hook 'after-init-hook
-                                #'(lambda() (edit-server-start))))
-              :config (setq edit-server-new-frame-alist
-                            '((name . "Edit with Emacs FRAME")
-                              (top . 200)
-                              (left . 200)
-                              (width . 80)
-                              (height . 25)
-                              (minibuffer . t)
-                              (menu-bar-lines . t))))
+  :ensure t
+  :commands edit-server-start
+  :init (if after-init-time
+            (edit-server-start)
+          (add-hook 'after-init-hook
+                    #'(lambda() (edit-server-start))))
+  :config (setq edit-server-new-frame-alist
+                '((name . "Edit with Emacs FRAME")
+                  (top . 200)
+                  (left . 200)
+                  (width . 80)
+                  (height . 25)
+                  (minibuffer . t)
+                  (menu-bar-lines . t))))
 (when (modulep! :tools lookup)
   (add-to-list '+lookup-provider-url-alist '("Hoogle" "https://hoogle.mangoiv.com/?q=%s")))
 ;; TRAMP speedup
@@ -164,8 +157,8 @@
   (kmacro "C-= = C-x C-u"))
 (map! :leader "c u" 'upcase-variable)
 
-
-
+(use-package! git-link)
+(map! :leader "v l y" 'git-link)
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.

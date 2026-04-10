@@ -47,15 +47,14 @@
 ;; (unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
-(package! pet)
 (package! igist)
 (package! cylc-mode :recipe (:host github
                              :repo "cylc/cylc-flow"
                              :files ("cylc/flow/etc/syntax/cylc-mode.el")))
-(package! slurm-mode)
-(package! ox-slack)
+(package! git-link)
 (package! cmake-mode)
 (package! magit-lfs)
 (package! dwim-shell-command)
 (package! detached)
 (package! edit-server)
+
