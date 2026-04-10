@@ -84,3 +84,6 @@ HISTFILE=~/.zsh_history
 HISTSIZE=1000
 SAVEHIST=1000
 setopt SHARE_HISTORY
+if command -v direnv &> /dev/null; then
+    eval "$(direnv hook zsh)"
+fi
