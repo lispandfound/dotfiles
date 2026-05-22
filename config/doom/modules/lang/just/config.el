@@ -4,5 +4,5 @@
 (use-package! just-ts-mode
   :config
   (set-formatter! 'just-format
-    '("just" "--fmt" "--unstable" "--justfile" filepath)
+    '("just" "--fmt" "--unstable" "--justfile" inplace)
     :modes '(just-ts-mode)))

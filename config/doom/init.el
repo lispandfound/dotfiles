@@ -100,6 +100,7 @@
        (eval +overlay)     ; run code, run (also, repls)
        (lookup +docsets +offline +dictionary)              ; navigate your code and its documentation
        lsp               ; M-x vscode
+       llm
        (magit +forge)             ; a git porcelain for Emacs
        make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
