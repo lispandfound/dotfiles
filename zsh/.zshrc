@@ -87,3 +87,4 @@ setopt SHARE_HISTORY
 if command -v direnv &> /dev/null; then
     eval "$(direnv hook zsh)"
 fi
+alias scipy="uv run --project ~/src/scratchpad/ ipython"
