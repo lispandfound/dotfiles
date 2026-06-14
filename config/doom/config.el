@@ -151,8 +151,8 @@
   (interactive)
   (let ((start (point)))
     (avy-with avy-zap-up-to-char
-      (call-interactively #'avy-goto-char)
-      (kill-region start (point)))))
+              (call-interactively #'avy-goto-char)
+              (kill-region start (point)))))
 
 (define-key! [remap zap-to-char] #'avy-zap-up-to-char)
 
@@ -268,12 +268,18 @@
     ">" #'python-indent-shift-right
     "<" #'python-indent-shift-left))
 
-(after! (:and python apheleia)
-  (push '(python-mode . ruff) apheleia-mode-alist)
-  (push '(python-ts-mode . ruff) apheleia-mode-alist))
 
+
+
+(after! apheleia
+  (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff)))
 
 (after! python
   (advice-add 'python-shell-completion-at-point :around #'cape-wrap-noninterruptible))
 
 (setq-hook! 'inferior-python-mode-hook corfu-auto nil)
+
+
+(after! xref
+  (remove-hook 'xref-backend-functions #'etags--xref-backend))

@@ -57,4 +57,4 @@
 (package! dwim-shell-command)
 (package! detached)
 (package! edit-server)
-
+(package! ox-slack)
