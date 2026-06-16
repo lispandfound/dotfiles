@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: caution
+# key: caution
+# --
+> [!CAUTION]
+> Negative potential consequences of an action.
