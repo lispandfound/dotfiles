@@ -170,7 +170,7 @@
          ;; Replace built in completion of sessions with `consult'
          ([remap detached-open-session] . detached-consult-session))
   :custom ((detached-show-output-on-attach t)
-           (detached-notification-function (lambda (t) nil))
+           (detached-notification-function (lambda (_) nil))
            (detached-terminal-data-command system-type)))
 
 ;; --- DWIM Shell Command ---
@@ -283,3 +283,16 @@
 
 (after! xref
   (remove-hook 'xref-backend-functions #'etags--xref-backend))
+
+(setq view-read-only t)
+
+(global-set-key (kbd "M-u") 'upcase-dwim)
+(global-set-key (kbd "M-l") 'downcase-dwim)
+(global-set-key (kbd "M-c") 'capitalize-dwim)
+
+(after! gptel
+  (setq-default gptel-backend (gptel-make-ollama "Ollama-Cloud"
+                                :host "localhost:11434"
+                                :stream t
+                                :models '("deepseek-v4-flash:cloud"))
+                gptel-model "deepseek-v4-flash:cloud"))
