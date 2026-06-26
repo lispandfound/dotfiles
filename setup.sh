@@ -93,6 +93,15 @@ if ! command -v uv &> /dev/null; then
     fi
 fi
 
+# rassumfrassum: LSP multiplexer that combines ty + ruff into one server for eglot.
+# ty and ruff are run via uvx (no project installation needed).
+echo "Installing rassumfrassum (LSP multiplexer)..."
+if command -v uv &> /dev/null; then
+    uv tool install rassumfrassum
+else
+    echo "Warning: uv not found, skipping rassumfrassum installation."
+fi
+
 # Set up zsh as default shell
 echo "Setting up zsh..."
 if [[ "$SHELL" != *"zsh"* ]]; then

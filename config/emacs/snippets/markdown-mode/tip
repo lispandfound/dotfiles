@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: tip
+# key: tip
+# --
+> [!TIP]  
+> $0

@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: uv
+# key: uv
+# --
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = "$1"
+# dependencies = [
+#     $2
+# ]
+# ///
