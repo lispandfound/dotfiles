@@ -26,7 +26,6 @@
 ;;; =========================================================================
 
 (use-package doom-modeline
-  :hook (after-init . doom-modeline-mode)
   :custom
   (doom-modeline-height 28)
   (doom-modeline-bar-width 3)
@@ -35,7 +34,9 @@
   (doom-modeline-buffer-file-name-style 'truncate-upto-project)
   (doom-modeline-buffer-encoding 'nondefault)
   (doom-modeline-check 'simple)
-  (doom-modeline-minor-modes nil))
+  (doom-modeline-minor-modes nil)
+  :config
+  (doom-modeline-mode 1))
 
 ;;; =========================================================================
 ;;; HL-TODO — highlight TODO/FIXME/NOTE/HACK/REVIEW
@@ -62,6 +63,8 @@
 ;;; =========================================================================
 
 (use-package diff-hl
+  :custom
+  (diff-hl-disable-on-remote t)
   :hook
   ;; after-init triggers the load and activates the global modes.
   ((after-init         . global-diff-hl-mode)
@@ -147,7 +150,7 @@
   (add-hook 'consult-after-jump-hook #'pulsar-recenter-top)
   (add-hook 'consult-after-jump-hook #'pulsar-reveal-entry)
   (dolist (fn '(avy-goto-char avy-goto-char-2 avy-goto-word-0
-                avy-goto-line xref-find-definitions xref-go-back))
+                              avy-goto-line xref-find-definitions xref-go-back))
     (add-to-list 'pulsar-pulse-functions fn)))
 
 ;;; =========================================================================

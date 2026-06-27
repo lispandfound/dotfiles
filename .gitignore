@@ -17,3 +17,4 @@ config/emacs/tramp
 config/emacs/transient/
 config/emacs/tree-sitter/
 config/emacs/url/
+config/emacs/dape-breakpoints

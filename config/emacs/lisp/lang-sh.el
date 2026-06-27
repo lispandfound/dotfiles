@@ -5,8 +5,8 @@
 (use-package sh-script
   :ensure nil
   :hook
-  ((sh-mode      . eglot-ensure)
-   (bash-ts-mode . eglot-ensure))
+  ((sh-mode      . my/eglot-ensure-unless-remote)
+   (bash-ts-mode . my/eglot-ensure-unless-remote))
   :config
   (add-to-list 'eglot-server-programs
                '((sh-mode bash-ts-mode) . ("bash-language-server" "start"))))

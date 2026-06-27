@@ -22,7 +22,11 @@
   (connection-local-set-profiles
    '(:application tramp :protocol "ssh") 'remote-direct-async-process)
   (connection-local-set-profiles
-   '(:application tramp :protocol "rsync") 'remote-direct-async-process))
+   '(:application tramp :protocol "rsync") 'remote-direct-async-process)
+  ;; compile adds a hook that disables SSH ControlMaster; remove it.
+  (with-eval-after-load 'compile
+    (remove-hook 'compilation-mode-hook
+                 #'tramp-compile-disable-ssh-controlmaster-options)))
 
 ;; Shared remote memoization helper (verbatim from config.el).
 (defun memoize-remote (key cache orig-fn &rest args)
@@ -35,14 +39,60 @@
           current))
     (apply orig-fn args)))
 
+(defcustom my/eglot-remote-never-modes '(sh-mode bash-ts-mode)
+  "Major modes that never start eglot on remote files, without prompting."
+  :type '(repeat symbol)
+  :group 'eglot)
+
+(defvar my/eglot-remote--session-always nil
+  "Modes approved for eglot on remote files for this Emacs session.")
+
+(defvar my/eglot-remote--session-never nil
+  "Modes blocked from eglot on remote files for this Emacs session.")
+
+(defun my/eglot-ensure-unless-remote ()
+  "Start eglot, prompting before starting on a remote file.
+
+On remote files, modes in `my/eglot-remote-never-modes' are silently
+skipped.  Session-level decisions are honoured.  Otherwise prompts:
+  y   start eglot for this file
+  n   skip eglot for this file
+  a   always start eglot for this mode this session
+  N   never start eglot for this mode this session"
+  (if (not (file-remote-p (or buffer-file-name default-directory)))
+      (eglot-ensure)
+    (let ((mode major-mode))
+      (cond
+       ((memq mode my/eglot-remote-never-modes) nil)
+       ((memq mode my/eglot-remote--session-never) nil)
+       ((memq mode my/eglot-remote--session-always) (eglot-ensure))
+       (t
+        (pcase (read-char-choice
+                (format "Start eglot on remote %s? [y]es [n]o [a]lways [N]ever-for-type: "
+                        mode)
+                '(?y ?n ?a ?N))
+          (?y (eglot-ensure))
+          (?n nil)
+          (?a (push mode my/eglot-remote--session-always) (eglot-ensure))
+          (?N (push mode my/eglot-remote--session-never) nil)))))))
+
+;; Memoize project-current for remote paths to avoid repeated TRAMP lookups.
+(defvar my/project-current-cache nil)
+(defun my/memoize-project-current (orig &optional prompt directory)
+  (memoize-remote (or directory project-current-directory-override default-directory)
+                  'my/project-current-cache orig prompt directory))
+(advice-add 'project-current :around #'my/memoize-project-current)
+
 ;; Strip heavy features on remote buffers (adapted from config.el §4).
 (defun my/tramp-optimization-hook ()
   "Disable expensive features when visiting remote files."
   (when (file-remote-p default-directory)
     (setq-local vc-handled-backends nil)
     (display-line-numbers-mode -1)
-    (when (fboundp 'diff-hl-mode)
-      (diff-hl-mode -1))
+    (when (fboundp 'diff-hl-mode) (diff-hl-mode -1))
+    (when (fboundp 'flymake-mode) (flymake-mode -1))
+    (when (fboundp 'flyspell-mode) (flyspell-mode -1))
+    (eldoc-mode -1)
     (when (boundp 'doom-modeline-buffer-file-name-style)
       (setq-local doom-modeline-buffer-file-name-style 'file-name))))
 
