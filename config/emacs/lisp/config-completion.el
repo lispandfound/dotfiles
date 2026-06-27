@@ -62,9 +62,9 @@
   :ensure nil
   :after vertico
   :bind (:map vertico-map
-         ("RET"   . vertico-directory-enter)
-         ("DEL"   . vertico-directory-delete-char)
-         ("M-DEL" . vertico-directory-delete-word))
+              ("RET"   . vertico-directory-enter)
+              ("DEL"   . vertico-directory-delete-char)
+              ("M-DEL" . vertico-directory-delete-word))
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
 (use-package vertico-multiform
@@ -94,7 +94,7 @@
   ;; ensuring marginalia-mode is enabled at startup rather than on first M-A.
   :demand t
   :bind (:map minibuffer-local-map
-         ("M-A" . marginalia-cycle))
+              ("M-A" . marginalia-cycle))
   :config
   (marginalia-mode 1))
 
@@ -144,9 +144,9 @@
   :custom
   ;; Guard against nil default-directory in special buffers (e.g. *scratch*).
   (consult-project-function (lambda (may-prompt)
-                               (ignore-errors
-                                 (when-let ((proj (project-current may-prompt)))
-                                   (project-root proj)))))
+                              (ignore-errors
+                                (when-let ((proj (project-current may-prompt)))
+                                  (project-root proj)))))
   (xref-show-xrefs-function       #'consult-xref)
   (xref-show-definitions-function #'consult-xref)
   (consult-narrow-key "<")
@@ -214,8 +214,8 @@
                collect (format "/docker:%s:/" (car (last parts))))))
   (defvar my/consult-dir-source-docker
     `(:name "Docker" :narrow ?d :category file
-      :face consult-file :history file-name-history
-      :items ,#'my/consult-dir--docker-hosts))
+            :face consult-file :history file-name-history
+            :items ,#'my/consult-dir--docker-hosts))
   (add-to-list 'consult-dir-sources 'my/consult-dir-source-docker t))
 
 ;;; =========================================================================
@@ -240,8 +240,6 @@
    ("C-;"   . embark-act)
    ("C-c C-;" . embark-export)
    ("C-c C-l" . embark-collect))
-  :custom
-  (embark-quit-after-action nil)
   :init
   ;; Use embark for C-h on prefix keys (shows what's available).
   (setq which-key-use-C-h-commands nil
@@ -303,6 +301,12 @@
 
 (use-package wgrep
   :custom (wgrep-auto-save-buffer t))
+
+;;; =========================================================================
+;;; CONSULT-EGLOT — Jump to symbol powered by eglot
+;;; =========================================================================
+(use-package consult-eglot
+  :bind ("C-c c s" . consult-eglot-symbols))
 
 (provide 'config-completion)
 ;;; config-completion.el ends here

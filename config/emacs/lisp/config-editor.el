@@ -37,11 +37,11 @@
   :ensure nil
   :hook (prog-mode . hs-minor-mode)
   :bind (:map hs-minor-mode-map
-         ;; C-c h is the prefix; h/H/S/l hang off it.
-         ("C-c h h" . hs-toggle-hiding)
-         ("C-c h H" . hs-hide-all)
-         ("C-c h S" . hs-show-all)
-         ("C-c h l" . hs-hide-level)))
+              ;; C-c h is the prefix; h/H/S/l hang off it.
+              ("C-c h h" . hs-toggle-hiding)
+              ("C-c h H" . hs-hide-all)
+              ("C-c h S" . hs-show-all)
+              ("C-c h l" . hs-hide-level)))
 
 ;;; =========================================================================
 ;;; EXPAND-REGION — grow/shrink selection by semantic units
@@ -148,14 +148,14 @@
   :ensure nil
   :after ibuffer
   :bind (:map ibuffer-mode-map
-         ("C-o" . casual-ibuffer-tmenu)
-         ("F"   . casual-ibuffer-filter-tmenu)
-         ("s"   . casual-ibuffer-sortby-tmenu)
-         ("{"   . ibuffer-backwards-next-marked)
-         ("}"   . ibuffer-forward-next-marked)
-         ("["   . ibuffer-backward-filter-group)
-         ("]"   . ibuffer-forward-filter-group)
-         ("$"   . ibuffer-toggle-filter-group)))
+              ("C-o" . casual-ibuffer-tmenu)
+              ("F"   . casual-ibuffer-filter-tmenu)
+              ("s"   . casual-ibuffer-sortby-tmenu)
+              ("{"   . ibuffer-backwards-next-marked)
+              ("}"   . ibuffer-forward-next-marked)
+              ("["   . ibuffer-backward-filter-group)
+              ("]"   . ibuffer-forward-filter-group)
+              ("$"   . ibuffer-toggle-filter-group)))
 
 (use-package casual-image
   :ensure nil
@@ -165,17 +165,17 @@
   :ensure nil
   :after bookmark
   :bind (:map bookmark-bmenu-mode-map
-         ("C-o" . casual-bookmarks-tmenu)
-         ("S"   . casual-bookmarks-sortby-tmenu)
-         ("J"   . bookmark-jump)))
+              ("C-o" . casual-bookmarks-tmenu)
+              ("S"   . casual-bookmarks-sortby-tmenu)
+              ("J"   . bookmark-jump)))
 
 (use-package casual-agenda
   :ensure nil
   :after org-agenda
   :bind (:map org-agenda-mode-map
-         ("C-o" . casual-agenda-tmenu)
-         ("M-j" . org-agenda-clock-goto)
-         ("J"   . bookmark-jump)))
+              ("C-o" . casual-agenda-tmenu)
+              ("M-j" . org-agenda-clock-goto)
+              ("J"   . bookmark-jump)))
 
 (use-package casual-editkit
   :ensure nil
@@ -185,5 +185,11 @@
              (keymap-set rectangle-mark-mode-map "C-o"
                          #'casual-editkit-rectangle-tmenu))))
 
+;;; =========================================================================
+;;; ibuffer-project — group and filter ibuffer listing by project
+;;; =========================================================================
+(use-package ibuffer-project
+  :hook (ibuffer-hook . (lambda ()
+                          (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups)))))
 (provide 'config-editor)
 ;;; config-editor.el ends here
