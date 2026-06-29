@@ -157,30 +157,30 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
   :custom
   (magit-tramp-pipe-stty-settings 'pty)
   (magit-process-find-password-functions '(magit-process-password-auth-source))
+  :bind (:map my/vc-map
+         ("/" . magit-dispatch)
+         ("." . magit-file-dispatch)
+         ("g" . magit-status)
+         ("G" . magit-status-here)
+         ("B" . magit-blame-addition)
+         ("C" . magit-clone)
+         ("F" . magit-fetch)
+         ("L" . magit-log-buffer-file)
+         ("S" . magit-stage-file)
+         ("U" . magit-unstage-file)
+         ("R" . vc-revert))
   :config
-  ;; Memoize magit-toplevel for remote directories (verbatim from config.el §6).
+  ;; Memoize magit-toplevel for remote directories.
   (defvar magit-toplevel-cache nil)
   (defun memoize-magit-toplevel (orig &optional directory)
     (memoize-remote (or directory default-directory)
                     'magit-toplevel-cache orig directory))
-  (advice-add 'magit-toplevel :around #'memoize-magit-toplevel)
-  ;; C-c v bindings (mirrors Doom's <leader> v map)
-  (keymap-set my/vc-map "/" #'magit-dispatch)
-  (keymap-set my/vc-map "." #'magit-file-dispatch)
-  (keymap-set my/vc-map "g" #'magit-status)
-  (keymap-set my/vc-map "G" #'magit-status-here)
-  (keymap-set my/vc-map "B" #'magit-blame-addition)
-  (keymap-set my/vc-map "C" #'magit-clone)
-  (keymap-set my/vc-map "F" #'magit-fetch)
-  (keymap-set my/vc-map "L" #'magit-log-buffer-file)
-  (keymap-set my/vc-map "S" #'magit-stage-file)
-  (keymap-set my/vc-map "U" #'magit-unstage-file)
-  (keymap-set my/vc-map "R" #'vc-revert))
+  (advice-add 'magit-toplevel :around #'memoize-magit-toplevel))
 
 (use-package forge
   :after magit
-  :config
-  (keymap-set my/vc-map "'" #'forge-dispatch))
+  :bind (:map my/vc-map
+         ("'" . forge-dispatch)))
 
 (use-package magit-lfs :after magit)
 
@@ -189,8 +189,8 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 ;;; =========================================================================
 
 (use-package git-link
-  :config
-  (keymap-set my/vc-map "l" #'git-link))
+  :bind (:map my/vc-map
+         ("l" . git-link)))
 
 ;;; =========================================================================
 ;;; ENVRC — direnv integration (replaces :tools direnv)
@@ -203,8 +203,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 ;;; DOCKER
 ;;; =========================================================================
 
-(use-package docker
-  :bind ("C-c D" . docker))
+(use-package docker)
 
 ;;; =========================================================================
 ;;; GPTEL — LLM integration (verbatim from config.el §5)
@@ -225,8 +224,8 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 ;;; =========================================================================
 
 (use-package igist
-  :config
-  (keymap-set my/notes-map "g" #'igist-dispatch))
+  :bind (:map my/notes-map
+         ("g" . igist-dispatch)))
 
 ;;; =========================================================================
 ;;; DETACHED — background process management via dtach
@@ -318,14 +317,14 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 
 (use-package consult-dash
   :after (consult dash-docs)
-  :config
-  (keymap-set my/lookup-map "d" #'consult-dash))
+  :bind (:map my/lookup-map
+         ("d" . consult-dash)))
 
 (use-package dictionary
   :ensure nil
   :custom (dictionary-server "dict.org")
-  :config
-  (keymap-set my/lookup-map "w" #'dictionary-search))
+  :bind (:map my/lookup-map
+         ("w" . dictionary-search)))
 
 ;; Hoogle search — replaces (+lookup-provider-url-alist '("Hoogle" ...))
 (defun my/hoogle-search (query)
@@ -340,32 +339,30 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 
 (use-package denote
   :hook
-  ;; after-init triggers the load, which runs :config and populates C-c d.
-  ;; Without it, denote only loads when dired opens and the keymap stays empty.
   ((after-init . denote-rename-buffer-mode)
    (dired-mode . denote-dired-mode))
   :custom
   (denote-directory (expand-file-name "~/notes/"))
-  :config
-  ;; C-c d keybindings (replaces map! :leader "d" ...)
-  (keymap-set my/denote-map "d" #'denote)
-  (keymap-set my/denote-map "j" #'denote-journal-new-or-existing-entry)
-  (keymap-set my/denote-map "n" #'denote-open-or-create)
-  (keymap-set my/denote-map "t" #'denote-date)
-  (keymap-set my/denote-map "+" #'denote-subdirectory)
-  ;; Bookkeeping
-  (keymap-set my/denote-bk-map "r" #'denote-rename-file)
-  (keymap-set my/denote-bk-map "f" #'denote-rename-file-using-front-matter)
-  (keymap-set my/denote-bk-map "k" #'denote-rename-file-keywords)
-  ;; Linking
-  (keymap-set my/denote-link-map "i" #'denote-link)
-  (keymap-set my/denote-link-map "h" #'denote-org-link-to-heading)
-  (keymap-set my/denote-link-map "b" #'denote-backlinks)
-  (keymap-set my/denote-link-map "g" #'denote-find-backlink)
-  (keymap-set my/denote-link-map "o" #'denote-org-dblock-insert-backlinks)
-  ;; Searching
-  (keymap-set my/denote-search-map "n" #'consult-notes)
-  (keymap-set my/denote-search-map "s" #'consult-notes-search-in-all-notes))
+  :bind (:map my/denote-map
+         ("d" . denote)
+         ("j" . denote-journal-new-or-existing-entry)
+         ("n" . denote-open-or-create)
+         ("t" . denote-date)
+         ("+" . denote-subdirectory)
+         :map my/denote-bk-map
+         ("r" . denote-rename-file)
+         ("f" . denote-rename-file-using-front-matter)
+         ("k" . denote-rename-file-keywords)
+         :map my/denote-link-map
+         ("i" . denote-link)
+         ("h" . denote-org-link-to-heading)
+         ("b" . denote-backlinks)
+         ("g" . denote-find-backlink)
+         ("o" . denote-org-dblock-insert-backlinks)
+         :map my/notes-map
+         ("d" . denote)
+         ("j" . denote-journal-new-or-existing-entry)
+         ("n" . denote-open-or-create)))
 
 (use-package denote-journal
   :after denote
@@ -384,6 +381,12 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 
 (use-package consult-notes
   :commands (consult-notes consult-notes-search-in-all-notes)
+  :bind (:map my/denote-search-map
+         ("n" . consult-notes)
+         ("s" . consult-notes-search-in-all-notes)
+         :map my/notes-map
+         ("f" . consult-notes)
+         ("s" . consult-notes-search-in-all-notes))
   :config
   (consult-notes-org-headings-mode)
   (consult-notes-denote-mode)

@@ -66,18 +66,16 @@
   :custom
   (diff-hl-disable-on-remote t)
   :hook
-  ;; after-init triggers the load and activates the global modes.
   ((after-init         . global-diff-hl-mode)
    (after-init         . diff-hl-flydiff-mode)
    (magit-pre-refresh  . diff-hl-magit-pre-refresh)
    (magit-post-refresh . diff-hl-magit-post-refresh)
    (dired-mode         . diff-hl-dired-mode))
-  :config
-  ;; C-c v hunk navigation (mirrors Doom's <leader> v vc-gutter keys)
-  (keymap-set my/vc-map "r" #'diff-hl-revert-hunk)
-  (keymap-set my/vc-map "s" #'diff-hl-stage-current-hunk)
-  (keymap-set my/vc-map "n" #'diff-hl-next-hunk)
-  (keymap-set my/vc-map "p" #'diff-hl-previous-hunk))
+  :bind (:map my/vc-map
+         ("r" . diff-hl-revert-hunk)
+         ("s" . diff-hl-stage-current-hunk)
+         ("n" . diff-hl-next-hunk)
+         ("p" . diff-hl-previous-hunk)))
 
 ;;; =========================================================================
 ;;; TAB-BAR — workspaces

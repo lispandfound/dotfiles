@@ -74,14 +74,76 @@
 ;;; LEADER KEYMAPS (C-c prefix replaces Doom's SPC leader)
 ;;; =========================================================================
 
+(defvar-keymap my/buffer-map
+  :doc "Buffer commands (C-c b)"
+  "b" #'consult-buffer
+  "B" #'consult-buffer-other-window
+  "d" #'kill-current-buffer
+  "i" #'ibuffer
+  "n" #'next-buffer
+  "p" #'previous-buffer
+  "]" #'next-buffer
+  "[" #'previous-buffer
+  "r" #'revert-buffer
+  "R" #'rename-buffer
+  "s" #'save-buffer
+  "m" #'bookmark-set
+  "M" #'bookmark-delete
+  "z" #'bury-buffer
+  "x" #'scratch-buffer)
+
 (defvar-keymap my/code-map
-  :doc "Code commands (C-c c)")
+  :doc "Code commands (C-c c)"
+  "a" #'eglot-code-actions
+  "c" #'compile
+  "C" #'recompile
+  "d" #'xref-find-definitions
+  "D" #'xref-find-references
+  "f" #'eglot-format-buffer
+  "i" #'eglot-find-implementation
+  "k" #'eldoc
+  "r" #'eglot-rename
+  "w" #'delete-trailing-whitespace
+  "x" #'flymake-show-buffer-diagnostics
+  "X" #'flymake-show-project-diagnostics)
+
+(defvar-keymap my/dape-map
+  :doc "Dape debugger commands (C-c D)"
+  "d" #'dape
+  "c" #'dape-continue
+  "n" #'dape-next
+  "s" #'dape-step-in
+  "o" #'dape-step-out
+  "p" #'dape-pause
+  "r" #'dape-restart
+  "R" #'dape-repl
+  "i" #'dape-info
+  "b" #'dape-breakpoint-toggle
+  "B" #'dape-breakpoint-remove-all
+  "e" #'dape-evaluate-expression
+  "w" #'dape-watch-dwim
+  "q" #'dape-quit
+  "D" #'dape-disconnect-quit)
 
 (defvar-keymap my/lookup-map
   :doc "Lookup commands (C-c l)")
 
 (defvar-keymap my/notes-map
   :doc "Notes and gist commands (C-c n)")
+
+(defvar-keymap my/project-map
+  :doc "Project commands (C-c p)"
+  "f" #'project-find-file
+  "p" #'project-switch-project
+  "b" #'consult-project-buffer
+  "d" #'project-dired
+  "g" #'consult-ripgrep
+  "k" #'project-kill-buffers
+  "e" #'project-eshell
+  "c" #'project-compile
+  "o" #'find-sibling-file
+  "&" #'project-async-shell-command
+  "!" #'project-shell-command)
 
 (defvar-keymap my/vc-map
   :doc "Version control commands (C-c v)")
@@ -101,12 +163,14 @@
 (defvar-keymap my/toggle-map
   :doc "Toggle minor modes (C-c t)"
   "c" #'global-display-fill-column-indicator-mode
+  "d" #'diff-hl-mode
   "f" #'flymake-mode
   "F" #'toggle-frame-fullscreen
   "l" #'display-line-numbers-mode
   "p" #'prettify-symbols-mode
   "r" #'read-only-mode
   "s" #'flyspell-mode
+  "v" #'visible-mode
   "w" #'visual-line-mode)
 
 (defvar-keymap my/window-map
@@ -143,8 +207,13 @@
   :doc "File commands (C-c f)"
   "f" #'find-file
   "d" #'dired
+  "e" #'my/find-emacs-config
   "r" #'recentf-open
   "R" #'revert-buffer
+  "s" #'save-buffer
+  "S" #'write-file
+  "D" #'my/delete-this-file
+  "m" #'my/move-this-file
   "y" #'my/yank-buffer-path
   "Y" #'my/yank-buffer-path-relative)
 
@@ -152,17 +221,21 @@
   :doc "Open things (C-c o)"
   "b" #'browse-url
   "d" #'dired-jump
-  "e" #'eshell          ; plain eshell, any window
-  "t" #'my/popup-eshell ; eshell popup at bottom (toggle)
+  "D" #'docker
+  "e" #'eshell
+  "t" #'my/popup-eshell
   "f" #'make-frame)
 
 ;; Register prefix maps under C-c
+(keymap-global-set "C-c b" my/buffer-map)
 (keymap-global-set "C-c c" my/code-map)
 (keymap-global-set "C-c d" my/denote-map)
+(keymap-global-set "C-c D" my/dape-map)
 (keymap-global-set "C-c f" my/file-map)
 (keymap-global-set "C-c l" my/lookup-map)
 (keymap-global-set "C-c n" my/notes-map)
 (keymap-global-set "C-c o" my/open-map)
+(keymap-global-set "C-c p" my/project-map)
 (keymap-global-set "C-c t" my/toggle-map)
 (keymap-global-set "C-c v" my/vc-map)
 (keymap-global-set "C-c w" my/window-map)
@@ -170,7 +243,27 @@
 (keymap-set my/denote-map "l" my/denote-link-map)
 (keymap-set my/denote-map "s" my/denote-search-map)
 
-;; File path helpers used by my/file-map.
+;; File operation helpers used by my/file-map.
+(defun my/delete-this-file ()
+  "Delete the current file and kill its buffer."
+  (interactive)
+  (unless buffer-file-name (user-error "Buffer has no file"))
+  (when (yes-or-no-p (format "Delete %s? " buffer-file-name))
+    (delete-file buffer-file-name t)
+    (kill-current-buffer)))
+
+(defun my/move-this-file (new-name)
+  "Rename/move the current file to NEW-NAME."
+  (interactive (list (read-file-name "Move to: " (file-name-directory buffer-file-name))))
+  (unless buffer-file-name (user-error "Buffer has no file"))
+  (rename-file buffer-file-name new-name)
+  (set-visited-file-name new-name t t))
+
+(defun my/find-emacs-config ()
+  "Open the Emacs config directory in dired."
+  (interactive)
+  (dired user-emacs-directory))
+
 (defun my/yank-buffer-path ()
   "Copy the absolute path of the current buffer's file."
   (interactive)
