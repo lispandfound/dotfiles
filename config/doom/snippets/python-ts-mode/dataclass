@@ -1,6 +1,0 @@
-# key: dtc
-# name: dataclass
-# --
-@dataclass
-class $1:
-      $0
