@@ -44,6 +44,8 @@
   (dired-omit-files
    (rx (or (seq bol (? "#") (? ".") "#")  ; lock files
            (seq bol "..")                  ; parent dir
+           ;; Any dotfiles.
+           (seq bol "." (+ anychar))
            "__pycache__"
            ".DS_Store"
            ".direnv"))))
