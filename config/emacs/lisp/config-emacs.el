@@ -1,6 +1,14 @@
 ;;; config-emacs.el --- Built-in Emacs package configuration -*- lexical-binding: t; -*-
 
 ;;; =========================================================================
+;;; EXEC-PATH-FROM-SHELL — inherit shell PATH in GUI/daemon Emacs
+;;; =========================================================================
+
+(use-package exec-path-from-shell
+  :config
+  (exec-path-from-shell-initialize))
+
+;;; =========================================================================
 ;;; UNIQUIFY — unique buffer names showing path context
 ;;; =========================================================================
 
