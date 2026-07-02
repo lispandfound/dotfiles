@@ -13,6 +13,7 @@
   (tramp-copy-size-limit (* 1024 1024))
   (tramp-verbose 2)
   (tramp-use-connection-share nil)
+  (tramp-persistency-file-name (expand-file-name "tramp" my/local-dir))
   :config
   (connection-local-set-profile-variables
    'remote-direct-async-process

@@ -266,5 +266,9 @@
 (use-package breadcrumb
   :hook (prog-mode . breadcrumb-local-mode))
 
+(use-package bookmark
+  :ensure nil
+  :custom (bookmark-default-file (expand-file-name "bookmarks" my/local-dir)))
+
 (provide 'config-emacs)
 ;;; config-emacs.el ends here
