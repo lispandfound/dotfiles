@@ -79,7 +79,7 @@
   (inhibit-startup-message t)
   (initial-scratch-message nil)
   ;; Custom file — keep Emacs from polluting init.el
-  (custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (custom-file (expand-file-name "custom.el" my/local-dir))
   ;; Backup / auto-save go to .local/ so they don't appear in the repo.
   (backup-directory-alist `(("." . ,(expand-file-name "backup/" my/local-dir))))
   (auto-save-file-name-transforms `((".*" ,(expand-file-name "backup/" my/local-dir) t)))

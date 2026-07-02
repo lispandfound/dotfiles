@@ -122,6 +122,14 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 ;;; Handles +tree-sitter across all lang modules.
 ;;; =========================================================================
 
+(use-package treesit
+  :ensure nil
+  :custom
+  (treesit-extra-load-path (list (expand-file-name "tree-sitter/" my/local-dir)))
+  :config
+  (setq treesit--install-language-grammar-out-dir-history
+        (list (expand-file-name "tree-sitter/" my/local-dir))))
+
 (use-package treesit-auto
   :custom (treesit-auto-install 'prompt)
   :config
@@ -158,17 +166,17 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
   (magit-tramp-pipe-stty-settings 'pty)
   (magit-process-find-password-functions '(magit-process-password-auth-source))
   :bind (:map my/vc-map
-         ("/" . magit-dispatch)
-         ("." . magit-file-dispatch)
-         ("g" . magit-status)
-         ("G" . magit-status-here)
-         ("B" . magit-blame-addition)
-         ("C" . magit-clone)
-         ("F" . magit-fetch)
-         ("L" . magit-log-buffer-file)
-         ("S" . magit-stage-file)
-         ("U" . magit-unstage-file)
-         ("R" . vc-revert))
+              ("/" . magit-dispatch)
+              ("." . magit-file-dispatch)
+              ("g" . magit-status)
+              ("G" . magit-status-here)
+              ("B" . magit-blame-addition)
+              ("C" . magit-clone)
+              ("F" . magit-fetch)
+              ("L" . magit-log-buffer-file)
+              ("S" . magit-stage-file)
+              ("U" . magit-unstage-file)
+              ("R" . vc-revert))
   :config
   ;; Memoize magit-toplevel for remote directories.
   (defvar magit-toplevel-cache nil)
@@ -180,7 +188,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 (use-package forge
   :after magit
   :bind (:map my/vc-map
-         ("'" . forge-dispatch)))
+              ("'" . forge-dispatch)))
 
 (use-package magit-lfs :after magit)
 
@@ -190,7 +198,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 
 (use-package git-link
   :bind (:map my/vc-map
-         ("l" . git-link)))
+              ("l" . git-link)))
 
 ;;; =========================================================================
 ;;; ENVRC — direnv integration (replaces :tools direnv)
@@ -225,7 +233,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 
 (use-package igist
   :bind (:map my/notes-map
-         ("g" . igist-dispatch)))
+              ("g" . igist-dispatch)))
 
 ;;; =========================================================================
 ;;; DETACHED — background process management via dtach
@@ -238,6 +246,8 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
          ([remap recompile]             . detached-compile-recompile)
          ([remap detached-open-session] . detached-consult-session))
   :custom
+  (detached-db-directory      (expand-file-name "detached/"          my/local-dir))
+  (detached-session-directory (expand-file-name "detached/sessions/" my/local-dir))
   (detached-show-output-on-attach t)
   (detached-notification-function (lambda (_) nil))
   (detached-terminal-data-command system-type))
@@ -283,6 +293,8 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
   :hook
   ((kill-emacs . dape-breakpoint-save)
    (after-init . dape-breakpoint-load))
+  :custom
+  (dape-default-breakpoints-file (expand-file-name "dape-breakpoints" my/local-dir))
   :config
   (add-hook 'dape-on-stopped-hooks #'dape-info)
   (add-hook 'dape-on-stopped-hooks #'dape-repl))
@@ -318,13 +330,13 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 (use-package consult-dash
   :after (consult dash-docs)
   :bind (:map my/lookup-map
-         ("d" . consult-dash)))
+              ("d" . consult-dash)))
 
 (use-package dictionary
   :ensure nil
   :custom (dictionary-server "dict.org")
   :bind (:map my/lookup-map
-         ("w" . dictionary-search)))
+              ("w" . dictionary-search)))
 
 ;; Hoogle search — replaces (+lookup-provider-url-alist '("Hoogle" ...))
 (defun my/hoogle-search (query)
@@ -344,25 +356,25 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
   :custom
   (denote-directory (expand-file-name "~/notes/"))
   :bind (:map my/denote-map
-         ("d" . denote)
-         ("j" . denote-journal-new-or-existing-entry)
-         ("n" . denote-open-or-create)
-         ("t" . denote-date)
-         ("+" . denote-subdirectory)
-         :map my/denote-bk-map
-         ("r" . denote-rename-file)
-         ("f" . denote-rename-file-using-front-matter)
-         ("k" . denote-rename-file-keywords)
-         :map my/denote-link-map
-         ("i" . denote-link)
-         ("h" . denote-org-link-to-heading)
-         ("b" . denote-backlinks)
-         ("g" . denote-find-backlink)
-         ("o" . denote-org-dblock-insert-backlinks)
-         :map my/notes-map
-         ("d" . denote)
-         ("j" . denote-journal-new-or-existing-entry)
-         ("n" . denote-open-or-create)))
+              ("d" . denote)
+              ("j" . denote-journal-new-or-existing-entry)
+              ("n" . denote-open-or-create)
+              ("t" . denote-date)
+              ("+" . denote-subdirectory)
+              :map my/denote-bk-map
+              ("r" . denote-rename-file)
+              ("f" . denote-rename-file-using-front-matter)
+              ("k" . denote-rename-file-keywords)
+              :map my/denote-link-map
+              ("i" . denote-link)
+              ("h" . denote-org-link-to-heading)
+              ("b" . denote-backlinks)
+              ("g" . denote-find-backlink)
+              ("o" . denote-org-dblock-insert-backlinks)
+              :map my/notes-map
+              ("d" . denote)
+              ("j" . denote-journal-new-or-existing-entry)
+              ("n" . denote-open-or-create)))
 
 (use-package denote-journal
   :after denote
@@ -382,11 +394,11 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 (use-package consult-notes
   :commands (consult-notes consult-notes-search-in-all-notes)
   :bind (:map my/denote-search-map
-         ("n" . consult-notes)
-         ("s" . consult-notes-search-in-all-notes)
-         :map my/notes-map
-         ("f" . consult-notes)
-         ("s" . consult-notes-search-in-all-notes))
+              ("n" . consult-notes)
+              ("s" . consult-notes-search-in-all-notes)
+              :map my/notes-map
+              ("f" . consult-notes)
+              ("s" . consult-notes-search-in-all-notes))
   :config
   (consult-notes-org-headings-mode)
   (consult-notes-denote-mode)
@@ -400,7 +412,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 ;; cylc-mode lives inside the cylc-flow repo; use :ensure to pass the recipe.
 (use-package cylc-mode
   :ensure (:host github :repo "cylc/cylc-flow"
-           :files ("cylc/flow/etc/syntax/cylc-mode.el"))
+                 :files ("cylc/flow/etc/syntax/cylc-mode.el"))
   :mode ("\\.cylc\\'" "suite.*\\.rc\\'"))
 
 ;;; =========================================================================
