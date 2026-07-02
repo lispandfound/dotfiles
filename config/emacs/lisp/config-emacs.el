@@ -152,6 +152,7 @@
 ;;; =========================================================================
 
 (use-package transient
+  :ensure nil ;; NOTE: transient ensured separately early in init.el
   :custom
   (transient-history-file (expand-file-name "transient/history.el" my/local-dir))
   (transient-values-file  (expand-file-name "transient/values.el"  my/local-dir))
