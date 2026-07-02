@@ -72,10 +72,10 @@
    (magit-post-refresh . diff-hl-magit-post-refresh)
    (dired-mode         . diff-hl-dired-mode))
   :bind (:map my/vc-map
-         ("r" . diff-hl-revert-hunk)
-         ("s" . diff-hl-stage-current-hunk)
-         ("n" . diff-hl-next-hunk)
-         ("p" . diff-hl-previous-hunk)))
+              ("r" . diff-hl-revert-hunk)
+              ("s" . diff-hl-stage-current-hunk)
+              ("n" . diff-hl-next-hunk)
+              ("p" . diff-hl-previous-hunk)))
 
 ;;; =========================================================================
 ;;; TAB-BAR — workspaces
@@ -99,7 +99,7 @@
 
 (use-package dashboard
   :custom
-  (dashboard-startup-banner 'logo)
+  (dashboard-startup-banner 'ascii)
   (dashboard-center-content t)
   (dashboard-projects-backend 'project-el)
   (dashboard-items '((recents   . 8)
