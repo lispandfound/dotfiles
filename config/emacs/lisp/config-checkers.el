@@ -9,10 +9,10 @@
   :ensure nil
   :hook (prog-mode . flymake-mode)
   :bind (:map flymake-mode-map
-         ("M-n"     . flymake-goto-next-error)
-         ("M-p"     . flymake-goto-prev-error)
-         ("C-c ! l" . flymake-show-buffer-diagnostics)
-         ("C-c ! L" . flymake-show-project-diagnostics))
+              ("M-n"     . flymake-goto-next-error)
+              ("M-p"     . flymake-goto-prev-error)
+              ("C-c ! l" . flymake-show-buffer-diagnostics)
+              ("C-c ! L" . flymake-show-project-diagnostics))
   :custom
   (flymake-no-changes-timeout 0.5)
   (flymake-fringe-indicator-position 'right-fringe)
@@ -47,7 +47,7 @@
 (use-package consult-jinx
   :ensure (:host codeberg :repo "bingshan/emacs-consult-jinx")
   :after (jinx consult)
-  :bind ([remap jinx-correct] . consult-jinx))
+  :bind ([remap jinx-correct-all] . consult-jinx))
 
 (provide 'config-checkers)
 ;;; config-checkers.el ends here
