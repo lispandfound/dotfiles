@@ -12,6 +12,7 @@
   (remote-file-name-inhibit-auto-save-visited t)
   (tramp-copy-size-limit (* 1024 1024))
   (tramp-verbose 2)
+  (tramp-default-method "rsync")
   (tramp-use-connection-share nil)
   :config
   (connection-local-set-profile-variables
@@ -397,7 +398,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 ;; cylc-mode lives inside the cylc-flow repo; use :ensure to pass the recipe.
 (use-package cylc-mode
   :ensure (:host github :repo "cylc/cylc-flow"
-           :files ("cylc/flow/etc/syntax/cylc-mode.el"))
+                 :files ("cylc/flow/etc/syntax/cylc-mode.el"))
   :mode ("\\.cylc\\'" "suite.*\\.rc\\'"))
 
 ;;; =========================================================================
