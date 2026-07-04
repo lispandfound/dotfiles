@@ -1,6 +1,14 @@
 ;;; config-emacs.el --- Built-in Emacs package configuration -*- lexical-binding: t; -*-
 
 ;;; =========================================================================
+;;; EXEC-PATH-FROM-SHELL — inherit shell PATH in GUI/daemon Emacs
+;;; =========================================================================
+
+(use-package exec-path-from-shell
+  :config
+  (exec-path-from-shell-initialize))
+
+;;; =========================================================================
 ;;; UNIQUIFY — unique buffer names showing path context
 ;;; =========================================================================
 
@@ -36,6 +44,8 @@
   (dired-omit-files
    (rx (or (seq bol (? "#") (? ".") "#")  ; lock files
            (seq bol "..")                  ; parent dir
+           ;; Any dotfiles.
+           (seq bol "." (+ anychar))
            "__pycache__"
            ".DS_Store"
            ".direnv"))))
@@ -104,6 +114,7 @@
 (use-package eshell
   :ensure nil
   :custom
+  (eshell-directory-name       (expand-file-name "eshell/" my/local-dir))
   (eshell-history-size 10000)
   (eshell-buffer-maximum-lines 10000)
   (eshell-scroll-to-bottom-on-input t))
@@ -128,12 +139,33 @@
   (search-default-mode #'char-fold-to-regexp))
 
 ;;; =========================================================================
+;;; TRAMP — remote file state
+;;; =========================================================================
+
+(use-package tramp
+  :ensure nil
+  :custom
+  (tramp-persistency-file-name (expand-file-name "tramp" my/local-dir)))
+
+;;; =========================================================================
+;;; TRANSIENT — persistent history/values/levels
+;;; =========================================================================
+
+(use-package transient
+  :ensure nil ;; NOTE: transient ensured separately early in init.el
+  :custom
+  (transient-history-file (expand-file-name "transient/history.el" my/local-dir))
+  (transient-values-file  (expand-file-name "transient/values.el"  my/local-dir))
+  (transient-levels-file  (expand-file-name "transient/levels.el"  my/local-dir)))
+
+;;; =========================================================================
 ;;; PROJECT.EL — replaces projectile
 ;;; =========================================================================
 
 (use-package project
   :ensure nil
   :custom
+  (project-list-file (expand-file-name "projects" my/local-dir))
   (project-switch-commands
    '((project-find-file    "Find file"  ?f)
      (project-find-regexp  "Find regexp" ?g)
@@ -233,6 +265,10 @@
 
 (use-package breadcrumb
   :hook (prog-mode . breadcrumb-local-mode))
+
+(use-package bookmark
+  :ensure nil
+  :custom (bookmark-default-file (expand-file-name "bookmarks" my/local-dir)))
 
 (provide 'config-emacs)
 ;;; config-emacs.el ends here

@@ -155,7 +155,23 @@
               ("}"   . ibuffer-forward-next-marked)
               ("["   . ibuffer-backward-filter-group)
               ("]"   . ibuffer-forward-filter-group)
-              ("$"   . ibuffer-toggle-filter-group)))
+              ("$"   . ibuffer-toggle-filter-group))
+  :config
+  (transient-define-prefix casual-ibuffer-groupby-tmenu ()
+    "Casual IBuffer submenu for switching between grouping strategies."
+    ["IBuffer: Group By"
+     [("p" "Project" my/ibuffer-groupby-project)
+      ("d" "Directory Suffix" my/ibuffer-groupby-directory-suffix)]
+     [("r" "Remote Host" my/ibuffer-groupby-remote)
+      ("m" "Major Mode" ibuffer-set-filter-groups-by-mode)]
+     [("n" "None" ibuffer-clear-filter-groups)]]
+
+    [:class transient-row
+            (casual-lib-quit-one)
+            (casual-lib-quit-all)])
+
+  (transient-append-suffix 'casual-ibuffer-tmenu "$"
+    '("G" "Group By›" casual-ibuffer-groupby-tmenu)))
 
 (use-package casual-image
   :ensure nil
@@ -186,10 +202,75 @@
                          #'casual-editkit-rectangle-tmenu))))
 
 ;;; =========================================================================
-;;; ibuffer-project — group and filter ibuffer listing by project
+;;; IBUFFER GROUPING — switch how `ibuffer' groups buffers on the fly
+;;; via casual-ibuffer's "Group By" menu (see `casual-ibuffer-groupby-tmenu'
+;;; above): by project, by directory, by remote host, or by major mode.
 ;;; =========================================================================
 (use-package ibuffer-project
   :hook (ibuffer-hook . (lambda ()
                           (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups)))))
+
+(defun my/ibuffer-groupby-project ()
+  "Group ibuffer buffers by project, using `ibuffer-project'."
+  (interactive)
+  (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+  (ibuffer-update nil t))
+
+(defun my/ibuffer--buffer-directory (buf)
+  "Return the directory BUF would be grouped under, or nil."
+  (with-current-buffer buf
+    (if buffer-file-name
+        (file-name-directory buffer-file-name)
+      default-directory)))
+
+(defun my/ibuffer--unique-dir-suffix (dir all-dirs)
+  "Return the shortest trailing path of DIR that stays unique among ALL-DIRS.
+Mirrors the disambiguation `uniquify-buffer-name-style' does for buffer
+names, but for directories: start from just the leaf directory name and
+grow the suffix leftward only as far as needed to stay distinct from
+every other directory in ALL-DIRS."
+  (let* ((components (nreverse (split-string (directory-file-name dir) "/" t)))
+         (others (remove dir all-dirs))
+         (max-n (length components))
+         (n 1))
+    (while (and (< n max-n)
+                (seq-some (lambda (other)
+                            (equal (seq-take components n)
+                                   (seq-take (nreverse (split-string (directory-file-name other) "/" t)) n)))
+                          others))
+      (setq n (1+ n)))
+    (concat (unless (= n max-n) "…/")
+            (mapconcat #'identity (reverse (seq-take components n)) "/"))))
+
+(defun my/ibuffer-groupby-directory-suffix ()
+  "Group ibuffer buffers by directory, naming groups by shortest unique suffix."
+  (interactive)
+  (let ((dirs (seq-uniq (delq nil (mapcar #'my/ibuffer--buffer-directory (buffer-list))))))
+    (setq ibuffer-filter-groups
+          (mapcar (lambda (dir)
+                    (cons (my/ibuffer--unique-dir-suffix dir dirs)
+                          (list (cons 'directory (concat "\\`" (regexp-quote dir) "\\'")))))
+                  dirs)))
+  (ibuffer-update nil t))
+
+(defun my/ibuffer--buffer-remote-host (buf)
+  "Return \"METHOD:HOST\" for BUF's TRAMP connection, or nil if BUF is local."
+  (with-current-buffer buf
+    (let ((file (or buffer-file-name default-directory)))
+      (when (file-remote-p file)
+        (format "%s:%s" (file-remote-p file 'method) (file-remote-p file 'host))))))
+
+(defun my/ibuffer-groupby-remote ()
+  "Group ibuffer buffers by TRAMP remote host, with a separate \"Local\" group."
+  (interactive)
+  (let ((hosts (seq-uniq (delq nil (mapcar #'my/ibuffer--buffer-remote-host (buffer-list))))))
+    (setq ibuffer-filter-groups
+          (append
+           (mapcar (lambda (host)
+                     `(,host (predicate equal (my/ibuffer--buffer-remote-host (current-buffer)) ,host)))
+                   hosts)
+           '(("Local" (predicate not (my/ibuffer--buffer-remote-host (current-buffer))))))))
+  (ibuffer-update nil t))
+
 (provide 'config-editor)
 ;;; config-editor.el ends here

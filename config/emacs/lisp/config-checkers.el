@@ -9,10 +9,10 @@
   :ensure nil
   :hook (prog-mode . flymake-mode)
   :bind (:map flymake-mode-map
-         ("M-n"     . flymake-goto-next-error)
-         ("M-p"     . flymake-goto-prev-error)
-         ("C-c ! l" . flymake-show-buffer-diagnostics)
-         ("C-c ! L" . flymake-show-project-diagnostics))
+              ("M-n"     . flymake-goto-next-error)
+              ("M-p"     . flymake-goto-prev-error)
+              ("C-c ! l" . flymake-show-buffer-diagnostics)
+              ("C-c ! L" . flymake-show-project-diagnostics))
   :custom
   (flymake-no-changes-timeout 0.5)
   (flymake-fringe-indicator-position 'right-fringe)
@@ -28,32 +28,26 @@
   :after (consult flymake))
 
 ;;; =========================================================================
-;;; ISPELL — hunspell with en_AU dictionary
+;;; JINX — fast spell checking via enchant/hunspell
+;;; Checks strings and comments in prog-mode (respects syntax tables).
 ;;; =========================================================================
 
-(use-package ispell
-  :ensure nil
+(use-package jinx
+  :hook (emacs-startup . global-jinx-mode)
+  :bind (("M-$"   . jinx-correct)
+         ("C-M-$" . jinx-correct-all))
   :custom
-  (ispell-program-name "hunspell")
-  (ispell-local-dictionary "en_AU")
-  (ispell-local-dictionary-alist
-   '(("en_AU" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_AU") nil utf-8)))
-  :config
-  (setenv "DICTIONARY" "en_AU"))
+  (jinx-languages "en_AU"))
 
 ;;; =========================================================================
-;;; FLYSPELL — spell checking (built-in)
-;;; +everywhere: prog-mode gets flyspell-prog-mode (strings+comments only)
+;;; CONSULT-JINX — consult-powered correction picker
+;;; Not on MELPA; installed directly from Codeberg.
 ;;; =========================================================================
 
-(use-package flyspell
-  :ensure nil
-  :hook
-  ((text-mode . flyspell-mode)
-   (prog-mode . flyspell-prog-mode))
-  :custom
-  (flyspell-issue-message-flag nil)
-  (flyspell-issue-welcome-flag nil))
+(use-package consult-jinx
+  :ensure (:host codeberg :repo "bingshan/emacs-consult-jinx")
+  :after (jinx consult)
+  :bind ([remap jinx-correct-all] . consult-jinx))
 
 (provide 'config-checkers)
 ;;; config-checkers.el ends here

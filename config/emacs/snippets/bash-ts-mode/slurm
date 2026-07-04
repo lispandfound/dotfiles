@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: slurm
+# key: slurm
+# --
+#!/bin/bash
+#SBATCH --job-name=${1:jobname}
+#SBATCH --output=$1_%j.out
+#SBATCH --error=$1_%j.err
+#SBATCH --time=${2:01:00:00}
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=${3:4}
+#SBATCH --mem=${4:8G}
+#SBATCH --partition=${5:work}
+${6:#SBATCH --mail-user=${7:user@example.com}
+#SBATCH --mail-type=ALL
+}$0

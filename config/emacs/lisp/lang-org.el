@@ -7,10 +7,16 @@
    (org-mode . org-fragtog-mode))
   :custom
   (org-directory "~/org/")
+  (org-id-locations-file (expand-file-name "org-id-locations" my/local-dir))
   (org-startup-indented t)
   (org-hide-leading-stars t)
   (org-log-done 'time)
-  (org-return-follows-link t))
+  (org-return-follows-link t)
+  :bind (:map my/notes-map
+              ("a" . org-agenda)
+              ("c" . org-capture)
+              ("l" . org-store-link)
+              ("t" . org-todo-list)))
 
 ;; org-fragtog: auto-toggle LaTeX fragment previews on cursor entry/exit.
 ;; Moved here from tools/denote where it was logically misplaced.
