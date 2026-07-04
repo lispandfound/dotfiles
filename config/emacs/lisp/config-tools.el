@@ -219,15 +219,16 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 ;;; GPTEL — LLM integration (verbatim from config.el §5)
 ;;; =========================================================================
 
-(use-package gptel
-  :config
-  (setq-default gptel-backend
-                (gptel-make-ollama "Ollama-Cloud"
-                  :host "localhost:11434"
-                  :stream t
-                  :models '("deepseek-v4-flash:cloud"))
-                gptel-model "deepseek-v4-flash:cloud")
-  (gptel-make-gh-copilot "Copilot"))
+;; TODO: uncomment when https://github.com/karthink/gptel/issues/1468 is closed
+;; (use-package gptel
+;;   :config
+;;   (setq-default gptel-backend
+;;                 (gptel-make-ollama "Ollama-Cloud"
+;;                   :host "localhost:11434"
+;;                   :stream t
+;;                   :models '("deepseek-v4-flash:cloud"))
+;;                 gptel-model "deepseek-v4-flash:cloud")
+;;   (gptel-make-gh-copilot "Copilot"))
 
 ;;; =========================================================================
 ;;; IGIST — GitHub Gists (SPC n g → C-c n g)
