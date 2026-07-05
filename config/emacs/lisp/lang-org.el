@@ -32,5 +32,8 @@
 (with-eval-after-load 'ox
   (require 'ox-slack nil t))
 
+(use-package org-re-reveal
+  :after org)
+
 (provide 'lang-org)
 ;;; lang-org.el ends here
