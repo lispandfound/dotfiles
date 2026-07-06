@@ -28,8 +28,8 @@
 (setq native-comp-async-report-warnings-errors 'silent)
 
 ;; Raise the GC threshold during startup so we don't GC on every allocation.
-;; Reset to a saner value in emacs-startup-hook.
-(defvar my/startup-gc-threshold gc-cons-threshold)
+;; gcmh (see config-emacs.el) takes over gc-cons-threshold management once
+;; loaded; file-name-handler-alist is restored here.
 (defvar my/startup-file-name-handler file-name-handler-alist)
 
 (setq gc-cons-threshold most-positive-fixnum
@@ -37,5 +37,4 @@
 
 (add-hook 'emacs-startup-hook
           (lambda ()
-            (setq gc-cons-threshold (* 16 1024 1024)
-                  file-name-handler-alist my/startup-file-name-handler)))
+            (setq file-name-handler-alist my/startup-file-name-handler)))

@@ -1,6 +1,16 @@
 ;;; config-emacs.el --- Built-in Emacs package configuration -*- lexical-binding: t; -*-
 
 ;;; =========================================================================
+;;; GCMH — automatic GC threshold tuning
+;;; Replaces the manual gc-cons-threshold reset that used to live in
+;;; early-init.el's emacs-startup-hook: gcmh keeps the threshold high during
+;;; active use and only collects during idle time.
+;;; =========================================================================
+
+(use-package gcmh
+  :hook (emacs-startup . gcmh-mode))
+
+;;; =========================================================================
 ;;; EXEC-PATH-FROM-SHELL — inherit shell PATH in GUI/daemon Emacs
 ;;; =========================================================================
 
