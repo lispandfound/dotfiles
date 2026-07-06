@@ -21,8 +21,8 @@
             (display-buffer-reuse-window display-buffer-at-bottom)
             (window-height . 0.25))
 
-           ;; Eshell and vterm — 30% bottom popup
-           (,(rx bos "*" (or "eshell" "vterm" "shell" "terminal") (* any))
+           ;; Eshell, vterm, and the Python REPL — 30% bottom popup
+           (,(rx bos "*" (or "eshell" "vterm" "shell" "terminal" "Python") (* any))
             (display-buffer-reuse-window display-buffer-at-bottom)
             (window-height . 0.30))))
   (add-to-list 'display-buffer-alist rule))
@@ -56,7 +56,8 @@
      helpful-mode
      compilation-mode
      eshell-mode
-     vterm-mode))
+     vterm-mode
+     inferior-python-mode))
   :config
   (popper-mode 1)
   (popper-echo-mode 1))

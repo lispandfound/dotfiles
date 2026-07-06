@@ -81,8 +81,16 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 ;; Memoize project-current for remote paths to avoid repeated TRAMP lookups.
 (defvar my/project-current-cache nil)
 (defun my/memoize-project-current (orig &optional prompt directory)
-  (memoize-remote (or directory project-current-directory-override default-directory)
-                  'my/project-current-cache orig prompt directory))
+  (let* ((dir (or directory project-current-directory-override default-directory))
+         ;; `my/tramp-optimization-hook' buffer-locally nils `vc-handled-backends'
+         ;; on remote buffers.  If we're resolving a *local* project (e.g.
+         ;; switching projects from a remote buffer), that stale buffer-local
+         ;; value would leak in and make project-try-vc fail to find a real
+         ;; local repo, which then gets deleted from the known-projects list.
+         (vc-handled-backends (if (file-remote-p dir)
+                                   vc-handled-backends
+                                 (default-value 'vc-handled-backends))))
+    (memoize-remote dir 'my/project-current-cache orig prompt directory)))
 (advice-add 'project-current :around #'my/memoize-project-current)
 
 ;; Strip heavy features on remote buffers (adapted from config.el §4).
