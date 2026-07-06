@@ -75,7 +75,12 @@
               ("r" . diff-hl-revert-hunk)
               ("s" . diff-hl-stage-current-hunk)
               ("n" . diff-hl-next-hunk)
-              ("p" . diff-hl-previous-hunk)))
+              ("p" . diff-hl-previous-hunk))
+  :config
+  (defvar-keymap my/diff-hl-repeat-map
+    :repeat t
+    "n" #'diff-hl-next-hunk
+    "p" #'diff-hl-previous-hunk))
 
 ;;; =========================================================================
 ;;; TAB-BAR — workspaces

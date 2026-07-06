@@ -92,6 +92,11 @@
   "z" #'bury-buffer
   "x" #'scratch-buffer)
 
+(defvar-keymap my/buffer-nav-repeat-map
+  :repeat t
+  "n" #'next-buffer
+  "p" #'previous-buffer)
+
 (defvar-keymap my/code-map
   :doc "Code commands (C-c c)"
   "a" #'eglot-code-actions

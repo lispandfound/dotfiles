@@ -97,7 +97,12 @@
 
 (use-package winner
   :ensure nil
-  :config (winner-mode 1))
+  :config
+  (winner-mode 1)
+  (defvar-keymap winner-repeat-map
+    :repeat t
+    "u" #'winner-undo
+    "U" #'winner-redo))
 
 ;;; =========================================================================
 ;;; ELECTRIC
