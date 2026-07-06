@@ -52,6 +52,17 @@
   :commands (er/expand-region er/contract-region er/mark-symbol er/mark-word))
 
 ;;; =========================================================================
+;;; PUNI — structural editing (balanced deletion, slurp/barf, raise)
+;;; Complements electric-pair-mode rather than replacing it: puni keeps
+;;; existing pairs balanced when deleting/killing; electric-pair-mode still
+;;; handles auto-inserting them (puni has no auto-pairing of its own).
+;;; =========================================================================
+
+(use-package puni
+  :defer t
+  :hook (prog-mode . puni-mode))
+
+;;; =========================================================================
 ;;; DRAG-STUFF — move lines or regions up/down with M-up/M-down
 ;;; =========================================================================
 
