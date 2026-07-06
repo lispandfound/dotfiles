@@ -270,5 +270,8 @@
   :ensure nil
   :custom (bookmark-default-file (expand-file-name "bookmarks" my/local-dir)))
 
+(use-package compile
+  :hook (compilation-filter-hook . ansi-color-compilation-filter))
+
 (provide 'config-emacs)
 ;;; config-emacs.el ends here

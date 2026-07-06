@@ -225,8 +225,8 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
                 (gptel-make-ollama "Ollama-Cloud"
                   :host "localhost:11434"
                   :stream t
-                  :models '("deepseek-v4-flash:cloud"))
-                gptel-model "deepseek-v4-flash:cloud")
+                  :models '(deepseek-v4-flash:cloud))
+                gptel-model 'deepseek-v4-flash:cloud)
   (gptel-make-gh-copilot "Copilot"))
 
 ;;; =========================================================================
@@ -237,22 +237,6 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
   :bind (:map my/notes-map
               ("g" . igist-dispatch)))
 
-;;; =========================================================================
-;;; DETACHED — background process management via dtach
-;;; =========================================================================
-
-(use-package detached
-  :init (detached-init)
-  :bind (([remap async-shell-command]   . detached-shell-command)
-         ([remap compile]               . detached-compile)
-         ([remap recompile]             . detached-compile-recompile)
-         ([remap detached-open-session] . detached-consult-session))
-  :custom
-  (detached-db-directory      (expand-file-name "detached/"          my/local-dir))
-  (detached-session-directory (expand-file-name "detached/sessions/" my/local-dir))
-  (detached-show-output-on-attach t)
-  (detached-notification-function (lambda (_) nil))
-  (detached-terminal-data-command system-type))
 
 ;;; =========================================================================
 ;;; DWIM-SHELL-COMMAND
@@ -429,6 +413,15 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 
 (use-package ox-slack
   :after org)
+
+
+;;; =========================================================================
+;;; DIRED-RSYNC — Rsync transfer in dired
+;;; =========================================================================
+
+(use-package dired-rsync-transient
+  :bind (:map dired-mode-map
+              ("C-c C-r" . dired-rsync-transient)))
 
 (provide 'config-tools)
 ;;; config-tools.el ends here
