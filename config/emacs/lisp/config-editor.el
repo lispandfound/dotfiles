@@ -77,13 +77,17 @@
 
 (use-package link-hint
   :bind ("C-c o l" . link-hint-open-link)
-  :config
+  :init
   (with-eval-after-load 'help-mode
     (keymap-set help-mode-map "o" #'link-hint-open-link))
   (with-eval-after-load 'info
     (keymap-set Info-mode-map "o" #'link-hint-open-link))
   (with-eval-after-load 'apropos
-    (keymap-set apropos-mode-map "o" #'link-hint-open-link)))
+    (keymap-set apropos-mode-map "o" #'link-hint-open-link))
+  (with-eval-after-load 'view
+    (keymap-set view-mode-map "O" #'link-hint-open-link))
+  (with-eval-after-load 'helpful
+    (keymap-set helpful-mode-map "o" #'link-hint-open-link)))
 
 ;;; =========================================================================
 ;;; VUNDO — visual undo tree
