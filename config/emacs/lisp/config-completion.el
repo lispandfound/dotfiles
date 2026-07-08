@@ -78,12 +78,7 @@
       (add-face-text-property 0 (length file) 'marginalia-file-priv-dir 'append file))
     file)
   (add-to-list 'vertico-multiform-categories
-               '(file (+vertico-transform-functions . my/vertico-highlight-directory)))
-  (setq vertico-multiform-commands
-        '((consult-imenu   buffer)
-          (consult-outline buffer)))
-  (setq vertico-multiform-categories
-        '((consult-grep buffer))))
+               '(file (+vertico-transform-functions . my/vertico-highlight-directory))))
 
 ;;; =========================================================================
 ;;; MARGINALIA — completion candidate annotations

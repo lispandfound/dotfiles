@@ -270,5 +270,12 @@
   :ensure nil
   :custom (bookmark-default-file (expand-file-name "bookmarks" my/local-dir)))
 
+(use-package fancy-compilation
+  :after compile
+  :custom
+  (fancy-compilation-override-colors nil)
+  (fancy-compilation-term "xterm-256color")
+  :config (fancy-compilation-mode))
+
 (provide 'config-emacs)
 ;;; config-emacs.el ends here

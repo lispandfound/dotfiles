@@ -3,6 +3,9 @@
 ;; Disable package.el — elpaca takes over entirely.
 (setq package-enable-at-startup nil)
 
+;; Must be set early for imenu support to work
+(setq use-package-enable-imenu-support t)
+
 ;; Runtime/generated files go here; gitignored so they don't pollute the repo.
 (defvar my/local-dir
   (expand-file-name ".local/" user-emacs-directory))

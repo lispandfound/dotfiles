@@ -81,8 +81,16 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 ;; Memoize project-current for remote paths to avoid repeated TRAMP lookups.
 (defvar my/project-current-cache nil)
 (defun my/memoize-project-current (orig &optional prompt directory)
-  (memoize-remote (or directory project-current-directory-override default-directory)
-                  'my/project-current-cache orig prompt directory))
+  (let* ((dir (or directory project-current-directory-override default-directory))
+         ;; `my/tramp-optimization-hook' buffer-locally nils `vc-handled-backends'
+         ;; on remote buffers.  If we're resolving a *local* project (e.g.
+         ;; switching projects from a remote buffer), that stale buffer-local
+         ;; value would leak in and make project-try-vc fail to find a real
+         ;; local repo, which then gets deleted from the known-projects list.
+         (vc-handled-backends (if (file-remote-p dir)
+                                   vc-handled-backends
+                                 (default-value 'vc-handled-backends))))
+    (memoize-remote dir 'my/project-current-cache orig prompt directory)))
 (advice-add 'project-current :around #'my/memoize-project-current)
 
 ;; Strip heavy features on remote buffers (adapted from config.el §4).
@@ -226,8 +234,8 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
                 (gptel-make-ollama "Ollama-Cloud"
                   :host "localhost:11434"
                   :stream t
-                  :models '("deepseek-v4-flash:cloud"))
-                gptel-model "deepseek-v4-flash:cloud")
+                  :models '(deepseek-v4-flash:cloud))
+                gptel-model 'deepseek-v4-flash:cloud)
   (gptel-make-gh-copilot "Copilot"))
 
 ;;; =========================================================================
@@ -238,22 +246,6 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
   :bind (:map my/notes-map
               ("g" . igist-dispatch)))
 
-;;; =========================================================================
-;;; DETACHED — background process management via dtach
-;;; =========================================================================
-
-(use-package detached
-  :init (detached-init)
-  :bind (([remap async-shell-command]   . detached-shell-command)
-         ([remap compile]               . detached-compile)
-         ([remap recompile]             . detached-compile-recompile)
-         ([remap detached-open-session] . detached-consult-session))
-  :custom
-  (detached-db-directory      (expand-file-name "detached/"          my/local-dir))
-  (detached-session-directory (expand-file-name "detached/sessions/" my/local-dir))
-  (detached-show-output-on-attach t)
-  (detached-notification-function (lambda (_) nil))
-  (detached-terminal-data-command system-type))
 
 ;;; =========================================================================
 ;;; DWIM-SHELL-COMMAND
@@ -496,6 +488,15 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 
 (use-package ox-slack
   :after org)
+
+
+;;; =========================================================================
+;;; DIRED-RSYNC — Rsync transfer in dired
+;;; =========================================================================
+
+(use-package dired-rsync-transient
+  :bind (:map dired-mode-map
+              ("C-c C-r" . dired-rsync-transient)))
 
 (provide 'config-tools)
 ;;; config-tools.el ends here

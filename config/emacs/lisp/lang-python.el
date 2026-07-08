@@ -2,11 +2,44 @@
 
 ;; python-ts-mode is built-in (Emacs 29+); treesit-auto handles remapping.
 
+(defcustom my/python-scratchpad-dir "~/src/scratchpad/"
+  "uv project to run the Python REPL in when the current buffer has no
+project-local uv environment (see `my/python-uv-project-root')."
+  :type 'directory
+  :group 'python)
+
+(defun my/python-uv-project-root ()
+  "Return the uv project directory to use for this buffer's REPL.
+Uses the buffer's own uv project when `uv-mode-root' finds a `.venv',
+otherwise falls back to `my/python-scratchpad-dir'."
+  (directory-file-name
+   (expand-file-name (or (uv-mode-root) my/python-scratchpad-dir))))
+
+(defun my/python-shell-setup ()
+  "Point `run-python' at `uv run', preferring ipython.
+Runs inside the buffer's own uv project when one is active, or
+`my/python-scratchpad-dir' otherwise (see `my/python-uv-project-root').
+IPython is pulled in via `--with' so it augments the project's
+environment without being added to its own dependencies."
+  (let ((root (my/python-uv-project-root)))
+    (setq-local python-shell-interpreter "uv")
+    (setq-local python-shell-interpreter-args
+                (combine-and-quote-strings
+                 (list "run" "--project" root
+                       "--with" "ipython" "ipython" "--simple-prompt")))
+    ;; `uv -i' can't be probed the way `python-shell-prompt-detect' expects,
+    ;; and ipython's --simple-prompt output already matches python.el's own
+    ;; default ">>> "/"... " regexps, so detection is unnecessary here and
+    ;; would only produce a spurious warning.
+    (setq-local python-shell-prompt-detect-enabled nil)))
+
 (use-package python
   :ensure nil
   :hook
   ((python-ts-mode . eglot-ensure)
    (python-mode    . eglot-ensure)
+   (python-ts-mode . my/python-shell-setup)
+   (python-mode    . my/python-shell-setup)
    (python-ts-mode . (lambda ()
                        (setq-local dash-docs-docsets
                                    '("Python" "SciPy" "Pandas" "Numpy" "xarray"))))
@@ -47,7 +80,10 @@
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff)))
 
 (use-package uv-mode
-  :hook ((python-mode python-ts-mode) . uv-mode))
+  ;; :demand so `uv-mode-root' is defined before `my/python-shell-setup'
+  ;; (hooked onto the same modes, above) ever needs to call it.
+  :demand t
+  :hook ((python-mode python-ts-mode) . uv-mode-auto-activate-hook))
 
 ;; uv.el — transient interface to the uv CLI (add/remove/sync/lock/run/...).
 ;; Complements uv-mode, which only handles venv activation.
