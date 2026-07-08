@@ -228,6 +228,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 ;;; =========================================================================
 
 (use-package gptel
+  :bind (:map my/open-map ("g" . gptel-menu))
   :config
   (setq-default gptel-backend
                 (gptel-make-ollama "Ollama-Cloud"
@@ -287,11 +288,77 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
   :hook
   ((kill-emacs . dape-breakpoint-save)
    (after-init . dape-breakpoint-load))
+  :bind ("C-c D" . my/dape-tmenu)
   :custom
   (dape-default-breakpoints-file (expand-file-name "dape-breakpoints" my/local-dir))
   :config
   (add-hook 'dape-on-stopped-hooks #'dape-info)
-  (add-hook 'dape-on-stopped-hooks #'dape-repl))
+  (add-hook 'dape-on-stopped-hooks #'dape-repl)
+
+  ;; Control-panel transient replacing the old my/dape-map prefix keymap:
+  ;; stepping keeps the menu open, so n/n/n works without re-pressing C-c D.
+  (transient-define-prefix my/dape-tmenu ()
+    "Dape debugger control panel."
+    [["Stepping"
+      ("n" "Next" dape-next :transient t)
+      ("s" "Step in" dape-step-in :transient t)
+      ("o" "Step out" dape-step-out :transient t)
+      ("c" "Continue" dape-continue :transient t)
+      ("p" "Pause" dape-pause :transient t)]
+     ["Breakpoints"
+      ("b" "Toggle" dape-breakpoint-toggle :transient t)
+      ("B" "Remove all" dape-breakpoint-remove-all :transient t)]
+     ["Inspect"
+      ("e" "Evaluate" dape-evaluate-expression)
+      ("w" "Watch dwim" dape-watch-dwim)
+      ("i" "Info buffers" dape-info)
+      ("R" "REPL" dape-repl)]
+     ["Session"
+      ("d" "Start" dape)
+      ("r" "Restart" dape-restart)
+      ("q" "Quit" dape-quit)
+      ("D" "Disconnect" dape-disconnect-quit)]]))
+
+;;; =========================================================================
+;;; SMERGE — merge conflict resolution transient (C-c v m)
+;;; =========================================================================
+
+(use-package smerge-mode
+  :ensure nil
+  :bind (:map my/vc-map ("m" . my/smerge-menu))
+  :config
+  (transient-define-prefix my/smerge-tmenu ()
+    "Resolve merge conflicts with smerge."
+    [["Navigate"
+      ("n" "Next conflict" smerge-next :transient t)
+      ("p" "Previous conflict" smerge-prev :transient t)]
+     ["Keep"
+      ("u" "Upper (ours)" smerge-keep-upper :transient t)
+      ("l" "Lower (theirs)" smerge-keep-lower :transient t)
+      ("b" "Base" smerge-keep-base :transient t)
+      ("a" "All" smerge-keep-all :transient t)
+      ("RET" "At point" smerge-keep-current :transient t)]
+     ["Diff"
+      ("<" "Base/upper" smerge-diff-base-upper)
+      ("=" "Upper/lower" smerge-diff-upper-lower)
+      (">" "Base/lower" smerge-diff-base-lower)
+      ("E" "Ediff" smerge-ediff)]
+     ["Other"
+      ("R" "Refine" smerge-refine :transient t)
+      ("C" "Combine with next" smerge-combine-with-next)
+      ("r" "Auto-resolve" smerge-resolve :transient t)
+      ("k" "Kill current" smerge-kill-current :transient t)]])
+
+  (defun my/smerge-menu ()
+    "Open the smerge menu, enabling `smerge-mode' if the buffer has conflicts."
+    (interactive)
+    (unless smerge-mode
+      (if (save-excursion
+            (goto-char (point-min))
+            (re-search-forward "^<<<<<<< " nil t))
+          (smerge-mode 1)
+        (user-error "No merge conflict markers in this buffer")))
+    (my/smerge-tmenu)))
 
 ;;; =========================================================================
 ;;; EROS — eval overlays for :tools eval +overlay

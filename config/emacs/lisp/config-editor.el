@@ -216,6 +216,60 @@
              (keymap-set rectangle-mark-mode-map "C-o"
                          #'casual-editkit-rectangle-tmenu))))
 
+(use-package casual-compile
+  :ensure nil
+  :after compile
+  :bind (:map compilation-mode-map ("C-o" . casual-compile-tmenu))
+  :config
+  ;; grep-mode derives from compilation but its keymap does not inherit
+  ;; compilation-mode-map, so bind there too.
+  (with-eval-after-load 'grep
+    (keymap-set grep-mode-map "C-o" #'casual-compile-tmenu)))
+
+(use-package casual-eshell
+  :ensure nil
+  :after eshell
+  :bind (:map eshell-mode-map ("C-o" . casual-eshell-tmenu)))
+
+(use-package casual-eww
+  :ensure nil
+  :after eww
+  :bind (:map eww-mode-map ("C-o" . casual-eww-tmenu)))
+
+(use-package casual-help
+  :ensure nil
+  :after help-mode
+  :bind (:map help-mode-map ("C-o" . casual-help-tmenu)))
+
+(use-package casual-man
+  :ensure nil
+  :after man
+  :bind (:map Man-mode-map ("C-o" . casual-man-tmenu)))
+
+(use-package casual-re-builder
+  :ensure nil
+  :after re-builder
+  :bind (:map reb-mode-map      ("C-o" . casual-re-builder-tmenu)
+         :map reb-lisp-mode-map ("C-o" . casual-re-builder-tmenu)))
+
+(use-package casual-ediff
+  :ensure nil
+  :after ediff
+  :config
+  ;; ediff builds its control-buffer keymap dynamically per session.
+  (add-hook 'ediff-keymap-setup-hook
+            (lambda () (keymap-set ediff-mode-map "C-o" #'casual-ediff-tmenu))))
+
+;; Editing modes keep C-o = open-line; major-mode menus live on C-c m.
+(use-package casual-elisp
+  :ensure nil
+  :bind (:map emacs-lisp-mode-map ("C-c m" . casual-elisp-tmenu)))
+
+(use-package casual-org
+  :ensure nil
+  :after org
+  :bind (:map org-mode-map ("C-c m" . casual-org-tmenu)))
+
 ;;; =========================================================================
 ;;; IBUFFER GROUPING — switch how `ibuffer' groups buffers on the fly
 ;;; via casual-ibuffer's "Group By" menu (see `casual-ibuffer-groupby-tmenu'
