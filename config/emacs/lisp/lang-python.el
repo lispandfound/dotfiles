@@ -49,5 +49,20 @@
 (use-package uv-mode
   :hook ((python-mode python-ts-mode) . uv-mode))
 
+;; uv.el — transient interface to the uv CLI (add/remove/sync/lock/run/...).
+;; Complements uv-mode, which only handles venv activation.
+(use-package uv
+  :ensure (:host github :repo "johannes-mueller/uv.el")
+  :commands (uv)
+  :init
+  (with-eval-after-load 'python
+    (keymap-set python-base-mode-map "C-c u" #'uv))
+  :config
+  ;; uv.el reads pyproject.toml via the TOML tree-sitter grammar.
+  (add-to-list 'treesit-language-source-alist
+               '(toml "https://github.com/tree-sitter-grammars/tree-sitter-toml"))
+  (unless (treesit-language-available-p 'toml)
+    (treesit-install-language-grammar 'toml)))
+
 (provide 'lang-python)
 ;;; lang-python.el ends here

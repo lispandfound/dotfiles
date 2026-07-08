@@ -107,23 +107,7 @@
   "x" #'flymake-show-buffer-diagnostics
   "X" #'flymake-show-project-diagnostics)
 
-(defvar-keymap my/dape-map
-  :doc "Dape debugger commands (C-c D)"
-  "d" #'dape
-  "c" #'dape-continue
-  "n" #'dape-next
-  "s" #'dape-step-in
-  "o" #'dape-step-out
-  "p" #'dape-pause
-  "r" #'dape-restart
-  "R" #'dape-repl
-  "i" #'dape-info
-  "b" #'dape-breakpoint-toggle
-  "B" #'dape-breakpoint-remove-all
-  "e" #'dape-evaluate-expression
-  "w" #'dape-watch-dwim
-  "q" #'dape-quit
-  "D" #'dape-disconnect-quit)
+;; C-c D is bound to the my/dape-tmenu transient in config-tools.el.
 
 (defvar-keymap my/lookup-map
   :doc "Lookup commands (C-c l)")
@@ -173,35 +157,7 @@
   "v" #'visible-mode
   "w" #'visual-line-mode)
 
-(defvar-keymap my/window-map
-  :doc "Window / workspace commands (C-c w)"
-  ;; Splits (mnemonic: - splits below, | splits right)
-  "-" #'split-window-below
-  "|" #'split-window-right
-  ;; Delete windows
-  "d" #'delete-window
-  "o" #'delete-other-windows
-  ;; winner-mode undo/redo
-  "u" #'winner-undo
-  "U" #'winner-redo
-  ;; Popup terminal
-  "t" #'my/popup-eshell
-  ;; tab-bar workspace commands
-  "N" #'tab-new
-  "c" #'tab-close
-  "r" #'tab-rename
-  "n" #'tab-next
-  "p" #'tab-previous
-  "w" #'tab-switch
-  "1" (lambda () (interactive) (tab-bar-select-tab 1))
-  "2" (lambda () (interactive) (tab-bar-select-tab 2))
-  "3" (lambda () (interactive) (tab-bar-select-tab 3))
-  "4" (lambda () (interactive) (tab-bar-select-tab 4))
-  "5" (lambda () (interactive) (tab-bar-select-tab 5))
-  "6" (lambda () (interactive) (tab-bar-select-tab 6))
-  "7" (lambda () (interactive) (tab-bar-select-tab 7))
-  "8" (lambda () (interactive) (tab-bar-select-tab 8))
-  "9" (lambda () (interactive) (tab-bar-select-tab 9)))
+;; C-c w is bound to the my/tab-bar-tmenu transient in config-windows.el.
 
 (defvar-keymap my/file-map
   :doc "File commands (C-c f)"
@@ -230,7 +186,6 @@
 (keymap-global-set "C-c b" my/buffer-map)
 (keymap-global-set "C-c c" my/code-map)
 (keymap-global-set "C-c d" my/denote-map)
-(keymap-global-set "C-c D" my/dape-map)
 (keymap-global-set "C-c f" my/file-map)
 (keymap-global-set "C-c l" my/lookup-map)
 (keymap-global-set "C-c n" my/notes-map)
@@ -238,7 +193,6 @@
 (keymap-global-set "C-c p" my/project-map)
 (keymap-global-set "C-c t" my/toggle-map)
 (keymap-global-set "C-c v" my/vc-map)
-(keymap-global-set "C-c w" my/window-map)
 (keymap-set my/denote-map "b" my/denote-bk-map)
 (keymap-set my/denote-map "l" my/denote-link-map)
 (keymap-set my/denote-map "s" my/denote-search-map)

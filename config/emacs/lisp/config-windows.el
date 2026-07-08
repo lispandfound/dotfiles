@@ -151,5 +151,52 @@ the ace-selected window instead of the default location."
    nil "[ace-window]")
   (message "ace-window: next buffer will open in selected window…"))
 
+;;; =========================================================================
+;;; TAB-BAR / WINDOW TRANSIENT — C-c w
+;;; Replaces the old my/window-map prefix keymap: same keys, but winner
+;;; undo/redo and tab next/prev repeat without re-pressing the prefix, and
+;;; open tabs are listed as selectable menu entries.
+;;; =========================================================================
+
+(require 'transient)
+
+(defun my/tab-bar--select-suffixes (_)
+  "Build one transient suffix per open tab (up to 9), keyed by tab number."
+  (transient-parse-suffixes
+   'my/tab-bar-tmenu
+   (seq-map-indexed
+    (lambda (tab i)
+      (let ((n (1+ i))
+            (name (alist-get 'name tab)))
+        (list (number-to-string n)
+              (if (eq (car tab) 'current-tab)
+                  (format "%s (current)" name)
+                name)
+              (lambda () (interactive) (tab-bar-select-tab n)))))
+    (seq-take (funcall tab-bar-tabs-function) 9))))
+
+(transient-define-prefix my/tab-bar-tmenu ()
+  "Window and tab-bar workspace commands."
+  ["Windows"
+   [("-" "Split below" split-window-below)
+    ("|" "Split right" split-window-right)
+    ("t" "Popup eshell" my/popup-eshell)]
+   [("d" "Delete" delete-window)
+    ("o" "Delete others" delete-other-windows)]
+   [("u" "Winner undo" winner-undo :transient t)
+    ("U" "Winner redo" winner-redo :transient t)]]
+  ["Tabs"
+   [("N" "New" tab-new)
+    ("c" "Close" tab-close)
+    ("r" "Rename" tab-rename)]
+   [("n" "Next" tab-next :transient t)
+    ("p" "Previous" tab-previous :transient t)
+    ("w" "Switch…" tab-switch)]]
+  ["Select tab"
+   :class transient-column
+   :setup-children my/tab-bar--select-suffixes])
+
+(keymap-global-set "C-c w" #'my/tab-bar-tmenu)
+
 (provide 'config-windows)
 ;;; config-windows.el ends here
