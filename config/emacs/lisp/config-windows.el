@@ -21,8 +21,18 @@
             (display-buffer-reuse-window display-buffer-at-bottom)
             (window-height . 0.25))
 
-           ;; Eshell, vterm, and the Python REPL — 30% bottom popup
-           (,(rx bos "*" (or "eshell" "vterm" "shell" "terminal" "Python") (* any))
+           ;; Eat, vterm, shell, and the Python REPL — 30% bottom popup.
+           ;; Plain eshell is deliberately excluded here: only popup eshells
+           ;; (see `my/popup-eshell-p' below) get this treatment, so that a
+           ;; regular `M-x eshell' opens like any other buffer.
+           (,(rx bos "*" (or "eat" "vterm" "shell" "terminal" "Python") (* any))
+            (display-buffer-reuse-window display-buffer-at-bottom)
+            (window-height . 0.30))
+
+           ;; Popup eshells — matched by the `my/popup-eshell-p' marker, not
+           ;; by name, so this only ever catches buffers `my/popup-eshell'
+           ;; created.
+           (my/popup-eshell-buffer-p
             (display-buffer-reuse-window display-buffer-at-bottom)
             (window-height . 0.30))))
   (add-to-list 'display-buffer-alist rule))
@@ -55,7 +65,8 @@
      help-mode
      helpful-mode
      compilation-mode
-     eshell-mode
+     my/popup-eshell-buffer-p
+     eat-mode
      vterm-mode
      inferior-python-mode))
   :config
@@ -66,34 +77,55 @@
 ;;; POPUP ESHELL — Doom-style toggleable eshell at the bottom
 ;;; =========================================================================
 
+(defvar-local my/popup-eshell-p nil
+  "Non-nil in eshell buffers created by `my/popup-eshell'.
+This is what lets those buffers be routed to a bottom popup (see
+`display-buffer-alist' and `popper-reference-buffers') while a plain
+`M-x eshell' buffer is left to display and behave normally.")
+
+(defun my/popup-eshell-buffer-p (buffer-or-name &optional _action)
+  "Return non-nil if BUFFER-OR-NAME is a popup eshell.
+Takes an optional second ACTION argument (ignored) so it can double as
+a `display-buffer-alist' condition as well as a `popper-reference-buffers'
+predicate."
+  (when-let ((buf (get-buffer buffer-or-name)))
+    (buffer-local-value 'my/popup-eshell-p buf)))
+
+;; Forward declaration so the `let'-binding below binds the real dynamic
+;; variable from esh-mode.el, not a throwaway lexical one — eshell isn't
+;; necessarily loaded yet when this file is compiled.
+(defvar eshell-buffer-name)
+
 (defun my/popup-eshell ()
   "Toggle a popup eshell at the bottom of the frame.
 
-If an eshell window is already visible:
+Only operates on eshells marked via `my/popup-eshell-p' — i.e. ones this
+command itself created — so a regular `M-x eshell' buffer is never
+hijacked as the popup.
+
+If a popup eshell window is already visible:
   - and it is the selected window → dismiss it
   - otherwise → jump to it
-If no eshell window is visible, open or create one at the bottom."
+If no popup eshell window is visible, open or create one at the bottom."
   (interactive)
   (let ((win (cl-find-if
-              (lambda (w)
-                (with-current-buffer (window-buffer w)
-                  (derived-mode-p 'eshell-mode)))
+              (lambda (w) (my/popup-eshell-buffer-p (window-buffer w)))
               (window-list nil 'no-minibuffer))))
     (cond
-     ;; Eshell focused → close popup
+     ;; Popup eshell focused → close popup
      ((eq win (selected-window))
       (delete-window win))
-     ;; Eshell visible elsewhere → focus it
+     ;; Popup eshell visible elsewhere → focus it
      (win
       (select-window win))
-     ;; Not visible → open existing buffer or create a new eshell
+     ;; Not visible → open existing popup-eshell buffer or create a new one
      (t
-      (let* ((buf (cl-find-if (lambda (b)
-                                (with-current-buffer b
-                                  (derived-mode-p 'eshell-mode)))
-                              (buffer-list)))
-             ;; If no eshell buffer exists, create one without disturbing windows.
-             (buf (or buf (save-window-excursion (eshell) (current-buffer)))))
+      (let* ((buf (or (cl-find-if #'my/popup-eshell-buffer-p (buffer-list))
+                       ;; None exists yet — create one without disturbing windows.
+                       (let ((eshell-buffer-name "*popup-eshell*"))
+                         (save-window-excursion (eshell) (current-buffer))))))
+        (with-current-buffer buf
+          (setq my/popup-eshell-p t))
         (select-window
          (display-buffer buf '((display-buffer-at-bottom)
                                (window-height . 0.30)))))))))

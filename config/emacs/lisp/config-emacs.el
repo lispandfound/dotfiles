@@ -98,11 +98,7 @@
 (use-package winner
   :ensure nil
   :config
-  (winner-mode 1)
-  (defvar-keymap winner-repeat-map
-    :repeat t
-    "u" #'winner-undo
-    "U" #'winner-redo))
+  (winner-mode 1))
 
 ;;; =========================================================================
 ;;; ELECTRIC
@@ -126,18 +122,105 @@
 ;;; ESHELL
 ;;; =========================================================================
 
+;;; --- Doom-style lambda prompt ---------------------------------------------
+
+(defface my/eshell-prompt-pwd
+  '((t :inherit font-lock-constant-face :weight bold))
+  "Face for the working directory in the eshell prompt.")
+
+(defface my/eshell-prompt-git
+  '((t :inherit font-lock-string-face))
+  "Face for the git branch in the eshell prompt.")
+
+(defface my/eshell-prompt-remote
+  '((t :inherit font-lock-keyword-face :weight bold))
+  "Face for the user@host indicator on remote eshell prompts.")
+
+(defun my/eshell-git-branch ()
+  "Return the current git branch by reading .git/HEAD, or nil.
+Reads the ref file directly rather than shelling out, so it adds no
+subprocess cost to every prompt."
+  (when-let* ((root (locate-dominating-file default-directory ".git"))
+              (head (expand-file-name ".git/HEAD" root))
+              ((file-exists-p head)))
+    (with-temp-buffer
+      (insert-file-contents head)
+      (goto-char (point-min))
+      (if (looking-at "ref: refs/heads/\\(.*\\)")
+          (match-string 1)
+        ;; Detached HEAD — show the short SHA.
+        (buffer-substring (point) (min (+ (point) 7) (point-max)))))))
+
+(defun my/eshell-prompt ()
+  "A Doom-inspired multiline eshell prompt.
+Shows user@host when remote, the abbreviated working directory, the git
+branch (local only, to keep remote prompts snappy), and a lambda that is
+green on success and red on a non-zero exit status."
+  (let ((status eshell-last-command-status))
+    (concat
+     "\n"
+     (when (file-remote-p default-directory)
+       (propertize
+        (concat (or (file-remote-p default-directory 'user) "")
+                "@" (or (file-remote-p default-directory 'host) "") " ")
+        'face 'my/eshell-prompt-remote))
+     (propertize (abbreviate-file-name (eshell/pwd)) 'face 'my/eshell-prompt-pwd)
+     (when-let* (((not (file-remote-p default-directory)))
+                 (branch (my/eshell-git-branch)))
+       (propertize (concat "  " branch) 'face 'my/eshell-prompt-git))
+     "\n"
+     (propertize "λ" 'face (if (zerop status) 'success 'error))
+     " ")))
+
 (use-package eshell
   :ensure nil
   :custom
   (eshell-directory-name       (expand-file-name "eshell/" my/local-dir))
   (eshell-history-size 10000)
   (eshell-buffer-maximum-lines 10000)
-  (eshell-scroll-to-bottom-on-input t))
+  (eshell-scroll-to-bottom-on-input t)
+  (eshell-prompt-function #'my/eshell-prompt)
+  (eshell-prompt-regexp "^λ ")
+  ;; We colour the prompt ourselves, so don't let eshell re-face it.
+  (eshell-highlight-prompt nil)
+  (eshell-history-append t)
+  (eshell-hist-ignoredups t))
 
 (use-package em-smart
   :ensure nil
   :after eshell
   :custom (eshell-where-to-jump 'begin))
+
+;;; --- Fish-like syntax highlighting ----------------------------------------
+
+(use-package eshell-syntax-highlighting
+  :after eshell
+  :config (eshell-syntax-highlighting-global-mode 1))
+
+;;; =========================================================================
+;;; EAT — terminal emulator + eshell interactive-command backend
+;;; A pure-Elisp terminal (no native compilation, unlike vterm).  As a
+;;; standalone terminal it runs full-screen/interactive apps well; via
+;;; `eat-eshell-mode' it routes eshell command output through a real
+;;; terminal emulator so htop, vim, ssh, colours and progress bars all
+;;; behave — while everything else about eshell stays the same.
+;;; =========================================================================
+
+(use-package eat
+  ;; Recipe comes from elpaca's menu (MELPA/NonGNU), which bundles the
+  ;; required terminfo files.
+  ;;
+  ;; Enable via `eshell-first-time-mode-hook' rather than `eshell-load-hook':
+  ;; the latter fires once when eshell loads, which under elpaca's async
+  ;; activation can happen before this package is set up (so the hook is empty
+  ;; and the mode never turns on).  The first-time-mode hook fires when you
+  ;; actually open eshell — always after elpaca is done — and eat's enable
+  ;; routine retro-fits the current buffer, so interactive commands work
+  ;; immediately.
+  :hook (eshell-first-time-mode . eat-eshell-mode)
+  :custom
+  (eat-kill-buffer-on-exit t)
+  (eat-term-scrollback-size 200000))
 
 ;;; =========================================================================
 ;;; ISEARCH
@@ -160,7 +243,12 @@
 (use-package tramp
   :ensure nil
   :custom
-  (tramp-persistency-file-name (expand-file-name "tramp" my/local-dir)))
+  (tramp-persistency-file-name (expand-file-name "tramp" my/local-dir))
+  :config
+  ;; Adopt the remote login shell's own $PATH so eshell/commands can find
+  ;; remote executables (fixes "nothing in my PATH" over TRAMP).  The literal
+  ;; entries stay as fallbacks for hosts that don't export a useful PATH.
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
 ;;; =========================================================================
 ;;; TRANSIENT — persistent history/values/levels

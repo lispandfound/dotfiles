@@ -178,6 +178,7 @@
   "v" #'visible-mode
   "w" #'visual-line-mode)
 
+
 (defvar-keymap my/window-map
   :doc "Window / workspace commands (C-c w)"
   ;; Splits (mnemonic: - splits below, | splits right)
@@ -208,6 +209,18 @@
   "8" (lambda () (interactive) (tab-bar-select-tab 8))
   "9" (lambda () (interactive) (tab-bar-select-tab 9)))
 
+(defvar-keymap my/winner-repeat-map
+  :doc "Repeat map for winner-mode undo/redo."
+  :repeat t
+  "u" #'winner-undo
+  "U" #'winner-redo)
+
+(defvar-keymap my/tab-repeat-map
+  :doc "Repeat map for tab navigation."
+  :repeat t
+  "n" #'tab-next
+  "p" #'tab-previous)
+
 (defvar-keymap my/file-map
   :doc "File commands (C-c f)"
   "f" #'find-file
@@ -229,6 +242,7 @@
   "D" #'docker
   "e" #'eshell
   "t" #'my/popup-eshell
+  "T" #'eat
   "f" #'make-frame)
 
 ;; Register prefix maps under C-c
