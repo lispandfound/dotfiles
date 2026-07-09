@@ -121,9 +121,9 @@ If no popup eshell window is visible, open or create one at the bottom."
      ;; Not visible → open existing popup-eshell buffer or create a new one
      (t
       (let* ((buf (or (cl-find-if #'my/popup-eshell-buffer-p (buffer-list))
-                       ;; None exists yet — create one without disturbing windows.
-                       (let ((eshell-buffer-name "*popup-eshell*"))
-                         (save-window-excursion (eshell) (current-buffer))))))
+                      ;; None exists yet — create one without disturbing windows.
+                      (let ((eshell-buffer-name "*popup-eshell*"))
+                        (save-window-excursion (eshell) (current-buffer))))))
         (with-current-buffer buf
           (setq my/popup-eshell-p t))
         (select-window
@@ -226,7 +226,7 @@ the ace-selected window instead of the default location."
     ("p" "Previous" tab-previous :transient t)
     ("w" "Switch…" tab-switch)]]
   ["Select tab"
-   :class transient-column
+   :class transient-row
    :setup-children my/tab-bar--select-suffixes])
 
 (keymap-global-set "C-c w" #'my/tab-bar-tmenu)
