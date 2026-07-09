@@ -4,8 +4,8 @@
 # --
 #!/bin/bash
 #PBS -N ${1:jobname}
-#PBS -o $1_\${PBS_JOBID}.out
-#PBS -e $1_\${PBS_JOBID}.err
+#PBS -o $1.out
+#PBS -e $1.err
 #PBS -l walltime=${2:01:00:00}
 #PBS -l select=1:ncpus=${3:4}:mem=${4:8gb}
 #PBS -q ${5:work}
