@@ -250,15 +250,19 @@
   :ensure nil
   :after re-builder
   :bind (:map reb-mode-map      ("C-o" . casual-re-builder-tmenu)
-         :map reb-lisp-mode-map ("C-o" . casual-re-builder-tmenu)))
+              :map reb-lisp-mode-map ("C-o" . casual-re-builder-tmenu)))
 
 (use-package casual-ediff
   :ensure nil
-  :after ediff
+  :after (casual ediff)
+  :hook (ediff-keymap-setup . (lambda ()
+                                (keymap-set ediff-mode-map "C-o" #'casual-ediff-tmenu)))
   :config
-  ;; ediff builds its control-buffer keymap dynamically per session.
-  (add-hook 'ediff-keymap-setup-hook
-            (lambda () (keymap-set ediff-mode-map "C-o" #'casual-ediff-tmenu))))
+  (casual-ediff-install)
+  :custom
+  (ediff-keep-variants nil)
+  (ediff-window-setup-function 'ediff-setup-windows-plain)
+  (ediff-split-window-function 'split-window-horizontally))
 
 ;; Editing modes keep C-o = open-line; major-mode menus live on C-c m.
 (use-package casual-elisp
