@@ -88,8 +88,8 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
          ;; value would leak in and make project-try-vc fail to find a real
          ;; local repo, which then gets deleted from the known-projects list.
          (vc-handled-backends (if (file-remote-p dir)
-                                   vc-handled-backends
-                                 (default-value 'vc-handled-backends))))
+                                  vc-handled-backends
+                                (default-value 'vc-handled-backends))))
     (memoize-remote dir 'my/project-current-cache orig prompt directory)))
 (advice-add 'project-current :around #'my/memoize-project-current)
 
@@ -215,7 +215,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 ;;; =========================================================================
 
 (use-package envrc
-  :hook (after-init . envrc-global-mode))
+  :hook (eplaca-after-init . envrc-global-mode))
 
 ;;; =========================================================================
 ;;; DOCKER
@@ -272,7 +272,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
   :init
   (if after-init-time
       (edit-server-start)
-    (add-hook 'after-init-hook #'edit-server-start))
+    (add-hook 'eplaca-after-init-hook #'edit-server-start))
   :custom
   (edit-server-new-frame-alist
    '((name . "Edit with Emacs FRAME")
@@ -287,7 +287,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 (use-package dape
   :hook
   ((kill-emacs . dape-breakpoint-save)
-   (after-init . dape-breakpoint-load))
+   (eplaca-after-init . dape-breakpoint-load))
   :bind ("C-c D" . my/dape-tmenu)
   :custom
   (dape-default-breakpoints-file (expand-file-name "dape-breakpoints" my/local-dir))
@@ -412,7 +412,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 
 (use-package denote
   :hook
-  ((after-init . denote-rename-buffer-mode)
+  ((eplaca-after-init . denote-rename-buffer-mode)
    (dired-mode . denote-dired-mode))
   :custom
   (denote-directory (expand-file-name "~/notes/"))
@@ -496,7 +496,20 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 
 (use-package dired-rsync-transient
   :bind (:map dired-mode-map
-              ("C-c C-r" . dired-rsync-transient)))
+              ("C-c C-r" . dired-rsync-transient))
+  :config
+  (defun my/dired-rsync-pop-to-buffer (&rest _)
+    "Pop to the most recently created dired-rsync process buffer."
+    (when-let ((buf (car (dired-rsync--get-active-buffers))))
+      (pop-to-buffer buf)))
+  (add-to-list 'display-buffer-alist
+               '("^\\*rsync @"
+                 (display-buffer-reuse-window display-buffer-pop-up-window)
+                 (window-height . 0.3)
+                 (reusable-frames . visible)))
+  (with-eval-after-load 'popper
+    (lambda () (add-to-list 'popper-reference-buffers "^\\*rsync @")))
+  (advice-add 'dired-rsync :after #'my/dired-rsync-pop-to-buffer))
 
 (provide 'config-tools)
 ;;; config-tools.el ends here

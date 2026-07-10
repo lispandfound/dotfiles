@@ -44,7 +44,7 @@
 (use-package popper
   ;; after-init triggers the load and activates popper-mode.
   ;; :bind alone would defer the package and popper-mode would never run.
-  :hook (after-init . popper-mode)
+  :hook (elpaca-after-init . popper-mode)
   :bind (("C-`"   . popper-toggle)
          ("M-`"   . popper-cycle)
          ("C-M-`" . popper-toggle-type))
