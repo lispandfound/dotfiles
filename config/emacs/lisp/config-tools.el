@@ -431,11 +431,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
               ("h" . denote-org-link-to-heading)
               ("b" . denote-backlinks)
               ("g" . denote-find-backlink)
-              ("o" . denote-org-dblock-insert-backlinks)
-              :map my/notes-map
-              ("d" . denote)
-              ("j" . denote-journal-new-or-existing-entry)
-              ("n" . denote-open-or-create)))
+              ("o" . denote-org-dblock-insert-backlinks)))
 
 (use-package denote-journal
   :after denote

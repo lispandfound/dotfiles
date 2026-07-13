@@ -5,10 +5,7 @@
 (use-package rust-mode
   :hook
   ((rust-mode    . eglot-ensure)
-   (rust-ts-mode . eglot-ensure))
-  :config
-  (add-to-list 'eglot-server-programs
-               '((rust-mode rust-ts-mode) . ("rust-analyzer"))))
+   (rust-ts-mode . eglot-ensure)))
 
 (provide 'lang-rust)
 ;;; lang-rust.el ends here

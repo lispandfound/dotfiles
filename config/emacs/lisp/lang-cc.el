@@ -9,15 +9,10 @@
   ((c-ts-mode   . eglot-ensure)
    (c++-ts-mode . eglot-ensure)
    (c-mode      . eglot-ensure)
-   (c++-mode    . eglot-ensure))
-  :config
-  (add-to-list 'eglot-server-programs
-               '((c-mode c++-mode c-ts-mode c++-ts-mode) . ("clangd"))))
+   (c++-mode    . eglot-ensure)))
 
 (with-eval-after-load 'cmake-mode
-  (add-hook 'cmake-mode-hook #'eglot-ensure)
-  (add-to-list 'eglot-server-programs
-               '(cmake-mode . ("cmake-language-server"))))
+  (add-hook 'cmake-mode-hook #'eglot-ensure))
 
 (provide 'lang-cc)
 ;;; lang-cc.el ends here

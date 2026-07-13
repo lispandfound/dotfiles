@@ -6,10 +6,7 @@
   :ensure nil
   :hook
   ((sh-mode      . my/eglot-ensure-unless-remote)
-   (bash-ts-mode . my/eglot-ensure-unless-remote))
-  :config
-  (add-to-list 'eglot-server-programs
-               '((sh-mode bash-ts-mode) . ("bash-language-server" "start"))))
+   (bash-ts-mode . my/eglot-ensure-unless-remote)))
 
 (provide 'lang-sh)
 ;;; lang-sh.el ends here

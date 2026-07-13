@@ -74,6 +74,11 @@
 ;;; LEADER KEYMAPS (C-c prefix replaces Doom's SPC leader)
 ;;; =========================================================================
 
+(defvar-keymap my/buffer-repeat-map
+  :repeat t
+  "n" #'next-buffer
+  "p" #'previous-buffer)
+
 (defvar-keymap my/buffer-map
   :doc "Buffer commands (C-c b)"
   "b" #'consult-buffer
@@ -82,8 +87,6 @@
   "i" #'ibuffer
   "n" #'next-buffer
   "p" #'previous-buffer
-  "]" #'next-buffer
-  "[" #'previous-buffer
   "r" #'revert-buffer
   "R" #'rename-buffer
   "s" #'save-buffer
@@ -91,11 +94,6 @@
   "M" #'bookmark-delete
   "z" #'bury-buffer
   "x" #'scratch-buffer)
-
-(defvar-keymap my/buffer-nav-repeat-map
-  :repeat t
-  "n" #'next-buffer
-  "p" #'previous-buffer)
 
 (defvar-keymap my/code-map
   :doc "Code commands (C-c c)"
@@ -163,18 +161,6 @@
   "w" #'visual-line-mode)
 
 ;; C-c w is bound to the my/tab-bar-tmenu transient in config-windows.el.
-
-(defvar-keymap my/winner-repeat-map
-  :doc "Repeat map for winner-mode undo/redo."
-  :repeat t
-  "u" #'winner-undo
-  "U" #'winner-redo)
-
-(defvar-keymap my/tab-repeat-map
-  :doc "Repeat map for tab navigation."
-  :repeat t
-  "n" #'tab-next
-  "p" #'tab-previous)
 
 (defvar-keymap my/file-map
   :doc "File commands (C-c f)"
