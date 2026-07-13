@@ -208,16 +208,89 @@ the ace-selected window instead of the default location."
               (lambda () (interactive) (tab-bar-select-tab n)))))
     (seq-take (funcall tab-bar-tabs-function) 9))))
 
+(defun my/split-window-below ()
+  "Split the window below.
+Honors the `--balance' and `--follow' switches of `my/tab-bar-tmenu'."
+  (interactive)
+  (let ((args (transient-args 'my/tab-bar-tmenu))
+        (new (split-window-below)))
+    (when (member "--balance" args) (balance-windows))
+    (when (member "--follow" args) (select-window new))))
+
+(defun my/split-window-right ()
+  "Split the window to the right.
+Honors the `--balance' and `--follow' switches of `my/tab-bar-tmenu'."
+  (interactive)
+  (let ((args (transient-args 'my/tab-bar-tmenu))
+        (new (split-window-right)))
+    (when (member "--balance" args) (balance-windows))
+    (when (member "--follow" args) (select-window new))))
+
+(defun my/rotate-windows (&optional reverse)
+  "Rotate the buffers shown in this frame's windows by one step.
+With REVERSE non-nil (interactively, a prefix argument), rotate the
+other way."
+  (interactive "P")
+  (let ((windows (window-list nil 'no-minibuffer)))
+    (when (cdr windows)
+      (let* ((buffers (mapcar #'window-buffer windows))
+             (shifted (if reverse
+                          (append (last buffers) (butlast buffers))
+                        (append (cdr buffers) (list (car buffers))))))
+        (cl-mapc #'set-window-buffer windows shifted)))))
+
+(defun my/rotate-windows-backward ()
+  "Rotate the buffers shown in this frame's windows one step backward.
+See `my/rotate-windows'."
+  (interactive)
+  (my/rotate-windows t))
+
+(defun my/window-info-line ()
+  "Return a one-line diagnostic summary of the selected window.
+Used as the live, dynamically-updating header of the transient's
+\"Diagnostics\" group — see `my/tab-bar-tmenu'."
+  (let ((win (selected-window)))
+    (format "Buffer: %s  Size: %dx%d  Dedicated: %s  Side: %s"
+            (buffer-name (window-buffer win))
+            (window-width win)
+            (window-height win)
+            (if (window-dedicated-p win) "yes" "no")
+            (or (window-parameter win 'window-side) "no"))))
+
+(defun my/window-info-copy ()
+  "Copy the selected window's diagnostic info to the kill ring.
+See `my/window-info-line'."
+  (interactive)
+  (let ((line (my/window-info-line)))
+    (kill-new line)
+    (message "Copied: %s" line)))
+
 (transient-define-prefix my/tab-bar-tmenu ()
   "Window and tab-bar workspace commands."
+  ["Arguments"
+   ("b" "Balance windows after split" "--balance")
+   ("f" "Select new window after split" "--follow")]
   ["Windows"
-   [("-" "Split below" split-window-below)
-    ("|" "Split right" split-window-right)
-    ("t" "Popup eshell" my/popup-eshell)]
-   [("d" "Delete" delete-window)
-    ("o" "Delete others" delete-other-windows)]
-   [("u" "Winner undo" winner-undo :transient t)
+   [("-" "Split below" my/split-window-below :transient t)
+    ("|" "Split right" my/split-window-right :transient t)
+    ("d" "Delete" delete-window :transient t)
+    ("o" "Delete others" delete-other-windows :transient t)
+    ("0" "Kill buffer & window" kill-buffer-and-window :transient t)]
+   [("<left>"  "Jump left"  windmove-left  :transient t)
+    ("<right>" "Jump right" windmove-right :transient t)
+    ("<up>"    "Jump up"    windmove-up    :transient t)
+    ("<down>"  "Jump down"  windmove-down  :transient t)]
+   [("M-<left>"  "Move left"  windmove-swap-states-left  :transient t)
+    ("M-<right>" "Move right" windmove-swap-states-right :transient t)
+    ("M-<up>"    "Move up"    windmove-swap-states-up    :transient t)
+    ("M-<down>"  "Move down"  windmove-swap-states-down  :transient t)]
+   [("<" "Rotate backward" my/rotate-windows-backward :transient t)
+    (">" "Rotate forward" my/rotate-windows :transient t)
+    ("u" "Winner undo" winner-undo :transient t)
     ("U" "Winner redo" winner-redo :transient t)]]
+  ["Diagnostics"
+   :description my/window-info-line
+   ("i" "Copy window info" my/window-info-copy :transient t)]
   ["Tabs"
    [("N" "New" tab-new)
     ("c" "Close" tab-close)
