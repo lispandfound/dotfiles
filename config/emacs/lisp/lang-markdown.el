@@ -7,5 +7,8 @@
   (markdown-command "multimarkdown")
   (markdown-fontify-code-blocks-natively t))
 
+(use-package edit-indirect
+  :after (markdown-mode))
+
 (provide 'lang-markdown)
 ;;; lang-markdown.el ends here
