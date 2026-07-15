@@ -59,8 +59,10 @@
 ;;; =========================================================================
 
 (use-package puni
-  :defer t
   :hook (prog-mode . puni-mode))
+
+(use-package embrace
+  :bind ("C-," . embrace-commander))
 
 ;;; =========================================================================
 ;;; DRAG-STUFF — move lines or regions up/down with M-up/M-down
