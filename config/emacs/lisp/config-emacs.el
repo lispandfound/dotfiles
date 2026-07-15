@@ -345,15 +345,93 @@ green on success and red on a non-zero exit status."
   (ediff-split-window-function 'split-window-horizontally))
 
 ;;; =========================================================================
-;;; PROCED — process manager with auto-refresh
+;;; PROCED — process manager with transient UI, tree view, and optimizations
 ;;; =========================================================================
+
+(defun my/casual-proced-checkbox (var label)
+  (format "[%s] %s" (if var "X" " ") label))
+
+(transient-define-prefix my/casual-proced-sort-tmenu ()
+  "Sort the Proced process listing."
+  ["Sort by"
+   ("p" "PID"    proced-sort-pid    :transient t)
+   ("c" "CPU%"   proced-sort-pcpu   :transient t)
+   ("m" "Mem%"   proced-sort-pmem   :transient t)
+   ("t" "Time"   proced-sort-time   :transient t)
+   ("u" "User"   proced-sort-user   :transient t)
+   ("s" "Start"  proced-sort-start  :transient t)]
+  [:class transient-row
+   ("C-g" "quit" transient-quit-one)
+   ("q" "Quit"   transient-quit-seq)])
+
+(transient-define-prefix my/casual-proced-tmenu ()
+  "Transient menu for Proced process manager."
+  :refresh-suffixes t
+
+  [:inapt-if-not-derived 'proced-mode
+   ["Signal & Priority"
+    ("k" "Kill (SIGTERM)"  (lambda () (interactive) (proced-send-signal 15)) :transient t)
+    ("K" "Kill (SIGKILL)"  (lambda () (interactive) (proced-send-signal 9))  :transient t)
+    ("i" "Interrupt (SIGINT)" (lambda () (interactive) (proced-send-signal 2)) :transient t)
+    ("s" "Signal…" (lambda () (interactive) (proced-send-signal)) :transient t)
+    ("R" "Renice…" proced-renice :transient t)]
+
+   ["Filter"
+    ("f" "Filter…" proced-filter-interactive
+     :description (lambda () (format "Filter: %s" proced-filter))
+     :transient t)
+    ("F" "Format…" proced-format-interactive
+     :description (lambda () (format "Format: %s" proced-format))
+     :transient t)
+    ("o" "Omit Process" proced-omit-processes :transient t)
+    ("y" "User (mine)"  (lambda () (interactive) (proced-filter 'user)) :transient t)
+    ("a" "All"          (lambda () (interactive) (proced-filter 'all)) :transient t)
+    ("r" "Running"      (lambda () (interactive) (proced-filter 'all-running)) :transient t)
+    ("e" "Emacs"        (lambda () (interactive) (proced-filter 'emacs)) :transient t)]
+
+   ["Tree"
+    ("T" "Toggle Tree" proced-toggle-tree
+     :description (lambda () (my/casual-proced-checkbox proced-tree-flag "Tree"))
+     :transient t)
+    ("C" "Mark Children"   proced-mark-children :transient t)
+    ("P" "Mark Parents"    proced-mark-parents :transient t)]]
+
+  [:inapt-if-not-derived 'proced-mode
+   ["Sort & Mark"
+    ("S" "Sort by›" my/casual-proced-sort-tmenu :transient t)
+    ("m" "Mark"          proced-mark          :transient t)
+    ("u" "Unmark"        proced-unmark        :transient t)
+    ("U" "Unmark All"    proced-unmark-all    :transient t)
+    ("t" "Toggle Marks"  proced-toggle-marks   :transient t)]
+
+   ["Actions"
+    ("g" "Refresh" revert-buffer :transient t)
+    ("A" "Auto-Upd" proced-toggle-auto-update
+     :description (lambda () (my/casual-proced-checkbox proced-auto-update-flag "Auto-Upd"))
+     :transient t)]
+
+   ["Help"
+    ("?" "Proced Help" proced-help)]]
+
+  [:class transient-row
+   ("C-g" "quit" transient-quit-one)
+   ("q" "Quit Proced" quit-window)])
 
 (use-package proced
   :ensure nil
   :custom
   (proced-auto-update-flag t)
-  (proced-auto-update-interval 5)
-  (proced-enable-color-flag t))
+  (proced-auto-update-interval 10)
+  (proced-enable-color-flag t)
+  (proced-show-remote-processes nil)
+  (proced-tree-flag t)
+  (proced-tree-depth 3)
+  (proced-format 'short)
+  (proced-filter 'user)
+  (proced-sort 'pcpu)
+  (proced-descend t)
+  :bind (:map proced-mode-map
+              ("C-o" . my/casual-proced-tmenu)))
 
 ;;; =========================================================================
 ;;; TABULATED-LIST — q quits in any tabulated buffer
