@@ -79,6 +79,40 @@ environment without being added to its own dependencies."
   (setf (alist-get 'python-mode    apheleia-mode-alist) '(ruff-isort ruff))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff)))
 
+;; Compilation navigation for `ruff check' and `ty check'.  Both default to a
+;; Rust-style "full" diagnostic (header line, then " --> file:line:col") and
+;; both accept --output-format concise ("file:line:col: ..."), so each tool
+;; gets a rule for either shape.  The built-in `rustc' rule doesn't cover
+;; them: ruff's header leads with a bare rule code and no severity word, and
+;; ty's codes are names (error[invalid-assignment]), not error[E0123].
+(with-eval-after-load 'compile
+  ;; ruff's text output carries no severity, so everything is an error.
+  ;; ty marks each diagnostic, hence the (WARNING . INFO) type groups.
+  (dolist (rule
+           `((ruff-concise
+              ,(concat "^\\(?1:.+?\\):\\(?2:[0-9]+\\):\\(?3:[0-9]+\\): "
+                       "\\(?:[A-Z]+[0-9]+ \\|invalid-syntax: \\)")
+              1 2 3)
+             (ruff-full
+              ,(concat "^\\(?:[A-Z]+[0-9]+ \\|invalid-syntax: \\).*\n"
+                       " *--> \\(?1:.+?\\):\\(?2:[0-9]+\\):\\(?3:[0-9]+\\)$")
+              1 2 3)
+             (ty-concise
+              ,(concat "^\\(?1:.+?\\):\\(?2:[0-9]+\\):\\(?3:[0-9]+\\): "
+                       "\\(?:error\\|\\(?4:warning\\)\\|\\(?5:info\\)\\)"
+                       "\\[[a-z0-9-]+\\]")
+              1 2 3 (4 . 5))
+             (ty-full
+              ,(concat "^\\(?:error\\|\\(?4:warning\\)\\|\\(?5:info\\)\\)"
+                       "\\[[a-z0-9-]+\\]:.*\n"
+                       " *--> \\(?1:.+?\\):\\(?2:[0-9]+\\):\\(?3:[0-9]+\\)$")
+              1 2 3 (4 . 5))))
+    (setf (alist-get (car rule) compilation-error-regexp-alist-alist)
+          (cdr rule))
+    ;; Prepended so these win over the generic `gnu' rule, which would
+    ;; otherwise claim the concise lines first.
+    (add-to-list 'compilation-error-regexp-alist (car rule))))
+
 (use-package uv-mode
   ;; :demand so `uv-mode-root' is defined before `my/python-shell-setup'
   ;; (hooked onto the same modes, above) ever needs to call it.
