@@ -202,6 +202,8 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 
 (use-package magit-lfs :after magit)
 
+(use-package vc-jj
+  :init (add-to-list 'vc-handled-backends 'JJ))
 
 (use-package git-gutter
   :hook (prog-mode . git-gutter-mode)
