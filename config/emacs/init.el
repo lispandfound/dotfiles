@@ -175,6 +175,7 @@
 (require 'lang-python)
 (require 'lang-rust)
 (require 'lang-sh)
+(require 'lang-typst)
 (require 'lang-yaml)
 
 ;;; =========================================================================
