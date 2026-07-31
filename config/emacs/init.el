@@ -43,9 +43,9 @@
     (let ((load-source-file-function nil)) (load (expand-file-name "elpaca-autoloads" elpaca-directory)))))
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
-
 ;; Install use-package integration and wait for it to be ready.
 (elpaca elpaca-use-package (elpaca-use-package-mode))
+
 (elpaca-wait)
 
 ;;; =========================================================================
@@ -57,11 +57,13 @@
 
 ;; Install compat first — many packages depend on it and will warn if loaded
 ;; outside elpaca's control.
-(use-package compat :ensure t)
+(use-package compat)
 
 ;; Install transient from MELPA before magit and gptel, which both require
 ;; a version newer than what ships with Emacs (>= 0.13).
-(use-package transient :ensure t)
+(use-package transient)
+;; Ditto with project.el
+(use-package project)
 
 (elpaca-wait)
 
