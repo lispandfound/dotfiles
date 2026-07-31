@@ -434,6 +434,172 @@ green on success and red on a non-zero exit status."
               ("C-o" . my/casual-proced-tmenu)))
 
 ;;; =========================================================================
+;;; ARTIST MODE — transient tool palette with a live status header
+;;; =========================================================================
+
+(defvar my/artist-tool-names
+  '((pen-char       . "Pen")
+    (pen-line       . "Pen Line")
+    (line           . "Line")
+    (s-line         . "Straight Line")
+    (rect           . "Rectangle")
+    (square         . "Square")
+    (polyline       . "Poly-line")
+    (spolyline      . "Straight Poly-line")
+    (ellipse        . "Ellipse")
+    (circle         . "Circle")
+    (text-thru      . "Text (see-thru)")
+    (text-ovwrt     . "Text (overwrite)")
+    (spray-can      . "Spray-can")
+    (spray-get-size . "Spray (set radius)")
+    (erase-char     . "Erase Char")
+    (erase-rect     . "Erase Rectangle")
+    (vaporize-line  . "Vaporize Line")
+    (vaporize-lines . "Vaporize Lines")
+    (cut-r          . "Cut Rectangle")
+    (cut-s          . "Cut Square")
+    (copy-r         . "Copy Rectangle")
+    (copy-s         . "Copy Square")
+    (paste          . "Paste")
+    (flood-fill     . "Flood-fill"))
+  "Human-readable names for `artist-curr-go' tool symbols.")
+
+(defun my/artist-tool-name (&optional symbol)
+  "Return a human-readable name for SYMBOL (default `artist-curr-go')."
+  (let ((sym (or symbol artist-curr-go)))
+    (or (alist-get sym my/artist-tool-names) (symbol-name sym))))
+
+(defun my/artist-char-display (char)
+  "Return a display string for the character CHAR."
+  (if (eq char ?\s) "SPC" (char-to-string char)))
+
+(defun my/artist-char-desc (is-set char default)
+  "Return the display string for CHAR if IS-SET, else DEFAULT."
+  (if is-set (my/artist-char-display char) default))
+
+(defun my/artist-status-line ()
+  "Return a one-line diagnostic summary of the artist-mode drawing state.
+Used as the live, dynamically-updating header of the transient's
+\"Status\" group — see `my/artist-tmenu'."
+  (format "Tool: %-20s Fill: %-6s Line: %-6s Erase: %-4s%s%s%s"
+          (my/artist-tool-name)
+          (my/artist-char-desc artist-fill-char-set artist-fill-char "off")
+          (my/artist-char-desc artist-line-char-set artist-line-char "normal")
+          (my/artist-char-display artist-erase-char)
+          (if artist-rubber-banding "  [rubber-band]" "")
+          (if artist-trim-line-endings "  [trim]" "")
+          (if (not artist-borderless-shapes) "  [border]" "")))
+
+(defun my/artist-status-copy ()
+  "Copy the current artist-mode status line to the kill ring.
+See `my/artist-status-line'."
+  (interactive)
+  (let ((line (my/artist-status-line)))
+    (kill-new line)
+    (message "Copied: %s" line)))
+
+(transient-define-prefix my/artist-tmenu ()
+  "Transient tool palette for `artist-mode'.
+Tool-selection suffixes exit the menu once picked (so the next
+click/drag reaches the buffer instead of the popup); character
+setters and toggles stay open for quick successive tweaks."
+  :refresh-suffixes t
+
+  ["Status"
+   :description my/artist-status-line
+   ("i" "Copy status" my/artist-status-copy :transient t)
+   ("C-o" "Select operation…" artist-select-operation)]
+
+  [["Draw"
+    ("1" "Pen" (lambda () (interactive) (artist-select-operation "Pen"))
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'pen-char) "Pen")))
+    ("2" "Pen Line" artist-select-op-pen-line
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'pen-line) "Pen Line")))
+    ("l" "Line" artist-select-op-line
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'line) "Line")))
+    ("L" "Straight Line" artist-select-op-straight-line
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 's-line) "Straight Line")))
+    ("r" "Rectangle" artist-select-op-rectangle
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'rect) "Rectangle")))
+    ("s" "Square" artist-select-op-square
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'square) "Square")))]
+   ["More shapes"
+    ("p" "Poly-line" artist-select-op-poly-line
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'polyline) "Poly-line")))
+    ("P" "Straight Poly-line" artist-select-op-straight-poly-line
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'spolyline) "Straight Poly-line")))
+    ("e" "Ellipse" artist-select-op-ellipse
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'ellipse) "Ellipse")))
+    ("c" "Circle" artist-select-op-circle
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'circle) "Circle")))
+    ("t" "Text (see-thru)" artist-select-op-text-see-thru
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'text-thru) "Text (see-thru)")))
+    ("T" "Text (overwrite)" artist-select-op-text-overwrite
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'text-ovwrt) "Text (overwrite)")))]
+   ["Spray"
+    ("S" "Spray-can" artist-select-op-spray-can
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'spray-can) "Spray-can")))
+    ("z" "Spray radius…" artist-select-op-spray-set-size
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'spray-get-size) "Spray radius…")))
+    ("Z" "Spray chars…" artist-select-spray-chars
+     :description (lambda () (format "Spray chars: %s" (artist-charlist-to-string artist-spray-chars)))
+     :transient t)]]
+
+  [["Erase & vaporize"
+    ("C-d" "Erase char (tool)" artist-select-op-erase-char
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'erase-char) "Erase char")))
+    ("E" "Erase rectangle" artist-select-op-erase-rectangle
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'erase-rect) "Erase rectangle")))
+    ("v" "Vaporize line" artist-select-op-vaporize-line
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'vaporize-line) "Vaporize line")))
+    ("V" "Vaporize lines" artist-select-op-vaporize-lines
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'vaporize-lines) "Vaporize lines")))]
+   ["Cut, copy & paste"
+    ("C-k" "Cut rectangle" artist-select-op-cut-rectangle
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'cut-r) "Cut rectangle")))
+    ("K" "Cut square" artist-select-op-cut-square
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'cut-s) "Cut square")))
+    ("M-w" "Copy rectangle" artist-select-op-copy-rectangle
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'copy-r) "Copy rectangle")))
+    ("W" "Copy square" artist-select-op-copy-square
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'copy-s) "Copy square")))
+    ("C-y" "Paste" artist-select-op-paste
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'paste) "Paste")))
+    ("f" "Flood-fill" artist-select-op-flood-fill
+     :description (lambda () (my/casual-proced-checkbox (eq artist-curr-go 'flood-fill) "Flood-fill")))]]
+
+  [["Characters"
+    ("C-f" "Fill char…" artist-select-fill-char
+     :description (lambda () (format "Fill char: %s" (my/artist-char-desc artist-fill-char-set artist-fill-char "off")))
+     :transient t)
+    ("C-l" "Line char…" artist-select-line-char
+     :description (lambda () (format "Line char: %s" (my/artist-char-desc artist-line-char-set artist-line-char "normal")))
+     :transient t)
+    ("C-e" "Erase char…" artist-select-erase-char
+     :description (lambda () (format "Erase char: %s" (my/artist-char-display artist-erase-char)))
+     :transient t)]
+   ["Settings"
+    ("C-r" "Rubber-banding" artist-toggle-rubber-banding
+     :description (lambda () (my/casual-proced-checkbox artist-rubber-banding "Rubber-banding"))
+     :transient t)
+    ("C-t" "Trim line endings" artist-toggle-trim-line-endings
+     :description (lambda () (my/casual-proced-checkbox artist-trim-line-endings "Trim line endings"))
+     :transient t)
+    ("C-s" "Draw shape borders" artist-toggle-borderless-shapes
+     :description (lambda () (my/casual-proced-checkbox (not artist-borderless-shapes) "Draw shape borders"))
+     :transient t)]]
+
+  [:class transient-row
+   ("?" "Describe artist-mode" (lambda () (interactive) (describe-function 'artist-mode)))
+   ("C-g" "quit" transient-quit-one)
+   ("q" "Quit" transient-quit-one)])
+
+(use-package artist
+  :ensure nil
+  :bind (:map artist-mode-map
+              ("C-o" . my/artist-tmenu)))
+
+;;; =========================================================================
 ;;; TABULATED-LIST — q quits in any tabulated buffer
 ;;; =========================================================================
 
