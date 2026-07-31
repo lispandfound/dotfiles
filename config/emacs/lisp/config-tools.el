@@ -539,7 +539,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
                  (window-height . 0.3)
                  (reusable-frames . visible)))
   (with-eval-after-load 'popper
-    (lambda () (add-to-list 'popper-reference-buffers "^\\*rsync @")))
+    (add-to-list 'popper-reference-buffers "^\\*rsync @"))
   (advice-add 'dired-rsync :after #'my/dired-rsync-pop-to-buffer))
 
 (provide 'config-tools)
