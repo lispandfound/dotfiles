@@ -205,6 +205,9 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
 (use-package vc-jj
   :init (add-to-list 'vc-handled-backends 'JJ))
 
+(use-package majutsu
+  :ensure (:host github :repo "0WD0/majutsu"))
+
 (use-package git-gutter
   :hook (prog-mode . git-gutter-mode)
   :config

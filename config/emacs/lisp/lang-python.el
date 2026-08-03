@@ -76,8 +76,10 @@ environment without being added to its own dependencies."
 
 ;; Apheleia: ruff + ruff-isort for Python files (verbatim from config.el §7).
 (with-eval-after-load 'apheleia
-  (setf (alist-get 'python-mode    apheleia-mode-alist) '(ruff-isort ruff))
-  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff)))
+  (setf (alist-get 'ruff apheleia-formatters) (-concat '("uv" "run") (alist-get 'ruff apheleia-formatters)))
+  (setf (alist-get 'ruff-isort apheleia-formatters) (-concat '("uv" "run") (alist-get 'ruff-isort apheleia-formatters)))
+  (setf (alist-get 'python-mode    apheleia-mode-alist) '(ruff ruff-isort))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff ruff-isort)))
 
 ;; Compilation navigation for `ruff check' and `ty check'.  Both default to a
 ;; Rust-style "full" diagnostic (header line, then " --> file:line:col") and
