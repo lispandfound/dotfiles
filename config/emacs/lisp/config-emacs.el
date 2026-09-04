@@ -250,6 +250,26 @@ green on success and red on a non-zero exit status."
   ;; entries stay as fallbacks for hosts that don't export a useful PATH.
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
+;; Emacs 31's `abbreviate-file-name' resolves a "~" in a tramp filename by
+;; contacting the remote host to learn its home directory.  dashboard calls it
+;; on every bookmark path while rendering the startup buffer, so a remote
+;; bookmark whose host is slow or unreachable (e.g. /rsync:euler:~...) froze
+;; startup in a tramp connection (upstream: emacs-dashboard/dashboard#408, no
+;; fix for bookmarks yet).  Abbreviating a remote path is display-only, so keep
+;; such names verbatim instead of touching the network.  Installed at load
+;; time (not inside the tramp :config above) so it is active before the startup
+;; dashboard renders, whatever order tramp loads in.
+(defun my/abbreviate-file-name-skip-remote (orig &rest args)
+  "Call ORIG on ARGS, but return remote file names unmodified.
+Dashboard abbreviates every bookmark path at startup; abbreviating a
+tramp name would open a connection to learn the remote home directory."
+  (let ((file (car args)))
+    (if (and (stringp file) (file-remote-p file))
+        file
+      (apply orig args))))
+(advice-add 'abbreviate-file-name :around
+            #'my/abbreviate-file-name-skip-remote)
+
 ;;; =========================================================================
 ;;; TRANSIENT — persistent history/values/levels
 ;;; =========================================================================
