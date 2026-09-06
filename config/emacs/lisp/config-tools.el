@@ -547,5 +547,7 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
     (add-to-list 'popper-reference-buffers "^\\*rsync @"))
   (advice-add 'dired-rsync :after #'my/dired-rsync-pop-to-buffer))
 
+(use-package claude-code)
+
 (provide 'config-tools)
 ;;; config-tools.el ends here
