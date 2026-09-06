@@ -88,3 +88,6 @@ if command -v direnv &> /dev/null; then
     eval "$(direnv hook zsh)"
 fi
 alias scipy="uv run --project ~/src/scratchpad/ ipython"
+
+# opencode
+export PATH=/home/jake/.opencode/bin:$PATH

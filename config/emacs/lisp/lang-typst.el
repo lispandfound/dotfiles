@@ -207,5 +207,64 @@ will be exported again."
                    " ")))
     (my/typst--convert command output)))
 
+;;; =========================================================================
+;;; ORG FRAGMENT PREVIEW — native Typst math in Org
+;;; =========================================================================
+
+;; org-typst-preview renders Typst fragments -- `#(...#)' inline, `#[...#]'
+;; display -- through the org-latex-preview interface, so Typst and LaTeX
+;; ($...$) coexist in one Org document.  ox-typst expands the same boundaries
+;; when exporting to Typst.
+
+(use-package org-typst-preview
+  :ensure (:host github :repo "roife/org-typst-preview")
+  :after org
+  :hook (org-mode . org-typst-preview-mode))
+
+(use-package ox-typst
+  :ensure (:host github :repo "jmpunkt/ox-typst")
+  :after org)
+
+;; org-typst-preview-auto-mode only re-renders after edits; it never shows the
+;; source when the cursor steps into a fragment.  Mirror org-fragtog instead:
+;; source on entry, preview on exit.
+;;
+;; The auto-toggle relies on the package's private helpers
+;; `org-typst-preview--fragment-at-point', `org-typst-preview--fragment-at' and
+;; `org-typst-preview--schedule', which may drift across package versions; pin
+;; the :ref in the recipe above if that becomes a problem.
+
+(defvar-local my/typst-fragtog--prev nil
+  "Typst fragment surrounding the cursor before the last command.")
+
+(defun my/typst-fragtog--post-cmd ()
+  "Toggle Typst previews as the cursor enters and exits fragments.
+
+Entering a `#(...#)'/`#[...#]' fragment shows its source; leaving it
+schedules a preview.  The previous fragment is re-parsed at its own
+begin, so fragments edited or deleted while the cursor was elsewhere
+are safely ignored."
+  (when (bound-and-true-p org-typst-preview-mode)
+    (let* ((prev my/typst-fragtog--prev)
+           (curr (org-typst-preview--fragment-at-point)))
+      (setq my/typst-fragtog--prev curr)
+      (unless (equal prev curr)
+        (when prev
+          (when-let* ((f (org-typst-preview--fragment-at
+                          (plist-get prev :begin))))
+            (org-typst-preview--schedule f)))
+        (when curr
+          (org-typst-preview-clear
+           (plist-get curr :begin) (plist-get curr :end)))))))
+
+(define-minor-mode my/typst-fragtog-mode
+  "Auto-toggle Typst fragment previews in Org, like `org-fragtog'."
+  :lighter " Typst≈"
+  (if my/typst-fragtog-mode
+      (add-hook 'post-command-hook #'my/typst-fragtog--post-cmd nil t)
+    (remove-hook 'post-command-hook #'my/typst-fragtog--post-cmd t)))
+
+(add-hook 'org-mode-hook #'my/typst-fragtog-mode)
+
 (provide 'lang-typst)
 ;;; lang-typst.el ends here

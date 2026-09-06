@@ -163,6 +163,7 @@
 (require 'config-emacs)
 (require 'config-checkers)
 (require 'config-tools)
+(require 'config-notes)
 
 ;; Language modules
 (require 'lang-elisp)
