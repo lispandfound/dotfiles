@@ -174,7 +174,8 @@
   "D" #'my/delete-this-file
   "m" #'my/move-this-file
   "y" #'my/yank-buffer-path
-  "Y" #'my/yank-buffer-path-relative)
+  "Y" #'my/yank-buffer-path-relative
+  "l" #'my/yank-claude-ref)
 
 (defvar-keymap my/open-map
   :doc "Open things (C-c o)"
@@ -240,6 +241,31 @@
         (kill-new rel)
         (message "Copied: %s" rel))
     (user-error "Buffer has no file")))
+
+(defun my/yank-claude-ref ()
+  "Copy a Claude Code mention of the current line, e.g. @src/foo.py#L12.
+With an active region, reference its line range instead (@src/foo.py#L12-20).
+The path is relative to the project root."
+  (interactive)
+  (unless buffer-file-name (user-error "Buffer has no file"))
+  (let* ((proj  (project-current))
+         (root  (if proj (project-root proj) default-directory))
+         (rel   (file-relative-name buffer-file-name root))
+         (start (line-number-at-pos (if (use-region-p) (region-beginning) (point))))
+         ;; A region ending at column 0 doesn't include that line.
+         (end   (if (use-region-p)
+                    (line-number-at-pos
+                     (save-excursion (goto-char (region-end))
+                                     (if (and (bolp) (> (point) (region-beginning)))
+                                         (1- (point))
+                                       (point))))
+                  start))
+         (ref   (if (= start end)
+                    (format "@%s#L%d" rel start)
+                  (format "@%s#L%d-%d" rel start end))))
+    (kill-new ref)
+    (deactivate-mark)
+    (message "Copied: %s" ref)))
 
 ;; upcase-variable macro (SPC c u → C-c c u)
 (defalias 'upcase-variable (kmacro "C-= = C-x C-u"))
