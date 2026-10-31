@@ -22,7 +22,8 @@
          (typst-ts-mode . visual-line-mode))
   :custom
   (typst-ts-mode-enable-raw-blocks-highlight t)
-  (typst-ts-watch-options "--open")
+  ;; A list: typst-ts-watch splices it into `start-process' with `apply'.
+  (typst-ts-watch-options '("--open"))
   :config
   (add-to-list 'eglot-server-programs
                '((typst-ts-mode) . ("tinymist" "lsp")))
@@ -44,7 +45,10 @@
 
   (keymap-set typst-ts-mode-map "C-c C-c" #'typst-ts-tmenu)
   (keymap-set typst-ts-mode-map "C-c C-e" #'my/typst-export-latex)
-  (keymap-set typst-ts-mode-map "C-c C-i" #'my/typst-import-latex))
+  (keymap-set typst-ts-mode-map "C-c C-i" #'my/typst-import-latex)
+  ;; Citations; see config-bib.el.
+  (keymap-set typst-ts-mode-map "C-c [" #'citar-insert-citation)
+  (keymap-set typst-ts-mode-map "C-c ]" #'my/bib-openalex-lookup))
 
 ;;; =========================================================================
 ;;; FORMATTING — typstyle via apheleia

@@ -164,6 +164,7 @@
 (require 'config-checkers)
 (require 'config-tools)
 (require 'config-notes)
+(require 'config-bib)
 
 ;; Language modules
 (require 'lang-elisp)
