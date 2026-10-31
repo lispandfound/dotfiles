@@ -243,19 +243,29 @@ will be exported again."
 Entering a `#(...#)'/`#[...#]' fragment shows its source; leaving it
 schedules a preview.  The previous fragment is re-parsed at its own
 begin, so fragments edited or deleted while the cursor was elsewhere
-are safely ignored."
-  (when (bound-and-true-p org-typst-preview-mode)
-    (let* ((prev my/typst-fragtog--prev)
-           (curr (org-typst-preview--fragment-at-point)))
-      (setq my/typst-fragtog--prev curr)
-      (unless (equal prev curr)
-        (when prev
-          (when-let* ((f (org-typst-preview--fragment-at
-                          (plist-get prev :begin))))
-            (org-typst-preview--schedule f)))
-        (when curr
-          (org-typst-preview-clear
-           (plist-get curr :begin) (plist-get curr :end)))))))
+are safely ignored.
+
+Fragments are compared by begin position only: typing inside a fragment
+changes its body but not where it starts, so edits never re-trigger a
+compile on every keystroke (which otherwise spammed transient
+\"Typst preview failed\" errors mid-formula).  Whole bodies are not
+compared, so the overlay's edit-hooks alone reveal the source while
+typing.  Errors are swallowed so a malformed note never breaks the
+post-command hook."
+  (ignore-errors
+    (when (bound-and-true-p org-typst-preview-mode)
+      (let* ((prev my/typst-fragtog--prev)
+             (curr (org-typst-preview--fragment-at-point))
+             (prev-begin (and prev (plist-get prev :begin)))
+             (curr-begin (and curr (plist-get curr :begin))))
+        (setq my/typst-fragtog--prev curr)
+        (unless (eql prev-begin curr-begin)
+          (when prev
+            (when-let* ((f (and prev-begin
+                                (org-typst-preview--fragment-at prev-begin))))
+              (org-typst-preview--schedule f)))
+          (when curr
+            (org-typst-preview-clear curr-begin (plist-get curr :end))))))))
 
 (define-minor-mode my/typst-fragtog-mode
   "Auto-toggle Typst fragment previews in Org, like `org-fragtog'."
