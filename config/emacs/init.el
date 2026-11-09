@@ -161,6 +161,7 @@
 (require 'config-completion)
 (require 'config-editor)
 (require 'config-emacs)
+(require 'config-env)
 (require 'config-checkers)
 (require 'config-tools)
 (require 'config-notes)

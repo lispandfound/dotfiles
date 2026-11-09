@@ -251,13 +251,6 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
               ("l" . git-link)))
 
 ;;; =========================================================================
-;;; ENVRC — direnv integration (replaces :tools direnv)
-;;; =========================================================================
-
-(use-package envrc
-  :hook (eplaca-after-init . envrc-global-mode))
-
-;;; =========================================================================
 ;;; DOCKER
 ;;; =========================================================================
 
