@@ -61,6 +61,21 @@
   (setf (alist-get 'typst-ts-mode apheleia-mode-alist) 'typstyle))
 
 ;;; =========================================================================
+;;; PROSE LINT — house-style checks via flymake
+;;; =========================================================================
+
+;; prose-lint.el lives inside the (private) lispandfound/prose-review repo,
+;; hence ssh and :files, as with cylc-mode in config-tools.el.  The linter
+;; itself is a uv tool on PATH:
+;;   uv tool install git+ssh://git@github.com/lispandfound/prose-review@v0.1.1
+;; It reads the nearest .prose-review.toml, so per-paper rule tuning applies.
+;; `just lint' gives the same findings in a compilation buffer.
+(use-package prose-lint
+  :ensure (:host github :repo "lispandfound/prose-review" :protocol ssh
+                 :files ("src/prose_review/assets/emacs/prose-lint.el"))
+  :hook (typst-ts-mode . prose-lint-setup-flymake))
+
+;;; =========================================================================
 ;;; COMPILATION NAVIGATION
 ;;; =========================================================================
 
