@@ -91,3 +91,4 @@ alias scipy="uv run --project ~/src/scratchpad/ ipython"
 
 # opencode
 export PATH=/home/jake/.opencode/bin:$PATH
+alias nix='noglob nix'

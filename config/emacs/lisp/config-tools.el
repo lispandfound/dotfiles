@@ -251,13 +251,6 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
               ("l" . git-link)))
 
 ;;; =========================================================================
-;;; ENVRC — direnv integration (replaces :tools direnv)
-;;; =========================================================================
-
-(use-package envrc
-  :hook (eplaca-after-init . envrc-global-mode))
-
-;;; =========================================================================
 ;;; DOCKER
 ;;; =========================================================================
 
@@ -546,6 +539,8 @@ skipped.  Session-level decisions are honoured.  Otherwise prompts:
   (with-eval-after-load 'popper
     (add-to-list 'popper-reference-buffers "^\\*rsync @"))
   (advice-add 'dired-rsync :after #'my/dired-rsync-pop-to-buffer))
+
+(use-package claude-code)
 
 (provide 'config-tools)
 ;;; config-tools.el ends here

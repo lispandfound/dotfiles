@@ -8,12 +8,55 @@ project-local uv environment (see `my/python-uv-project-root')."
   :type 'directory
   :group 'python)
 
+(defun my/python-venv-project ()
+  "Return the nearest directory above this buffer holding a uv `.venv'.
+Searches from the visited file rather than `default-directory', which
+envrc temporarily rebinds to the .envrc directory while it applies an
+environment (see `my/python--venv-after-envrc')."
+  (locate-dominating-file (or buffer-file-name default-directory) ".venv"))
+
 (defun my/python-uv-project-root ()
   "Return the uv project directory to use for this buffer's REPL.
-Uses the buffer's own uv project when `uv-mode-root' finds a `.venv',
+Uses the buffer's own uv project when one with a `.venv' encloses it,
 otherwise falls back to `my/python-scratchpad-dir'."
   (directory-file-name
-   (expand-file-name (or (uv-mode-root) my/python-scratchpad-dir))))
+   (expand-file-name (or (my/python-venv-project) my/python-scratchpad-dir))))
+
+(defun my/python-venv-activate ()
+  "Activate the enclosing uv project's `.venv' for this buffer only.
+Sets VIRTUAL_ENV and puts the venv's bin/ first on PATH and
+`exec-path', buffer-locally and on top of whatever environment envrc
+applied, so a project's direnv toolchain and its venv compose and
+nothing leaks into other buffers.  VIRTUAL_ENV is what lets ty (via
+rass) find the venv when it lives below the eglot project root, as in
+a monorepo's analysis/ directory."
+  (when-let* ((project (my/python-venv-project))
+              (venv (directory-file-name (expand-file-name ".venv" project)))
+              (bin (expand-file-name "bin" venv))
+              ((file-directory-p bin))
+              ((not (equal (getenv "VIRTUAL_ENV") venv))))
+    ;; Build the new value under a `let' (setenv works on whatever is bound),
+    ;; then install it buffer-locally once the `let' has unwound -- setting it
+    ;; inside would only assign the temporary binding.
+    (let ((env (let ((process-environment (copy-sequence process-environment)))
+                 (setenv "VIRTUAL_ENV" venv)
+                 (setenv "PATH" (concat bin path-separator (getenv "PATH")))
+                 process-environment)))
+      (setq-local process-environment env))
+    (setq-local exec-path (cons bin exec-path))))
+
+;; envrc resets `process-environment' and `exec-path' whenever it (re)applies
+;; a direnv environment -- once just after the major-mode hooks run, and again
+;; on `envrc-reload' -- so the venv is layered back on top each time.
+(defun my/python--venv-after-envrc (buf &rest _)
+  "Re-activate the uv venv in BUF after envrc has applied its environment."
+  (when (buffer-live-p buf)
+    (with-current-buffer buf
+      (when (derived-mode-p 'python-base-mode)
+        (my/python-venv-activate)))))
+
+(with-eval-after-load 'envrc
+  (advice-add 'envrc--apply :after #'my/python--venv-after-envrc))
 
 (defun my/python-shell-setup ()
   "Point `run-python' at `uv run', preferring ipython.
@@ -36,7 +79,8 @@ environment without being added to its own dependencies."
 (use-package python
   :ensure nil
   :hook
-  ((python-ts-mode . eglot-ensure)
+  ((python-base-mode . my/python-venv-activate)
+   (python-ts-mode . eglot-ensure)
    (python-mode    . eglot-ensure)
    (python-ts-mode . my/python-shell-setup)
    (python-mode    . my/python-shell-setup)
@@ -115,11 +159,9 @@ environment without being added to its own dependencies."
     ;; otherwise claim the concise lines first.
     (add-to-list 'compilation-error-regexp-alist (car rule))))
 
-(use-package uv-mode
-  ;; :demand so `uv-mode-root' is defined before `my/python-shell-setup'
-  ;; (hooked onto the same modes, above) ever needs to call it.
-  :demand t
-  :hook ((python-mode python-ts-mode) . uv-mode-auto-activate-hook))
+;; uv-mode is deliberately not used: it activates a venv by mutating the
+;; *global* PATH, VIRTUAL_ENV and `exec-path', leaking one project's venv into
+;; every other buffer and fighting envrc.  See `my/python-venv-activate'.
 
 ;; uv.el — transient interface to the uv CLI (add/remove/sync/lock/run/...).
 ;; Complements uv-mode, which only handles venv activation.
